@@ -5,7 +5,7 @@
 ## Login   <karraz_s@epitech.net>
 ## 
 ## Started on  Mon Oct 10 23:14:47 2016 stephane karraz
-## Last update Mon Oct 10 23:18:20 2016 stephane karraz
+## Last update Tue Oct 11 00:00:02 2016 stephane karraz
 ##
 
 NAME	= Gomoku
@@ -19,6 +19,8 @@ $(NAME)	:
 
 clean	:
 	rm -f $(NAME)
+
+fclean	: clean
 
 re	: clean all
 
