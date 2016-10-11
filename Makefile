@@ -5,8 +5,10 @@
 ## Login   <karraz_s@epitech.net>
 ## 
 ## Started on  Mon Oct 10 23:14:47 2016 stephane karraz
-## Last update Tue Oct 11 00:30:51 2016 stephane karraz
+## Last update Tue Oct 11 12:01:21 2016 stephane karraz
 ##
+
+export GOPATH=$(shell pwd)
 
 NAME	= Gomoku
 
@@ -14,7 +16,12 @@ SRC	= main.go
 
 all	: $(NAME)
 
-$(NAME)	: build
+lib	:
+	go get github.com/gtalent/starfish/gfx
+	go get github.com/gtalent/starfish/input
+
+
+$(NAME)	: lib build
 
 build:
 	go build -o $(NAME) $(SRC)
