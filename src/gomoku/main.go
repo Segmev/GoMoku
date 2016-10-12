@@ -45,15 +45,17 @@ func main() {
 
 	input.AddMousePressFunc(func(e input.MouseEvent) {
 		fmt.Println("Mouse Press!")
-		fmt.Println(e.X, e.Y)
-		pane.St = true
+		fmt.Println(e.X, e.Y, e.Button)
+		if e.Button == 1 {
+			pane.AddStone(e.X, e.Y, true)
+		} else {
+			pane.AddStone(e.X, e.Y, false)
+		}
 	})
 
 	input.AddMouseReleaseFunc(func(e input.MouseEvent) {
 		fmt.Println("Mouse Release!")
 		fmt.Println(e.X, e.Y)
-		pane.St = false
-
 	})
 	gfx.Main()
 }

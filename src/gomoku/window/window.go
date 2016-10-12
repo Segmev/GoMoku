@@ -6,15 +6,29 @@ import (
 	"github.com/gtalent/starfish/gfx"
 )
 
-type Drawer struct {
-	board *gfx.Image
-	text *gfx.Text
-	black_stone *gfx.Image
-	white_stone *gfx.Image
-	anim *gfx.Animation
-	St   bool
+type Stone struct {
+	x int
+	y int
+	white bool
 }
 
+type Drawer struct {
+	board		*gfx.Image
+	text		*gfx.Text
+	black_stone	*gfx.Image
+	white_stone	*gfx.Image
+	anim		*gfx.Animation
+	St		bool
+	Stones		[]*Stone
+}
+
+func (me *Drawer) AddStone(x, y int, white bool) bool {
+	stone := new(Stone)
+	stone.x, stone.y, stone.white = x, y, white
+	me.Stones = append(me.Stones, stone)
+	fmt.Println("Added!")
+	return true
+}
 
 func (me *Drawer) Init() bool {
 	me.board = gfx.LoadImageSize("ressources/board.png", gfx.DisplayHeight(), gfx.DisplayHeight())
@@ -31,6 +45,7 @@ func (me *Drawer) Init() bool {
 		fmt.Println("Could not load LiberationSans-Bold.ttf.")
 		return false
 	}
+	me.Stones = []*Stone{}
 	return true
 }
 
@@ -84,7 +99,14 @@ func (me *Drawer) Draw(c *gfx.Canvas) {
 		// c.DrawImage(me.white_stone, 9 * gfx.DisplayHeight() / 50 , gfx.DisplayHeight() / 50)
 		// c.DrawImage(me.white_stone, 13 * gfx.DisplayHeight() / 50 , gfx.DisplayHeight() / 50)
 		// c.DrawImage(me.white_stone, 20 * gfx.DisplayHeight() / 50 , gfx.DisplayHeight() / 50)
-		
+
+		for i := range(me.Stones) {
+			if me.Stones[i].white == false {
+				c.DrawImage(me.white_stone, me.Stones[i].x, me.Stones[i].y)
+			} else {
+				c.DrawImage(me.black_stone, me.Stones[i].x, me.Stones[i].y)
+			}
+		}
 	}
 	c.PopViewport()
 }
