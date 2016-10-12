@@ -8,12 +8,22 @@ import (
 	"github.com/gtalent/starfish/gfx"
 )
 
+// func exists(path string) (bool) {
+//     _, err := os.Stat(path)
+//     if err == nil { return true }
+//     if os.IsNotExist(err) { return false }
+//     return true
+// }
+
+
+// func putPion(
+
 func main() {
 	if !gfx.OpenDisplay(800, 600, false) {
 		return
 	}
 
-	gfx.SetDisplayTitle("Gomoku")
+	gfx.SetDisplayTitle("GoMoku")
 
 	var pane window.Drawer
 	if pane.Init() {
