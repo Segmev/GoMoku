@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"gomoku/window"
+	"gomoku/arbitre"
 	"github.com/gtalent/starfish/input"
 	"github.com/gtalent/starfish/gfx"
 )
@@ -37,7 +38,7 @@ func main() {
 	input.AddQuitFunc(quit)
 
 	input.AddKeyPressFunc(func(e input.KeyEvent) {
-		fmt.Println("Key Press!")
+		fmt.Println("Key Press! ", e.Key)
 		if e.Key == input.Key_Escape {
 			quit()
 		}
@@ -46,16 +47,27 @@ func main() {
 	input.AddMousePressFunc(func(e input.MouseEvent) {
 		fmt.Println("Mouse Press!")
 		fmt.Println(e.X, e.Y, e.Button)
-		if e.Button == 1 {
-			pane.AddStone(e.X, e.Y, true)
-		} else {
-			pane.AddStone(e.X, e.Y, false)
+		if e.Button == 1 || e.Button == 3 {
+			st := arbitre.IsStoneHere(&pane, e.X, e.Y, gfx.DisplayWidth() / 55)
+			if st  != nil {
+				if e.Button == 1 {
+					st.White = true
+				} else {
+					st.White = false
+				}
+				arbitre.AppearStone(&pane, e.X, e.Y, gfx.DisplayWidth() / 55)
+			}
 		}
+		// if e.Button == 1 {
+		// 	pane.AddStone(e.X, e.Y, true)
+		// } else {
+		// 	pane.AddStone(e.X, e.Y, false)
+		// }
 	})
 
-	input.AddMouseReleaseFunc(func(e input.MouseEvent) {
-		fmt.Println("Mouse Release!")
-		fmt.Println(e.X, e.Y)
-	})
+	// input.AddMouseReleaseFunc(func(e input.MouseEvent) {
+	// 	fmt.Println("Mouse Release!")
+	// 	fmt.Println(e.X, e.Y)
+	// })
 	gfx.Main()
 }

@@ -6,10 +6,12 @@ import (
 	"github.com/gtalent/starfish/gfx"
 )
 
+
 type Stone struct {
-	x int
-	y int
-	white bool
+	X int
+	Y int
+	Visible bool
+	White bool
 }
 
 type Drawer struct {
@@ -24,7 +26,7 @@ type Drawer struct {
 
 func (me *Drawer) AddStone(x, y int, white bool) bool {
 	stone := new(Stone)
-	stone.x, stone.y, stone.white = x, y, white
+	stone.X, stone.Y, stone.White = x, y, white
 	me.Stones = append(me.Stones, stone)
 	fmt.Println("Added!")
 	return true
@@ -46,6 +48,18 @@ func (me *Drawer) Init() bool {
 		return false
 	}
 	me.Stones = []*Stone{}
+	for j := 0; j <= 18; j++ {
+		for i := 0; i <= 18; i++ {
+			// c.DrawImage(me.white_stone,
+			// 	gfx.DisplayHeight() / 88 + i * (gfx.DisplayHeight() / 19),
+			// 	gfx.DisplayHeight() / 88 + j * (gfx.DisplayHeight() / 19))
+			stone := new(Stone)
+			stone.X = gfx.DisplayHeight() / 88 + i * (gfx.DisplayHeight() / 19)
+			stone.Y = gfx.DisplayHeight() / 88 + j * (gfx.DisplayHeight() / 19)
+			stone.White, stone.Visible = true, false
+			me.Stones = append(me.Stones, stone)
+		}
+	}
 	return true
 }
 
@@ -58,53 +72,14 @@ func (me *Drawer) Draw(c *gfx.Canvas) {
 	c.PushViewport(0, 0, gfx.DisplayWidth(), gfx.DisplayWidth())
 	{
 		c.DrawImage(me.board, 0, 0)
-		c.DrawImage(me.black_stone, gfx.DisplayHeight() / 88, gfx.DisplayHeight() / 88)
-		c.DrawImage(me.white_stone, gfx.DisplayHeight() / 88 + 1 * (gfx.DisplayHeight() / 19),
-			gfx.DisplayHeight() / 88)
-		c.DrawImage(me.white_stone, gfx.DisplayHeight() / 88 + 2 * (gfx.DisplayHeight() / 19),
-			gfx.DisplayHeight() / 88)
-		c.DrawImage(me.white_stone, gfx.DisplayHeight() / 88 + 3 * (gfx.DisplayHeight() / 19),
-			gfx.DisplayHeight() / 88)
-		c.DrawImage(me.white_stone, gfx.DisplayHeight() / 88 + 4 * (gfx.DisplayHeight() / 19),
-			gfx.DisplayHeight() / 88)
-		c.DrawImage(me.white_stone, gfx.DisplayHeight() / 88 + 5 * (gfx.DisplayHeight() / 19),
-			gfx.DisplayHeight() / 88)
-		c.DrawImage(me.white_stone, gfx.DisplayHeight() / 88 + 6 * (gfx.DisplayHeight() / 19),
-			gfx.DisplayHeight() / 88)
-		c.DrawImage(me.white_stone, gfx.DisplayHeight() / 88 + 7 * (gfx.DisplayHeight() / 19),
-			gfx.DisplayHeight() / 88)
-		c.DrawImage(me.white_stone, gfx.DisplayHeight() / 88 + 8 * (gfx.DisplayHeight() / 19),
-			gfx.DisplayHeight() / 88)
-		c.DrawImage(me.white_stone, gfx.DisplayHeight() / 88 + 9 * (gfx.DisplayHeight() / 19),
-			gfx.DisplayHeight() / 88)
-		c.DrawImage(me.white_stone, gfx.DisplayHeight() / 88 + 10 * (gfx.DisplayHeight() / 19),
-			gfx.DisplayHeight() / 88)
-		c.DrawImage(me.white_stone, gfx.DisplayHeight() / 88 + 11 * (gfx.DisplayHeight() / 19),
-			gfx.DisplayHeight() / 88)
-		c.DrawImage(me.white_stone, gfx.DisplayHeight() / 88 + 12 * (gfx.DisplayHeight() / 19),
-			gfx.DisplayHeight() / 88)
-		c.DrawImage(me.white_stone, gfx.DisplayHeight() / 88 + 13 * (gfx.DisplayHeight() / 19),
-			gfx.DisplayHeight() / 88)
-		c.DrawImage(me.white_stone, gfx.DisplayHeight() / 88 + 14 * (gfx.DisplayHeight() / 19),
-			gfx.DisplayHeight() / 88)
-		c.DrawImage(me.white_stone, gfx.DisplayHeight() / 88 + 15 * (gfx.DisplayHeight() / 19),
-			gfx.DisplayHeight() / 88)
-		c.DrawImage(me.white_stone, gfx.DisplayHeight() / 88 + 16 * (gfx.DisplayHeight() / 19),
-			gfx.DisplayHeight() / 88)
-		c.DrawImage(me.white_stone, gfx.DisplayHeight() / 88 + 17 * (gfx.DisplayHeight() / 19),
-			gfx.DisplayHeight() / 88)
-		c.DrawImage(me.white_stone, gfx.DisplayHeight() / 88 + 18 * (gfx.DisplayHeight() / 19),
-			gfx.DisplayHeight() / 88)
-		// c.DrawImage(me.white_stone, 5 * gfx.DisplayHeight() / 50 , gfx.DisplayHeight() / 50)
-		// c.DrawImage(me.white_stone, 9 * gfx.DisplayHeight() / 50 , gfx.DisplayHeight() / 50)
-		// c.DrawImage(me.white_stone, 13 * gfx.DisplayHeight() / 50 , gfx.DisplayHeight() / 50)
-		// c.DrawImage(me.white_stone, 20 * gfx.DisplayHeight() / 50 , gfx.DisplayHeight() / 50)
 
 		for i := range(me.Stones) {
-			if me.Stones[i].white == false {
-				c.DrawImage(me.white_stone, me.Stones[i].x, me.Stones[i].y)
-			} else {
-				c.DrawImage(me.black_stone, me.Stones[i].x, me.Stones[i].y)
+			if me.Stones[i].Visible {
+				if me.Stones[i].White == true {
+					c.DrawImage(me.white_stone, me.Stones[i].X, me.Stones[i].Y)
+				} else {
+					c.DrawImage(me.black_stone, me.Stones[i].X, me.Stones[i].Y)
+				}
 			}
 		}
 	}
