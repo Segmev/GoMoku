@@ -16,9 +16,6 @@ import (
 //     return true
 // }
 
-
-// func putPion(
-
 func main() {
 	if !gfx.OpenDisplay(800, 600, false) {
 		return
