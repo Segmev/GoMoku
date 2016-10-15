@@ -4,6 +4,9 @@ import (
 	"gomoku/window"
 	//	"strings"
 	// "fmt"
+	"strconv"
+	"github.com/gtalent/starfish/gfx"
+	"os"
 )
 
 type	Player struct {
@@ -13,8 +16,7 @@ type	Player struct {
 }
 
 type	GomokuGame struct {
-	Player1	Player
-	Player2	Player
+	Players	[2]Player
 	Turn	bool
 	End	bool
 }
@@ -43,10 +45,13 @@ func	CheckAlignement(dat *window.Drawer, stone *window.Stone, i, j, ite int, del
 	return false
 }
 
-func	TakeTwoStones(dat *window.Drawer, stone *window.Stone) {
+func	TakeTwoStones(dat *window.Drawer, game *GomokuGame, stone *window.Stone) {
 	for i := -1; i <= 1; i++ {
 		for j := -1; j <= 1; j++ {
-			CheckAlignement(dat, stone, i, j, 0, true)
+			if CheckAlignement(dat, stone, i, j, 0, true) {
+				if stone.White { game.Players[0].Points += 2
+				} else { game.Players[1].Points += 2 }
+			}
 		}
 	}
 }
@@ -77,10 +82,16 @@ func	GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 		st := IsStoneHere(pane, x, y, size)
 		if st != nil && !st.Visible {
 			st.White = game.Turn
-			TakeTwoStones(pane, st)
+			TakeTwoStones(pane, game, st)
 			AppearStone(pane, x, y, size)
 			game.Turn = !game.Turn
-//			fmt.Println(st.Ipos, st.Jpos)
 		}
+	} else {
+		gfx.CloseDisplay()
+		os.Exit(0)
+
 	}
+	if game.Players[0].Points < 10 && game.Players[1].Points < 10 { game.End = true }
+	pane.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
+	pane.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
 }
