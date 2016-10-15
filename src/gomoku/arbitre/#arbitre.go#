@@ -26,14 +26,14 @@ func	IsStoneAtPos(dat *window.Drawer, i, j int) bool {
 	return false
 }
 
-func	CheckAlignement(dat *window.Drawer, stone *window.Stone, i, j, ite int, del bool) bool {
+func	checkAlignementForRemove(dat *window.Drawer, stone *window.Stone, i, j, ite int, delete bool) bool {
 	if IsStoneAtPos(dat, stone.Ipos + i, stone.Jpos + j) {
 		if ite < 2 && dat.Stones[stone.Ipos + i][stone.Jpos + j].White != stone.White {
 			iniI, iniJ := i, j
 			if i > 0 { i++ } else if i < 0 { i-- }
 			if j > 0 { j++ } else if j < 0 { j-- }
-			if CheckAlignement(dat, stone, i, j, ite + 1, del) {
-				if del { dat.Stones[stone.Ipos + iniI][stone.Jpos + iniJ].Visible = false }
+			if checkAlignementForRemove(dat, stone, i, j, ite + 1) {
+				dat.Stones[stone.Ipos + iniI][stone.Jpos + iniJ].Visible = false
 				return true
 			}
 		} else if ite == 2 && dat.Stones[stone.Ipos + i][stone.Jpos + j].White == stone.White {
@@ -46,7 +46,7 @@ func	CheckAlignement(dat *window.Drawer, stone *window.Stone, i, j, ite int, del
 func	TakeTwoStones(dat *window.Drawer, stone *window.Stone) {
 	for i := -1; i <= 1; i++ {
 		for j := -1; j <= 1; j++ {
-			CheckAlignement(dat, stone, i, j, 0, true)
+			checkAlignementForRemove(dat, stone, i, j, 0)
 		}
 	}
 }
