@@ -37,8 +37,8 @@ func addInput(pane *window.Drawer, game *arbitre.GomokuGame) {
 		}
 	})
 	input.AddMousePressFunc(func(e input.MouseEvent) {
-		fmt.Println("Mouse Press!")
-		fmt.Println(e.X, e.Y, e.Button)
+		// fmt.Println("Mouse Press!")
+		// fmt.Println(e.X, e.Y, e.Button)
 		if e.Button == 1  {
 			arbitre.GamePlay(pane, game, e.X, e.Y, gfx.DisplayWidth() / 55)
 		}
