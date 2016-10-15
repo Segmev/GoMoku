@@ -24,7 +24,7 @@ func checkFiles() bool {
 	return true
 }
 
-func addInput(pane *window.Drawer) {
+func addInput(pane *window.Drawer, game *arbitre.GomokuGame) {
 	quit := func() {
 		gfx.CloseDisplay()
 		os.Exit(0)
@@ -39,16 +39,8 @@ func addInput(pane *window.Drawer) {
 	input.AddMousePressFunc(func(e input.MouseEvent) {
 		fmt.Println("Mouse Press!")
 		fmt.Println(e.X, e.Y, e.Button)
-		if e.Button == 1 || e.Button == 3 {
-			st := arbitre.IsStoneHere(pane, e.X, e.Y, gfx.DisplayWidth() / 55)
-			if st  != nil {
-				if e.Button == 1 {
-					st.White = true
-				} else {
-					st.White = false
-				}
-				arbitre.AppearStone(pane, e.X, e.Y, gfx.DisplayWidth() / 55)
-			}
+		if e.Button == 1  {
+			arbitre.GamePlay(pane, game, e.X, e.Y, gfx.DisplayWidth() / 55)
 		}
 	})
 }
@@ -57,19 +49,20 @@ func launchWindow(h, w int) bool {
 	if !gfx.OpenDisplay(h, w, false) {
 		return false
 	}
-
 	gfx.SetDisplayTitle("GoMoku")
-
+	
 	var pane window.Drawer
 	if pane.Init() {
 		gfx.AddDrawer(&pane)
 	}
-	addInput(&pane)
+	var game arbitre.GomokuGame
+	game.End = false
+	addInput(&pane, &game)
 	return true
 }
 
 func main() {
-	if checkFiles() && launchWindow(1400, 900) {
+	if checkFiles() && launchWindow(800, 600) {
 		gfx.Main()
 	} else {
 		os.Stderr.WriteString("Couldn't launch the game\n")

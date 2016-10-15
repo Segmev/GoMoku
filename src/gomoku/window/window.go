@@ -2,8 +2,9 @@ package window
 
 import (
 //	"os"
-	"fmt"
+//	"fmt"
 	"github.com/gtalent/starfish/gfx"
+	"strconv"
 )
 
 
@@ -17,19 +18,14 @@ type Stone struct {
 type Drawer struct {
 	board		*gfx.Image
 	text		*gfx.Text
+	wscore		*gfx.Text
+	bscore		*gfx.Text
 	black_stone	*gfx.Image
 	white_stone	*gfx.Image
 	anim		*gfx.Animation
 	St		bool
 	Stones		[]*Stone
-}
-
-func (me *Drawer) AddStone(x, y int, white bool) bool {
-	stone := new(Stone)
-	stone.X, stone.Y, stone.White = x, y, white
-	me.Stones = append(me.Stones, stone)
-	fmt.Println("Added!")
-	return true
+	font		*gfx.Font
 }
 
 func (me *Drawer) Init() bool {
@@ -38,21 +34,12 @@ func (me *Drawer) Init() bool {
 		gfx.DisplayHeight() / 20)
 	me.white_stone = gfx.LoadImageSize("ressources/wstone.png", gfx.DisplayHeight() / 20,
 		gfx.DisplayHeight() / 20)
-	font := gfx.LoadFont("ressources/LiberationSans-Bold.ttf", 26)
-	defer font.Free()
-	if font != nil {
-		font.SetRGB(100, 100, 255)
-		me.text = font.Write("GoMoku")
-	} else {
-		fmt.Println("Could not load LiberationSans-Bold.ttf.")
-		return false
-	}
+	me.font = gfx.LoadFont("ressources/LiberationSans-Bold.ttf", 26)
+	me.font.SetRGB(100, 100, 255)
+	me.text = me.font.Write("GoMoku")
 	me.Stones = []*Stone{}
 	for j := 0; j <= 18; j++ {
 		for i := 0; i <= 18; i++ {
-			// c.DrawImage(me.white_stone,
-			// 	gfx.DisplayHeight() / 88 + i * (gfx.DisplayHeight() / 19),
-			// 	gfx.DisplayHeight() / 88 + j * (gfx.DisplayHeight() / 19))
 			stone := new(Stone)
 			stone.X = gfx.DisplayHeight() / 88 + i * (gfx.DisplayHeight() / 19)
 			stone.Y = gfx.DisplayHeight() / 88 + j * (gfx.DisplayHeight() / 19)
@@ -67,12 +54,18 @@ func (me *Drawer) Draw(c *gfx.Canvas) {
 	//clear screen
 	c.SetRGB(55, 55, 55)
 	c.FillRect(0, 0, gfx.DisplayWidth(), gfx.DisplayHeight())
+	me.font.SetRGB(100, 100, 255)
 	c.DrawText(me.text, gfx.DisplayWidth() * 3 / 4, 0)
+	me.font.SetRGB(255, 255, 0)
+	me.wscore = me.font.Write(strconv.Itoa(3))
+	me.bscore = me.font.Write(strconv.Itoa(2))
+	c.DrawText(me.wscore, gfx.DisplayWidth() * 3 / 4, 20)
+	c.DrawText(me.bscore, gfx.DisplayWidth() * 4 / 5, 20)
 
 	c.PushViewport(0, 0, gfx.DisplayWidth(), gfx.DisplayWidth())
 	{
 		c.DrawImage(me.board, 0, 0)
-
+		
 		for i := range(me.Stones) {
 			if me.Stones[i].Visible {
 				if me.Stones[i].White == true {
