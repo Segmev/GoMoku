@@ -138,4 +138,5 @@ func	GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 	if game.Players[0].Points >= 10 || game.Players[1].Points >= 10 { game.End = 2 }
 	pane.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
 	pane.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
+	pane.Turn = game.Turn
 }

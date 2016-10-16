@@ -24,12 +24,14 @@ type Drawer struct {
 	score		*gfx.Text
 	Wscore		*gfx.Text
 	Bscore		*gfx.Text
+	mturn		*gfx.Text
 	black_stone	*gfx.Image
 	white_stone	*gfx.Image
 	anim		*gfx.Animation
 	St		bool
 	Stones		[][]*Stone
 	Font		*gfx.Font
+	Turn		bool
 }
 
 func (me *Drawer) Init() bool {
@@ -39,11 +41,12 @@ func (me *Drawer) Init() bool {
 		gfx.DisplayHeight() / 20)
 	me.white_stone = gfx.LoadImageSize("ressources/wstone.png", gfx.DisplayHeight() / 20,
 		gfx.DisplayHeight() / 20)
-	//	me.Font = gfx.LoadFont("ressources/LiberationSans-Bold.ttf", 26)
 	me.Font = gfx.LoadFont("ressources/MotionControl-Bold.otf", 46)
 	me.Font.SetRGB(25, 25, 25)
 	me.title = me.Font.Write("GoMoku")
-	me.score = me.Font.Write("Score")
+	me.score = me.Font.Write("Taken")
+	me.mturn = me.Font.Write("Turn")
+	me.Stones = nil
 	for i := 0; i <= 18; i++ {
 		row := []*Stone{}
 		for j := 0; j <= 18; j++ {
@@ -64,14 +67,21 @@ func (me *Drawer) Init() bool {
 func (me *Drawer) Draw(c *gfx.Canvas) {
 	c.SetRGB(255,255,255)
 	c.FillRect(0, 0, gfx.DisplayWidth(), gfx.DisplayHeight())
-//	me.Font.SetRGB(100, 100, 255)
 	c.DrawImage(me.backgrnd, gfx.DisplayWidth() / 2, 0)
+	
 	c.DrawText(me.title, gfx.DisplayWidth() * 4 / 5, 0)
-	c.DrawText(me.score, gfx.DisplayWidth() * 3 / 4, gfx.DisplayHeight() / 2 - 40)
-	c.DrawImage(me.black_stone, gfx.DisplayWidth() * 3 / 4 + 25, gfx.DisplayHeight() / 2 + 8)
-	c.DrawText(me.Wscore, gfx.DisplayWidth() * 3 / 4, gfx.DisplayHeight() / 2)
-	c.DrawImage(me.white_stone, gfx.DisplayWidth() * 8 / 9 + 25, gfx.DisplayHeight() / 2 + 8)
-	c.DrawText(me.Bscore, gfx.DisplayWidth() * 8 / 9, gfx.DisplayHeight() / 2)
+	c.DrawText(me.mturn, gfx.DisplayWidth() * 3 / 4, gfx.DisplayHeight() / 4)
+	if me.Turn {
+		c.DrawImage(me.white_stone, gfx.DisplayWidth() * 5 / 6, gfx.DisplayHeight() / 4 + 10)
+	} else {
+		c.DrawImage(me.black_stone, gfx.DisplayWidth() * 5 / 6, gfx.DisplayHeight() / 4 + 10)
+	}
+	c.DrawText(me.score, gfx.DisplayWidth() * 3 / 4, 4 * gfx.DisplayHeight() / 10)
+	c.DrawImage(me.black_stone, gfx.DisplayWidth() * 10 / 13, 5 * gfx.DisplayHeight() / 11 + 8)
+	c.DrawText(me.Wscore, gfx.DisplayWidth() * 5 / 6, 5 * gfx.DisplayHeight() / 11)
+	c.DrawImage(me.white_stone, gfx.DisplayWidth() * 10 / 13, 6 * gfx.DisplayHeight() / 11 + 8)
+	c.DrawText(me.Bscore, gfx.DisplayWidth() * 5 / 6, 6 * gfx.DisplayHeight() / 11)
+
 	c.PushViewport(0, 0, gfx.DisplayWidth(), gfx.DisplayWidth())
 	{
 		c.DrawImage(me.board, 0, 0)
