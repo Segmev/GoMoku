@@ -3,7 +3,7 @@ package arbitre
 import (
 	"gomoku/window"
 	//	"strings"
-	// "fmt"
+//	"fmt"
 	"strconv"
 	"github.com/gtalent/starfish/gfx"
 	"os"
@@ -17,8 +17,8 @@ type	Player struct {
 
 type	GomokuGame struct {
 	Players	[2]Player
-	Turn	bool
-	End	bool
+	Turn		bool
+	End		int
 }
 
 func	IsStoneAtPos(dat *window.Drawer, i, j int) bool {
@@ -53,29 +53,36 @@ func	CheckAlignement(dat *window.Drawer, stone *window.Stone, i, j, lim, ite int
 	return false
 }
 
-func	TakeTwoStones(dat *window.Drawer, game *GomokuGame, stone *window.Stone) {
+func	TakeTwoStones(dat *window.Drawer, game *GomokuGame, stone *window.Stone) bool {
+	hap := false
 	for i := -1; i <= 1; i++ {
 		for j := -1; j <= 1; j++ {
 			if CheckAlignement(dat, stone, i, j, 2, 0, true) {
 				if stone.White { game.Players[0].Points += 2
 				} else { game.Players[1].Points += 2 }
+				hap = true
 			}
 		}
 	}
+	return hap
 }
 
-
-func	CheckWinAlignment(dat *window.Drawer, game *GomokuGame, stone *window.Stone) bool {
-	for i := -1; i <= 1; i++ {
-		for j := -1; j <= 1; j++ {
-			if CheckAlignement(dat, stone, i, j, 3, 0, false) {
-				return true
+func	CheckWinAlignment(dat *window.Drawer, game *GomokuGame, color bool) bool {
+	for x := range(dat.Stones) {
+		for y := range(dat.Stones[x]) {
+			for i := -1; i <= 1; i++ {
+				for j := -1; j <= 1; j++ {
+					if !(i == 0 && j == 0) &&
+						dat.Stones[x][y].White == color &&
+						CheckAlignement(dat, dat.Stones[x][y], i, j, 3, 0, false) {
+						return true
+					}
+				}
 			}
 		}
 	}
 	return false
 }
-
 
 func	AppearStone(dat *window.Drawer, x, y, size int) bool {
 	stone := IsStoneHere(dat, x, y, size)
@@ -99,20 +106,33 @@ func	IsStoneHere(dat *window.Drawer, x, y, size int) *window.Stone {
 }
 
 func	GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
-	if !game.End {
+	if game.End != 2 {
 		st := IsStoneHere(pane, x, y, size)
 		if st != nil && !st.Visible {
 			st.White = game.Turn
-			TakeTwoStones(pane, game, st)
-			if CheckWinAlignment(pane, game, st) { game.End = true }
+			if TakeTwoStones(pane, game, st) {
+				if game.End == 1 {
+					t := CheckWinAlignment(pane, game, !game.Turn)
+					if !t {
+						game.End = 0
+					}
+				}
+				
+			}
 			AppearStone(pane, x, y, size)
+			if CheckWinAlignment(pane, game, game.Turn) {
+				game.End = 1
+			} else if game.End == 1 {
+				game.End = 2
+			}
 			game.Turn = !game.Turn
 		}
-	} else {
+	}
+	if game.End == 2 {
 		gfx.CloseDisplay()
 		os.Exit(0)
 	}
-	if game.Players[0].Points >= 10 || game.Players[1].Points >= 10 { game.End = true }
+	if game.Players[0].Points >= 10 || game.Players[1].Points >= 10 { game.End = 2 }
 	pane.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
 	pane.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
 }

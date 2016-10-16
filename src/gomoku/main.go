@@ -56,7 +56,7 @@ func launchWindow(h, w int) bool {
 		gfx.AddDrawer(&pane)
 	}
 	var game arbitre.GomokuGame
-	game.End = false
+	game.End = 0
 	addInput(&pane, &game)
 	return true
 }
@@ -66,6 +66,5 @@ func main() {
 		gfx.Main()
 	} else {
 		os.Stderr.WriteString("Couldn't launch the game\n")
-	}
-	
+	}	
 }
