@@ -3,7 +3,7 @@ package arbitre
 import (
 	"gomoku/window"
 	//	"strings"
-	// "fmt"
+	"fmt"
 	"strconv"
 	"github.com/gtalent/starfish/gfx"
 	"os"
@@ -67,16 +67,15 @@ func	TakeTwoStones(dat *window.Drawer, game *GomokuGame, stone *window.Stone) bo
 	}
 	return hap
 }
-
+*
 func	CheckWinAlignment(dat *window.Drawer, game *GomokuGame, color bool) bool {
 	for x := range(dat.Stones) {
 		for y := range(dat.Stones[x]) {
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
 					if !(i == 0 && j == 0) &&
-						dat.Stones[x][y].Visible &&
 						dat.Stones[x][y].White == color &&
-						CheckAlignement(dat, dat.Stones[x][y], i, j, 3, 0, false) {
+						CheckAlignement(dat, dat.Stones[x][y], i, j, 4, 0, false) {
 						return true
 					}
 				}
@@ -118,6 +117,7 @@ func	GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 					if !t {
 						game.End = 0
 					}
+					fmt.Println(game.End)
 				}				
 			}
 			AppearStone(pane, x, y, size)

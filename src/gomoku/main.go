@@ -62,7 +62,7 @@ func launchWindow(h, w int) bool {
 }
 
 func main() {
-	if checkFiles() && launchWindow(800, 600) {
+	if checkFiles() && launchWindow(900, 640) {
 		gfx.Main()
 	} else {
 		os.Stderr.WriteString("Couldn't launch the game\n")
