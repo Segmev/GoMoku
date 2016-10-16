@@ -28,17 +28,25 @@ func	IsStoneAtPos(dat *window.Drawer, i, j int) bool {
 	return false
 }
 
-func	CheckAlignement(dat *window.Drawer, stone *window.Stone, i, j, ite int, del bool) bool {
+func	CheckAlignement(dat *window.Drawer, stone *window.Stone, i, j, lim, ite int, del bool) bool {
 	if IsStoneAtPos(dat, stone.Ipos + i, stone.Jpos + j) {
-		if ite < 2 && dat.Stones[stone.Ipos + i][stone.Jpos + j].White != stone.White {
+		if del && ite < lim && dat.Stones[stone.Ipos + i][stone.Jpos + j].White != stone.White {
 			iniI, iniJ := i, j
 			if i > 0 { i++ } else if i < 0 { i-- }
 			if j > 0 { j++ } else if j < 0 { j-- }
-			if CheckAlignement(dat, stone, i, j, ite + 1, del) {
+			if CheckAlignement(dat, stone, i, j, lim, ite + 1, del) {
 				if del { dat.Stones[stone.Ipos + iniI][stone.Jpos + iniJ].Visible = false }
 				return true
 			}
-		} else if ite == 2 && dat.Stones[stone.Ipos + i][stone.Jpos + j].White == stone.White {
+		} else if !del && ite < lim && dat.Stones[stone.Ipos + i][stone.Jpos + j].White == stone.White {
+			iniI, iniJ := i, j
+			if i > 0 { i++ } else if i < 0 { i-- }
+			if j > 0 { j++ } else if j < 0 { j-- }
+			if CheckAlignement(dat, stone, i, j, lim, ite + 1, del) {
+				if del { dat.Stones[stone.Ipos + iniI][stone.Jpos + iniJ].Visible = false }
+				return true
+			}
+		} else if ite == lim && dat.Stones[stone.Ipos + i][stone.Jpos + j].White == stone.White {
 			return true
 		}
 	}
@@ -48,13 +56,26 @@ func	CheckAlignement(dat *window.Drawer, stone *window.Stone, i, j, ite int, del
 func	TakeTwoStones(dat *window.Drawer, game *GomokuGame, stone *window.Stone) {
 	for i := -1; i <= 1; i++ {
 		for j := -1; j <= 1; j++ {
-			if CheckAlignement(dat, stone, i, j, 0, true) {
+			if CheckAlignement(dat, stone, i, j, 2, 0, true) {
 				if stone.White { game.Players[0].Points += 2
 				} else { game.Players[1].Points += 2 }
 			}
 		}
 	}
 }
+
+
+func	CheckWinAlignment(dat *window.Drawer, game *GomokuGame, stone *window.Stone) bool {
+	for i := -1; i <= 1; i++ {
+		for j := -1; j <= 1; j++ {
+			if CheckAlignement(dat, stone, i, j, 3, 0, false) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 
 func	AppearStone(dat *window.Drawer, x, y, size int) bool {
 	stone := IsStoneHere(dat, x, y, size)
@@ -83,15 +104,15 @@ func	GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 		if st != nil && !st.Visible {
 			st.White = game.Turn
 			TakeTwoStones(pane, game, st)
+			if CheckWinAlignment(pane, game, st) { game.End = true }
 			AppearStone(pane, x, y, size)
 			game.Turn = !game.Turn
 		}
 	} else {
 		gfx.CloseDisplay()
 		os.Exit(0)
-
 	}
-	if game.Players[0].Points < 10 && game.Players[1].Points < 10 { game.End = true }
+	if game.Players[0].Points >= 10 || game.Players[1].Points >= 10 { game.End = true }
 	pane.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
 	pane.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
 }
