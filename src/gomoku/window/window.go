@@ -64,7 +64,7 @@ func (me *Drawer) Init() bool {
 func (me *Drawer) Draw(c *gfx.Canvas) {
 	c.SetRGB(255,255,255)
 	c.FillRect(0, 0, gfx.DisplayWidth(), gfx.DisplayHeight())
-	me.Font.SetRGB(100, 100, 255)
+//	me.Font.SetRGB(100, 100, 255)
 	c.DrawImage(me.backgrnd, gfx.DisplayWidth() / 2, 0)
 	c.DrawText(me.title, gfx.DisplayWidth() * 4 / 5, 0)
 	c.DrawText(me.score, gfx.DisplayWidth() * 3 / 4, gfx.DisplayHeight() / 2 - 40)
