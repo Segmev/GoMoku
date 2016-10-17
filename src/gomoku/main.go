@@ -44,9 +44,32 @@ func addInput(pane *window.Drawer, game *arbitre.GomokuGame) {
 		// fmt.Println("Mouse Press!")
 		// fmt.Println(e.X, e.Y, e.Button)
 		if e.Button == 1  {
-			arbitre.GamePlay(pane, game, e.X, e.Y, gfx.DisplayWidth() / 55)
+			if pane.GameState == "gameOne" {
+				arbitre.GamePlay(pane, game, e.X, e.Y, gfx.DisplayWidth() / 55)
+			}
 		}
 	})
+	input.AddMouseReleaseFunc(func(e input.MouseEvent) {
+		if pane.GameState == "menu" {
+	// 			c.FillRect(4 * gfx.DisplayWidth() / 14, gfx.DisplayHeight() * 4 / 10,
+	// 	8 * gfx.DisplayWidth() / 18, gfx.DisplayHeight() / 10)
+	// c.SetRGB(200,200,200)
+	// c.FillRect(4 * gfx.DisplayWidth() / 14, gfx.DisplayHeight() * 5 / 10,
+	// 	8 * gfx.DisplayWidth() / 18, gfx.DisplayHeight() / 10)
+
+			if e.X >= 4 * gfx.DisplayWidth() / 14 && e.X <= 4 * gfx.DisplayWidth() / 14 +
+				8 * gfx.DisplayWidth() / 18 {
+				if gfx.DisplayHeight() * 4 / 10 <= e.Y && e.Y <= gfx.DisplayHeight() * 4 / 10 +
+					gfx.DisplayHeight() / 11 {
+					pane.GameState = "gameOn"
+				} else if gfx.DisplayHeight() * 5 / 10 <= e.Y && e.Y <= gfx.DisplayHeight() *
+					5 / 10 + gfx.DisplayHeight() / 11 {
+					pane.GameState = "gameOn"
+				}
+			}
+		}
+	})
+
 }
 
 func launchWindow(h, w int) bool {
@@ -61,7 +84,7 @@ func launchWindow(h, w int) bool {
 	}
 	var game arbitre.GomokuGame
 	game.End = 0
-	pane.GameState = "gameOn"
+	pane.GameState = "menu"
 	addInput(&pane, &game)
 	return true
 }

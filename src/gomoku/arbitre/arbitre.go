@@ -23,41 +23,42 @@ type	GomokuGame struct {
 }
 
 func	(game *GomokuGame) Restart(pane *window.Drawer) bool {
-	for i := range(pane.Stones) {
-		for j := range(pane.Stones[i]) {
-			pane.Stones[i][j].Visible = false
+	for i := range(pane.Board_res.Stones) {
+		for j := range(pane.Board_res.Stones[i]) {
+			pane.Board_res.Stones[i][j].Visible = false
 		}
 	}
 	game.Players[0].Points, game.Players[1].Points = 0, 0
-	pane.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
-	pane.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
+	pane.Board_res.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
+	pane.Board_res.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
 	return true
 }
 
 func	IsStoneAtPos(dat *window.Drawer, i, j int) bool {
 	if i >= 0 && i <= 18 && j >= 0 && j <= 18 {
-		return dat.Stones[i][j].Visible
+		return dat.Board_res.Stones[i][j].Visible
 	}
 	return false
 }
 
 func	CheckAlignement(dat *window.Drawer, stone *window.Stone, i, j, lim, ite int, del bool) bool {
 	if IsStoneAtPos(dat, stone.Ipos + i, stone.Jpos + j) {
-		if del && ite < lim && dat.Stones[stone.Ipos + i][stone.Jpos + j].White != stone.White {
+		if del && ite < lim && dat.Board_res.Stones[stone.Ipos + i][stone.Jpos + j].White != stone.White {
 			iniI, iniJ := i, j
 			if i > 0 { i++ } else if i < 0 { i-- }
 			if j > 0 { j++ } else if j < 0 { j-- }
 			if CheckAlignement(dat, stone, i, j, lim, ite + 1, del) {
-				if del { dat.Stones[stone.Ipos + iniI][stone.Jpos + iniJ].Visible = false }
+				if del { dat.Board_res.Stones[stone.Ipos + iniI][stone.Jpos + iniJ].Visible = false }
 				return true
 			}
-		} else if !del && ite < lim && dat.Stones[stone.Ipos + i][stone.Jpos + j].White == stone.White {
+		} else if !del && ite < lim && dat.Board_res.Stones[stone.Ipos + i][stone.Jpos + j].White ==
+			stone.White {
 			if i > 0 { i++ } else if i < 0 { i-- }
 			if j > 0 { j++ } else if j < 0 { j-- }
 			if CheckAlignement(dat, stone, i, j, lim, ite + 1, del) {
 				return true
 			}
-		} else if ite == lim && dat.Stones[stone.Ipos + i][stone.Jpos + j].White == stone.White {
+		} else if ite == lim && dat.Board_res.Stones[stone.Ipos + i][stone.Jpos + j].White == stone.White {
 			return true
 		}
 	}
@@ -82,14 +83,14 @@ func	TakeTwoStones(dat *window.Drawer, game *GomokuGame, stone *window.Stone) bo
 }
 
 func	CheckWinAlignment(dat *window.Drawer, game *GomokuGame, color bool) bool {
-	for x := range(dat.Stones) {
-		for y := range(dat.Stones[x]) {
+	for x := range(dat.Board_res.Stones) {
+		for y := range(dat.Board_res.Stones[x]) {
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
 					if !(i == 0 && j == 0) &&
-						dat.Stones[x][y].Visible &&
-						dat.Stones[x][y].White == color &&
-						CheckAlignement(dat, dat.Stones[x][y], i, j, 3, 0, false) {
+						dat.Board_res.Stones[x][y].Visible &&
+						dat.Board_res.Stones[x][y].White == color &&
+						CheckAlignement(dat, dat.Board_res.Stones[x][y], i, j, 3, 0, false) {
 						return true
 					}
 				}
@@ -109,11 +110,11 @@ func	AppearStone(dat *window.Drawer, x, y, size int) bool {
 }
 
 func	IsStoneHere(dat *window.Drawer, x, y, size int) *window.Stone {
-	for i := range(dat.Stones) {
-		for j := range(dat.Stones[i]) {
-			if x >= dat.Stones[i][j].X && x <= dat.Stones[i][j].X + size * 2 &&
-				y >= dat.Stones[i][j].Y && y <= dat.Stones[i][j].Y + size * 2 {
-				return dat.Stones[i][j]
+	for i := range(dat.Board_res.Stones) {
+		for j := range(dat.Board_res.Stones[i]) {
+			if x >= dat.Board_res.Stones[i][j].X && x <= dat.Board_res.Stones[i][j].X + size * 2 &&
+				y >= dat.Board_res.Stones[i][j].Y && y <= dat.Board_res.Stones[i][j].Y + size * 2 {
+				return dat.Board_res.Stones[i][j]
 			}
 		}
 	}
@@ -149,7 +150,7 @@ func	GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 	}
 	
 	if game.Players[0].Points >= 10 || game.Players[1].Points >= 10 { game.End = 2 }
-	pane.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
-	pane.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
+	pane.Board_res.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
+	pane.Board_res.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
 	pane.Turn = game.Turn
 }
