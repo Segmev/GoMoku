@@ -44,7 +44,7 @@ func addInput(pane *window.Drawer, game *arbitre.GomokuGame) {
 		// fmt.Println("Mouse Press!")
 		// fmt.Println(e.X, e.Y, e.Button)
 		if e.Button == 1  {
-			if pane.GameState == "gameOne" {
+			if pane.GameState == "gameOn" {
 				arbitre.GamePlay(pane, game, e.X, e.Y, gfx.DisplayWidth() / 55)
 			}
 		}
