@@ -21,6 +21,18 @@ type	GomokuGame struct {
 	End		int
 }
 
+func	(game *GomokuGame) Restart(pane *window.Drawer) bool {
+	for i := range(pane.Stones) {
+		for j := range(pane.Stones[i]) {
+			pane.Stones[i][j].Visible = false
+		}
+	}
+	game.Players[0].Points, game.Players[1].Points = 0, 0
+	pane.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
+	pane.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
+	return true
+}
+
 func	IsStoneAtPos(dat *window.Drawer, i, j int) bool {
 	if i >= 0 && i <= 18 && j >= 0 && j <= 18 {
 		return dat.Stones[i][j].Visible

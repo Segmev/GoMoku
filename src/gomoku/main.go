@@ -36,6 +36,9 @@ func addInput(pane *window.Drawer, game *arbitre.GomokuGame) {
 		if e.Key == input.Key_Escape {
 			quit()
 		}
+		if e.Key == input.Key_r {
+			game.Restart(pane)
+		}
 	})
 	input.AddMousePressFunc(func(e input.MouseEvent) {
 		// fmt.Println("Mouse Press!")
