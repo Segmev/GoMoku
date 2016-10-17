@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"gomoku/window"
 	"gomoku/arbitre"
@@ -32,7 +31,7 @@ func addInput(pane *window.Drawer, game *arbitre.GomokuGame) {
 	}
 	input.AddQuitFunc(quit)
 	input.AddKeyPressFunc(func(e input.KeyEvent) {
-		fmt.Println("Key Press! ", e.Key)
+
 		if e.Key == input.Key_Escape {
 			quit()
 		}
@@ -67,8 +66,15 @@ func addInput(pane *window.Drawer, game *arbitre.GomokuGame) {
 					pane.GameState = "gameOn"
 				}
 			}
+		} else if pane.GameState == "gameOn" {
+			if 10 * gfx.DisplayWidth() / 14 <= e.X && gfx.DisplayHeight() * 10 / 11 <= e.Y {
+				game.Restart(pane)
+				pane.GameState = "menu"
+			}
 		}
 	})
+	// c.FillRect(10 * gfx.DisplayWidth() / 14, gfx.DisplayHeight() * 10 / 11,
+	// 	8 * gfx.DisplayWidth() / 18, gfx.DisplayHeight() / 11)
 
 }
 

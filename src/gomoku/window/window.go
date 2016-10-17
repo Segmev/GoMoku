@@ -26,6 +26,7 @@ type BoardRes struct {
 	board		*gfx.Image
 	Wscore		*gfx.Text
 	Bscore		*gfx.Text
+	Restart		*gfx.Text
 	St		bool
 	Stones		[][]*Stone	
 }
@@ -73,6 +74,7 @@ func (me *Drawer) initGame() bool {
 	}
 	me.Board_res.Wscore = me.Font.Write(strconv.Itoa(0))
 	me.Board_res.Bscore = me.Font.Write(strconv.Itoa(0))
+	me.Board_res.Restart = me.Font.Write("Restart game")
 	return true
 }
 
@@ -94,15 +96,15 @@ func (me *Drawer) drawGameBoard(c *gfx.Canvas) {
 	c.DrawText(me.title, gfx.DisplayWidth() * 4 / 5, 0)
 	c.DrawText(me.mturn, gfx.DisplayWidth() * 3 / 4, gfx.DisplayHeight() / 4)
 	if me.Turn {
-		c.DrawImage(me.white_stone, gfx.DisplayWidth() * 5 / 6, gfx.DisplayHeight() / 4 + 10)
+		c.DrawImage(me.white_stone, gfx.DisplayWidth() * 6 / 7, gfx.DisplayHeight() / 4 + 10)
 	} else {
-		c.DrawImage(me.black_stone, gfx.DisplayWidth() * 5 / 6, gfx.DisplayHeight() / 4 + 10)
+		c.DrawImage(me.black_stone, gfx.DisplayWidth() * 6 / 7, gfx.DisplayHeight() / 4 + 10)
 	}
 	c.DrawText(me.score, gfx.DisplayWidth() * 3 / 4, 4 * gfx.DisplayHeight() / 10)
-	c.DrawImage(me.black_stone, gfx.DisplayWidth() * 10 / 13, 5 * gfx.DisplayHeight() / 11 + 8)
-	c.DrawText(me.Board_res.Wscore, gfx.DisplayWidth() * 5 / 6, 5 * gfx.DisplayHeight() / 11)
-	c.DrawImage(me.white_stone, gfx.DisplayWidth() * 10 / 13, 6 * gfx.DisplayHeight() / 11 + 8)
-	c.DrawText(me.Board_res.Bscore, gfx.DisplayWidth() * 5 / 6, 6 * gfx.DisplayHeight() / 11)
+	c.DrawImage(me.black_stone, gfx.DisplayWidth() * 10 / 13, 6 * gfx.DisplayHeight() / 12 + 8)
+	c.DrawText(me.Board_res.Wscore, gfx.DisplayWidth() * 5 / 6, 6 * gfx.DisplayHeight() / 12)
+	c.DrawImage(me.white_stone, gfx.DisplayWidth() * 10 / 13, 7 * gfx.DisplayHeight() / 12 + 8)
+	c.DrawText(me.Board_res.Bscore, gfx.DisplayWidth() * 5 / 6, 7 * gfx.DisplayHeight() / 12)
 
 	c.PushViewport(0, 0, gfx.DisplayWidth(), gfx.DisplayWidth())
 	{
@@ -123,16 +125,20 @@ func (me *Drawer) drawGameBoard(c *gfx.Canvas) {
 		}
 	}
 	c.PopViewport()
+	c.SetRGB(133,94,66)
+	c.FillRect(10 * gfx.DisplayWidth() / 14, gfx.DisplayHeight() * 10 / 11,
+		8 * gfx.DisplayWidth() / 18, gfx.DisplayHeight() / 11)
+	c.DrawText(me.Board_res.Restart, 14 * gfx.DisplayWidth() / 19, gfx.DisplayHeight() * 11 / 12)
+
 }
 
 func (me *Drawer) drawMenu(c *gfx.Canvas) {
 	c.DrawText(me.title, 5 * gfx.DisplayWidth() / 12, gfx.DisplayHeight() * 1 / 10)
-	c.SetRGB(200,200,200)
-	c.FillRect(4 * gfx.DisplayWidth() / 14, gfx.DisplayHeight() * 4 / 10,
-		8 * gfx.DisplayWidth() / 18, gfx.DisplayHeight() / 11)
-	c.SetRGB(200,200,200)
-	c.FillRect(4 * gfx.DisplayWidth() / 14, gfx.DisplayHeight() * 5 / 10,
-		8 * gfx.DisplayWidth() / 18, gfx.DisplayHeight() / 11)
+	c.SetRGB(133,94,66)
+	c.FillRoundedRect(4 * gfx.DisplayWidth() / 14, gfx.DisplayHeight() * 4 / 10,
+		8 * gfx.DisplayWidth() / 18, gfx.DisplayHeight() / 11, 10)
+	c.FillRoundedRect(4 * gfx.DisplayWidth() / 14, gfx.DisplayHeight() * 5 / 10,
+		8 * gfx.DisplayWidth() / 18, gfx.DisplayHeight() / 11, 10)
 	c.DrawText(me.Menu_res.solo, 6 * gfx.DisplayWidth() / 20, gfx.DisplayHeight() * 4 / 10)
 	c.DrawText(me.Menu_res.duo, 6 * gfx.DisplayWidth() / 19, gfx.DisplayHeight() * 5 / 10)
 	c.DrawText(me.quitGame, 6 * gfx.DisplayWidth() / 22, gfx.DisplayHeight() * 9 / 10)
