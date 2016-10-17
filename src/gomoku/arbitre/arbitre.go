@@ -19,6 +19,7 @@ type	GomokuGame struct {
 	Players	[2]Player
 	Turn		bool
 	End		int
+	GameType	bool
 }
 
 func	(game *GomokuGame) Restart(pane *window.Drawer) bool {

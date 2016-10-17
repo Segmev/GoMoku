@@ -32,11 +32,12 @@ type Drawer struct {
 	Stones		[][]*Stone
 	Font		*gfx.Font
 	Turn		bool
+	GameState	string
 }
 
 func (me *Drawer) Init() bool {
 	me.board = gfx.LoadImageSize("ressources/board.png", gfx.DisplayHeight(), gfx.DisplayHeight())
-	me.backgrnd = gfx.LoadImageSize("ressources/woodback.jpg", gfx.DisplayHeight(), gfx.DisplayHeight())
+	me.backgrnd = gfx.LoadImageSize("ressources/woodback.jpg", gfx.DisplayWidth(), gfx.DisplayHeight())
 	me.black_stone = gfx.LoadImageSize("ressources/bstone.png", gfx.DisplayHeight() / 20,
 		gfx.DisplayHeight() / 20)
 	me.white_stone = gfx.LoadImageSize("ressources/wstone.png", gfx.DisplayHeight() / 20,
@@ -64,12 +65,7 @@ func (me *Drawer) Init() bool {
 	return true
 }
 
-func (me *Drawer) Draw(c *gfx.Canvas) {
-	c.SetRGB(255,255,255)
-	c.FillRect(0, 0, gfx.DisplayWidth(), gfx.DisplayHeight())
-	c.DrawImage(me.backgrnd, gfx.DisplayWidth() / 2, 0)
-	
-	c.DrawText(me.title, gfx.DisplayWidth() * 4 / 5, 0)
+func (me *Drawer) drawGameBoard(c *gfx.Canvas) {
 	c.DrawText(me.mturn, gfx.DisplayWidth() * 3 / 4, gfx.DisplayHeight() / 4)
 	if me.Turn {
 		c.DrawImage(me.white_stone, gfx.DisplayWidth() * 5 / 6, gfx.DisplayHeight() / 4 + 10)
@@ -99,4 +95,19 @@ func (me *Drawer) Draw(c *gfx.Canvas) {
 		}
 	}
 	c.PopViewport()
+
+}
+
+func (me *Drawer) Draw(c *gfx.Canvas) {
+	c.SetRGB(255,255,255)
+	c.FillRect(0, 0, gfx.DisplayWidth(), gfx.DisplayHeight())
+	c.DrawImage(me.backgrnd, gfx.DisplayWidth() * 0, 0)
+	
+	c.DrawText(me.title, gfx.DisplayWidth() * 4 / 5, 0)
+	// if me.GameState == "menu" {
+	// 	me.drawMenu(c)
+	// }
+	if me.GameState == "gameOn" {
+		me.drawGameBoard(c)
+	}
 }

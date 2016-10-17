@@ -17,9 +17,9 @@ func exists(path string) (bool) {
 }
 
 func checkFiles() bool {
-	if !exists("ressources/board.png") || !exists("ressources/bstone.png") ||
-		!exists("ressources/woodback.jpg") ||
-		!exists("ressources/wstone.png") || !exists("ressources/MotionControl-Bold.otf") {
+	if !exists("ressources/board.png")         || !exists("ressources/bstone.png") ||
+		!exists("ressources/woodback.jpg") || !exists("ressources/MotionControl-Bold.otf") ||
+		!exists("ressources/wstone.png") {
 		return false
 	}
 	return true
@@ -61,6 +61,7 @@ func launchWindow(h, w int) bool {
 	}
 	var game arbitre.GomokuGame
 	game.End = 0
+	pane.GameState = "gameOn"
 	addInput(&pane, &game)
 	return true
 }
@@ -70,5 +71,5 @@ func main() {
 		gfx.Main()
 	} else {
 		os.Stderr.WriteString("Couldn't launch the game\n")
-	}	
+	}
 }
