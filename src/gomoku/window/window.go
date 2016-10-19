@@ -9,8 +9,7 @@ import (
 
 
 type Stone struct {
-	X	int
-	Y	int
+	X,Y	int
 	Ipos	int
 	Jpos	int
 	Visible	bool

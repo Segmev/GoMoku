@@ -11,14 +11,14 @@ import (
 
 type	Player struct {
 	Name	string
-	Points	int
-	
+	Points	int	
 }
 
 type	GomokuGame struct {
 	Players	[2]Player
 	Turn		bool
 	End		int
+	WinnerColor	bool
 	GameType	bool
 }
 
@@ -112,13 +112,26 @@ func	AppearStone(dat *window.Drawer, x, y, size int) bool {
 func	IsStoneHere(dat *window.Drawer, x, y, size int) *window.Stone {
 	for i := range(dat.Board_res.Stones) {
 		for j := range(dat.Board_res.Stones[i]) {
-			if x >= dat.Board_res.Stones[i][j].X && x <= dat.Board_res.Stones[i][j].X + size * 2 &&
-				y >= dat.Board_res.Stones[i][j].Y && y <= dat.Board_res.Stones[i][j].Y + size * 2 {
+			if x >= dat.Board_res.Stones[i][j].X &&
+				x <= dat.Board_res.Stones[i][j].X + size * 2 &&
+				y >= dat.Board_res.Stones[i][j].Y &&
+				y <= dat.Board_res.Stones[i][j].Y + size * 2 {
 				return dat.Board_res.Stones[i][j]
 			}
 		}
 	}
 	return nil
+}
+
+func	HasTakenEnoughStones(game *GomokuGame) {
+	if game.Players[0].Points >= 10 {
+		game.End = 2
+		game.WinnerColor = false
+	}
+	if game.Players[1].Points >= 10 {
+		game.End = 2
+		game.WinnerColor = true
+	}
 }
 
 func	GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
@@ -135,11 +148,12 @@ func	GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 				}				
 			}
 			AppearStone(pane, x, y, size)
-			if CheckWinAlignment(pane, game, game.Turn) {
-				game.End = 1
-			} else if game.End == 1 {
+			if game.End == 1 {
 				game.End = 2
-			}
+			} else if CheckWinAlignment(pane, game, game.Turn) {
+				game.End = 1
+				game.WinnerColor = game.Turn
+			} 
 			game.Turn = !game.Turn
 		}
 	}
@@ -148,8 +162,8 @@ func	GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 		gfx.CloseDisplay()
 		os.Exit(0)
 	}
-	
-	if game.Players[0].Points >= 10 || game.Players[1].Points >= 10 { game.End = 2 }
+	HasTakenEnoughStones(game)
+
 	pane.Board_res.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
 	pane.Board_res.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
 	pane.Turn = game.Turn
