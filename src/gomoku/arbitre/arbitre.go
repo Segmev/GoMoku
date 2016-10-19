@@ -30,6 +30,7 @@ func	(game *GomokuGame) Restart(pane *window.Drawer) bool {
 	game.Players[0].Points, game.Players[1].Points = 0, 0
 	pane.Board_res.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
 	pane.Board_res.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
+	pane.GameState = "menu"
 	return true
 }
 
