@@ -21,13 +21,17 @@ type MenuRes struct {
 	duo	*gfx.Text
 }
 
+type EndRes struct {
+	end	*gfx.Text
+}
+
 type BoardRes struct {
 	board		*gfx.Image
 	Wscore		*gfx.Text
 	Bscore		*gfx.Text
 	Restart		*gfx.Text
 	St		bool
-	Stones		[][]*Stone	
+	Stones		[][]*Stone
 }
 
 type Drawer struct {
@@ -42,8 +46,10 @@ type Drawer struct {
 	Font		*gfx.Font
 	Turn		bool
 	GameState	string
+	WinnerColor	bool
 	Board_res	BoardRes
 	Menu_res	MenuRes
+	End_res		EndRes
 }
 
 func (me *Drawer) initMenu() bool {
@@ -74,6 +80,7 @@ func (me *Drawer) initGame() bool {
 	me.Board_res.Wscore = me.Font.Write(strconv.Itoa(0))
 	me.Board_res.Bscore = me.Font.Write(strconv.Itoa(0))
 	me.Board_res.Restart = me.Font.Write("Restart game")
+	me.End_res.end = me.Font.Write("Winner")
 	return true
 }
 
@@ -124,16 +131,15 @@ func (me *Drawer) drawGameBoard(c *gfx.Canvas) {
 		}
 	}
 	c.PopViewport()
-	c.SetRGB(133,94,66)
+	c.SetRGBA(133,94,66, 140)
 	c.FillRect(10 * gfx.DisplayWidth() / 14, gfx.DisplayHeight() * 10 / 11,
 		8 * gfx.DisplayWidth() / 18, gfx.DisplayHeight() / 11)
 	c.DrawText(me.Board_res.Restart, 14 * gfx.DisplayWidth() / 19, gfx.DisplayHeight() * 11 / 12)
-
 }
 
 func (me *Drawer) drawMenu(c *gfx.Canvas) {
 	c.DrawText(me.title, 5 * gfx.DisplayWidth() / 12, gfx.DisplayHeight() * 1 / 10)
-	c.SetRGB(133,94,66)
+	c.SetRGBA(133,94,66, 150)
 	c.FillRoundedRect(4 * gfx.DisplayWidth() / 14, gfx.DisplayHeight() * 4 / 10,
 		8 * gfx.DisplayWidth() / 18, gfx.DisplayHeight() / 11, 10)
 	c.FillRoundedRect(4 * gfx.DisplayWidth() / 14, gfx.DisplayHeight() * 5 / 10,
@@ -141,6 +147,19 @@ func (me *Drawer) drawMenu(c *gfx.Canvas) {
 	c.DrawText(me.Menu_res.solo, 6 * gfx.DisplayWidth() / 20, gfx.DisplayHeight() * 4 / 10)
 	c.DrawText(me.Menu_res.duo, 6 * gfx.DisplayWidth() / 19, gfx.DisplayHeight() * 5 / 10)
 	c.DrawText(me.quitGame, 6 * gfx.DisplayWidth() / 22, gfx.DisplayHeight() * 9 / 10)
+}
+
+func (me *Drawer) drawEnd(c *gfx.Canvas) {
+	c.SetRGBA(255,255,255,60)
+	c.FillRect(0, gfx.DisplayHeight() * 20 / 50, gfx.DisplayWidth(), gfx.DisplayHeight() * 10 / 50)
+	c.DrawText(me.End_res.end, 91 * gfx.DisplayWidth() / 200, 8 * gfx.DisplayHeight() / 20)
+	if me.WinnerColor {
+		c.DrawImage(me.white_stone, gfx.DisplayWidth() / 2, gfx.DisplayHeight() / 2)
+	} else {
+		c.DrawImage(me.black_stone, gfx.DisplayWidth() / 2, gfx.DisplayHeight() / 2)
+	}
+	c.DrawText(me.quitGame, 6 * gfx.DisplayWidth() / 22, gfx.DisplayHeight() * 9 / 10)
+	c.SetRGBA(255,255,255,255)
 }
 
 func (me *Drawer) Draw(c *gfx.Canvas) {
@@ -152,5 +171,7 @@ func (me *Drawer) Draw(c *gfx.Canvas) {
 		me.drawGameBoard(c)
 	} else if me.GameState == "menu" {
 		me.drawMenu(c)
+	} else if me.GameState == "end" {
+		me.drawEnd(c)
 	}
 }

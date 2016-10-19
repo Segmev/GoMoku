@@ -5,8 +5,8 @@ import (
 	//	"strings"
 	// "fmt"
 	"strconv"
-	"github.com/gtalent/starfish/gfx"
-	"os"
+	// "github.com/gtalent/starfish/gfx"
+	// "os"
 )
 
 type	Player struct {
@@ -18,7 +18,6 @@ type	GomokuGame struct {
 	Players	[2]Player
 	Turn		bool
 	End		int
-	WinnerColor	bool
 	GameType	bool
 }
 
@@ -123,14 +122,14 @@ func	IsStoneHere(dat *window.Drawer, x, y, size int) *window.Stone {
 	return nil
 }
 
-func	HasTakenEnoughStones(game *GomokuGame) {
+func	HasTakenEnoughStones(pane *window.Drawer, game *GomokuGame) {
 	if game.Players[0].Points >= 10 {
 		game.End = 2
-		game.WinnerColor = false
+		pane.WinnerColor = false
 	}
 	if game.Players[1].Points >= 10 {
 		game.End = 2
-		game.WinnerColor = true
+		pane.WinnerColor = true
 	}
 }
 
@@ -152,15 +151,14 @@ func	GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 				game.End = 2
 			} else if CheckWinAlignment(pane, game, game.Turn) {
 				game.End = 1
-				game.WinnerColor = game.Turn
+				pane.WinnerColor = game.Turn
 			} 
 			game.Turn = !game.Turn
 		}
 	}
-	HasTakenEnoughStones(game)
+	HasTakenEnoughStones(pane, game)
 	if game.End == 2 {
-		gfx.CloseDisplay()
-		os.Exit(0)
+		pane.GameState = "end"
 	}
 	pane.Board_res.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
 	pane.Board_res.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))

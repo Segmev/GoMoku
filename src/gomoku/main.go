@@ -92,6 +92,7 @@ func launchWindow(h, w int) bool {
 	game.End = 0
 	pane.GameState = "menu"
 	addInput(&pane, &game)
+	
 	return true
 }
 
