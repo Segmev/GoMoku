@@ -157,13 +157,11 @@ func	GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 			game.Turn = !game.Turn
 		}
 	}
-	
+	HasTakenEnoughStones(game)
 	if game.End == 2 {
 		gfx.CloseDisplay()
 		os.Exit(0)
 	}
-	HasTakenEnoughStones(game)
-
 	pane.Board_res.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
 	pane.Board_res.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
 	pane.Turn = game.Turn
