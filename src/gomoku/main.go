@@ -71,7 +71,10 @@ func addInput(pane *window.Drawer, game *arbitre.GomokuGame) {
 				game.Restart(pane)
 				pane.GameState = "menu"
 			}
-		}
+		} // else if pane.GameState == "end" {
+			
+		// }
+		
 	})
 	// c.FillRect(10 * gfx.DisplayWidth() / 14, gfx.DisplayHeight() * 10 / 11,
 	// 	8 * gfx.DisplayWidth() / 18, gfx.DisplayHeight() / 11)
