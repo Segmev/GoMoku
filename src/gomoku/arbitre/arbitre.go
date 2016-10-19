@@ -126,11 +126,11 @@ func	IsStoneHere(dat *window.Drawer, x, y, size int) *window.Stone {
 func	HasTakenEnoughStones(pane *window.Drawer, game *GomokuGame) {
 	if game.Players[0].Points >= 10 {
 		game.End = 2
-		pane.WinnerColor = false
+		pane.WinnerColor = true
 	}
 	if game.Players[1].Points >= 10 {
 		game.End = 2
-		pane.WinnerColor = true
+		pane.WinnerColor = false
 	}
 }
 
