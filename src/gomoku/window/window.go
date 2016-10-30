@@ -7,13 +7,15 @@ import (
 	"strconv"
 )
 
+type InfosStone struct {
+	Ipos, Jpos	int
+}
 
 type Stone struct {
 	X,Y	int
-	Ipos	int
-	Jpos	int
 	Visible	bool
 	White	bool
+	Infos	InfosStone
 }
 
 type MenuRes struct {
@@ -69,7 +71,7 @@ func (me *Drawer) initGame() bool {
 		row := []*Stone{}
 		for j := 0; j <= 18; j++ {
 			stone := new(Stone)
-			stone.Ipos, stone.Jpos = i, j
+			stone.Infos.Ipos, stone.Infos.Jpos = i, j
 			stone.X = gfx.DisplayHeight() / 88 + i * (gfx.DisplayHeight() / 19)
 			stone.Y = gfx.DisplayHeight() / 88 + j * (gfx.DisplayHeight() / 19)
 			stone.White, stone.Visible = true, false

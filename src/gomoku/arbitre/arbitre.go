@@ -5,8 +5,6 @@ import (
 	//	"strings"
 	// "fmt"
 	"strconv"
-	// "github.com/gtalent/starfish/gfx"
-	// "os"
 )
 
 type	Player struct {
@@ -42,23 +40,23 @@ func	IsStoneAtPos(dat *window.Drawer, i, j int) bool {
 }
 
 func	CheckAlignement(dat *window.Drawer, stone *window.Stone, i, j, lim, ite int, del bool) bool {
-	if IsStoneAtPos(dat, stone.Ipos + i, stone.Jpos + j) {
-		if del && ite < lim && dat.Board_res.Stones[stone.Ipos + i][stone.Jpos + j].White != stone.White {
+	if IsStoneAtPos(dat, stone.Infos.Ipos + i, stone.Infos.Jpos + j) {
+		if del && ite < lim && dat.Board_res.Stones[stone.Infos.Ipos + i][stone.Infos.Jpos + j].White != stone.White {
 			iniI, iniJ := i, j
 			if i > 0 { i++ } else if i < 0 { i-- }
 			if j > 0 { j++ } else if j < 0 { j-- }
 			if CheckAlignement(dat, stone, i, j, lim, ite + 1, del) {
-				if del { dat.Board_res.Stones[stone.Ipos + iniI][stone.Jpos + iniJ].Visible = false }
+				if del { dat.Board_res.Stones[stone.Infos.Ipos + iniI][stone.Infos.Jpos + iniJ].Visible = false }
 				return true
 			}
-		} else if !del && ite < lim && dat.Board_res.Stones[stone.Ipos + i][stone.Jpos + j].White ==
+		} else if !del && ite < lim && dat.Board_res.Stones[stone.Infos.Ipos + i][stone.Infos.Jpos + j].White ==
 			stone.White {
 			if i > 0 { i++ } else if i < 0 { i-- }
 			if j > 0 { j++ } else if j < 0 { j-- }
 			if CheckAlignement(dat, stone, i, j, lim, ite + 1, del) {
 				return true
 			}
-		} else if ite == lim && dat.Board_res.Stones[stone.Ipos + i][stone.Jpos + j].White == stone.White {
+		} else if ite == lim && dat.Board_res.Stones[stone.Infos.Ipos + i][stone.Infos.Jpos + j].White == stone.White {
 			return true
 		}
 	}
