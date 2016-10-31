@@ -1,22 +1,27 @@
 package main
 
 import (
-	"os"
-	"gomoku/window"
 	"gomoku/arbitre"
-	"github.com/gtalent/starfish/input"
+	"gomoku/window"
+	"os"
+
 	"github.com/gtalent/starfish/gfx"
+	"github.com/gtalent/starfish/input"
 )
 
-func exists(path string) (bool) {
-    _, err := os.Stat(path)
-    if err == nil { return true }
-    if os.IsNotExist(err) { return false }
-    return true
+func exists(path string) bool {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true
+	}
+	if os.IsNotExist(err) {
+		return false
+	}
+	return true
 }
 
 func checkFiles() bool {
-	if !exists("ressources/board.png")         || !exists("ressources/bstone.png") ||
+	if !exists("ressources/board.png") || !exists("ressources/bstone.png") ||
 		!exists("ressources/woodback.jpg") || !exists("ressources/MotionControl-Bold.otf") ||
 		!exists("ressources/wstone.png") {
 		return false
@@ -40,26 +45,26 @@ func addInput(pane *window.Drawer, game *arbitre.GomokuGame) {
 		}
 	})
 	input.AddMousePressFunc(func(e input.MouseEvent) {
-		if e.Button == 1  {
+		if e.Button == 1 {
 			if pane.GameState == "gameOn" {
-				arbitre.GamePlay(pane, game, e.X, e.Y, gfx.DisplayWidth() / 55)
+				arbitre.GamePlay(pane, game, e.X, e.Y, gfx.DisplayWidth()/55)
 			}
 		}
 	})
 	input.AddMouseReleaseFunc(func(e input.MouseEvent) {
 		if pane.GameState == "menu" {
-			if e.X >= 4 * gfx.DisplayWidth() / 14 && e.X <= 4 * gfx.DisplayWidth() / 14 +
-				8 * gfx.DisplayWidth() / 18 {
-				if gfx.DisplayHeight() * 4 / 10 <= e.Y && e.Y <= gfx.DisplayHeight() * 4 / 10 +
-					gfx.DisplayHeight() / 11 {
+			if e.X >= 4*gfx.DisplayWidth()/14 && e.X <= 4*gfx.DisplayWidth()/14+
+				8*gfx.DisplayWidth()/18 {
+				if gfx.DisplayHeight()*4/10 <= e.Y && e.Y <= gfx.DisplayHeight()*4/10+
+					gfx.DisplayHeight()/11 {
 					pane.GameState = "gameOn"
-				} else if gfx.DisplayHeight() * 5 / 10 <= e.Y && e.Y <= gfx.DisplayHeight() *
-					5 / 10 + gfx.DisplayHeight() / 11 {
+				} else if gfx.DisplayHeight()*5/10 <= e.Y && e.Y <= gfx.DisplayHeight()*
+					5/10+gfx.DisplayHeight()/11 {
 					pane.GameState = "gameOn"
 				}
 			}
 		} else if pane.GameState == "gameOn" {
-			if 10 * gfx.DisplayWidth() / 14 <= e.X && gfx.DisplayHeight() * 10 / 11 <= e.Y {
+			if 10*gfx.DisplayWidth()/14 <= e.X && gfx.DisplayHeight()*10/11 <= e.Y {
 				game.Restart(pane)
 				pane.GameState = "menu"
 			}
@@ -73,7 +78,7 @@ func launchWindow(h, w int) bool {
 		return false
 	}
 	gfx.SetDisplayTitle("GoMoku")
-	
+
 	var pane window.Drawer
 	if pane.Init() {
 		gfx.AddDrawer(&pane)
@@ -82,7 +87,7 @@ func launchWindow(h, w int) bool {
 	game.End = 0
 	pane.GameState = "menu"
 	addInput(&pane, &game)
-	
+
 	return true
 }
 
