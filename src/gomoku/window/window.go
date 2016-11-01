@@ -12,6 +12,7 @@ type InfosStone struct {
 	Ipos, Jpos int
 	OppoSt     [3][3]int
 	TeamSt     [3][3]int
+	Breakable  bool
 }
 
 type Stone struct {

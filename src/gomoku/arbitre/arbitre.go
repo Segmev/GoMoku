@@ -105,11 +105,16 @@ func getInfosNbStonesDirection(dat *window.Drawer, st *window.Stone, color bool,
 func CheckBreakable(dat *window.Drawer, stone *window.Stone) bool {
 	for i := -1; i <= 1; i++ {
 		for j := -1; j <= 1; j++ {
-			if stone.Infos.TeamSt[1+j][1+i] == 1 && dat.Board_res.Stones[stone.Infos.Ipos+i][stone.Infos.Jpos+j].Color != stone.Color {
+			if !(i == 0 && j == 0) && stone.Infos.TeamSt[1+j][1+i] == 1 &&
+				((IsStoneAtPos(dat, stone.Infos.Ipos+i, stone.Infos.Jpos+j) &&
+					dat.Board_res.Stones[stone.Infos.Ipos+i+i][stone.Infos.Jpos+j+j].Color != stone.Color) ||
+					stone.Infos.OppoSt[1+(-1*j)][1+(-1*i)] >= 1) {
+				stone.Infos.Breakable = true
 				return true
 			}
 		}
 	}
+	stone.Infos.Breakable = false
 	return false
 }
 
@@ -117,6 +122,7 @@ func CheckWinAlignment(dat *window.Drawer, game *GomokuGame, color bool) bool {
 	ret := false
 	for x := range dat.Board_res.Stones {
 		for y := range dat.Board_res.Stones[x] {
+			totOpp, totTeam := 0, 0
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
 					if !(i == 0 && j == 0) && dat.Board_res.Stones[x][y].Visible {
@@ -124,17 +130,23 @@ func CheckWinAlignment(dat *window.Drawer, game *GomokuGame, color bool) bool {
 							dat.Board_res.Stones[x][y].Infos.TeamSt[1+j][1+i] =
 								getInfosNbStonesDirection(dat, dat.Board_res.Stones[x][y],
 									dat.Board_res.Stones[x][y].Color, i, j)
-							if CheckAlignement(dat, dat.Board_res.Stones[x][y], i, j, 3, 0, false) {
+							totTeam += dat.Board_res.Stones[x][y].Infos.TeamSt[1+j][1+i]
+							CheckBreakable(dat, dat.Board_res.Stones[x][y])
+							if !dat.Board_res.Stones[x][y].Infos.Breakable &&
+								CheckAlignement(dat, dat.Board_res.Stones[x][y], i, j, 3, 0, false) {
 								ret = true
 							} else {
 								dat.Board_res.Stones[x][y].Infos.OppoSt[1+j][1+i] =
 									getInfosNbStonesDirection(dat, dat.Board_res.Stones[x][y],
 										!dat.Board_res.Stones[x][y].Color, i, j)
+								totOpp += dat.Board_res.Stones[x][y].Infos.OppoSt[1+j][1+i]
 							}
 						}
 					}
 				}
 			}
+			dat.Board_res.Stones[x][y].Infos.TeamSt[1][1] = totTeam
+			dat.Board_res.Stones[x][y].Infos.OppoSt[1][1] = totOpp
 		}
 	}
 	return ret
