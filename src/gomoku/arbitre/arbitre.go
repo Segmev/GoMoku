@@ -92,17 +92,45 @@ func TakeTwoStones(dat *window.Drawer, game *GomokuGame, stone *window.Stone) bo
 	return hap
 }
 
+func getInfosNbStonesDirection(dat *window.Drawer, st *window.Stone, color bool, i, j int) int {
+	cpt := 0
+	for IsStoneAtPos(dat, st.Infos.Ipos+i, st.Infos.Jpos+j) &&
+		dat.Board_res.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Color == color {
+		cpt += 1
+		i, j = augmentPos(i), augmentPos(j)
+	}
+	return cpt
+}
+
+func CheckBreakable(dat *window.Drawer, stone *window.Stone) bool {
+	for i := -1; i <= 1; i++ {
+		for j := -1; j <= 1; j++ {
+			if stone.Infos.TeamSt[1+j][1+i] == 1 && dat.Board_res.Stones[stone.Infos.Ipos+i][stone.Infos.Jpos+j].Color != stone.Color {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func CheckWinAlignment(dat *window.Drawer, game *GomokuGame, color bool) bool {
 	ret := false
 	for x := range dat.Board_res.Stones {
 		for y := range dat.Board_res.Stones[x] {
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
-					if !(i == 0 && j == 0) &&
-						dat.Board_res.Stones[x][y].Visible {
-						if dat.Board_res.Stones[x][y].Color == color &&
-							CheckAlignement(dat, dat.Board_res.Stones[x][y], i, j, 3, 0, false) {
-							ret = true
+					if !(i == 0 && j == 0) && dat.Board_res.Stones[x][y].Visible {
+						if dat.Board_res.Stones[x][y].Color == color {
+							dat.Board_res.Stones[x][y].Infos.TeamSt[1+j][1+i] =
+								getInfosNbStonesDirection(dat, dat.Board_res.Stones[x][y],
+									dat.Board_res.Stones[x][y].Color, i, j)
+							if CheckAlignement(dat, dat.Board_res.Stones[x][y], i, j, 3, 0, false) {
+								ret = true
+							} else {
+								dat.Board_res.Stones[x][y].Infos.OppoSt[1+j][1+i] =
+									getInfosNbStonesDirection(dat, dat.Board_res.Stones[x][y],
+										!dat.Board_res.Stones[x][y].Color, i, j)
+							}
 						}
 					}
 				}
