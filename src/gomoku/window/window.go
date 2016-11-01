@@ -17,7 +17,7 @@ type InfosStone struct {
 type Stone struct {
 	X, Y    int
 	Visible bool
-	White   bool
+	Color   bool
 	Infos   InfosStone
 }
 
@@ -77,7 +77,7 @@ func (me *Drawer) initGame() bool {
 			stone.Infos.Ipos, stone.Infos.Jpos = i, j
 			stone.X = gfx.DisplayHeight()/88 + i*(gfx.DisplayHeight()/19)
 			stone.Y = gfx.DisplayHeight()/88 + j*(gfx.DisplayHeight()/19)
-			stone.White, stone.Visible = true, false
+			stone.Color, stone.Visible = true, false
 			row = append(row, stone)
 		}
 		me.Board_res.Stones = append(me.Board_res.Stones, row)
@@ -124,7 +124,7 @@ func (me *Drawer) drawGameBoard(c *gfx.Canvas) {
 		for i := range me.Board_res.Stones {
 			for j := range me.Board_res.Stones[i] {
 				if me.Board_res.Stones[i][j].Visible {
-					if me.Board_res.Stones[i][j].White == true {
+					if me.Board_res.Stones[i][j].Color == true {
 						c.DrawImage(me.white_stone, me.Board_res.Stones[i][j].X,
 							me.Board_res.Stones[i][j].Y)
 					} else {

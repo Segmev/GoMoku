@@ -51,7 +51,7 @@ func augmentPos(pos int) int {
 
 func CheckAlignement(dat *window.Drawer, stone *window.Stone, i, j, lim, ite int, del bool) bool {
 	if IsStoneAtPos(dat, stone.Infos.Ipos+i, stone.Infos.Jpos+j) {
-		if del && ite < lim && dat.Board_res.Stones[stone.Infos.Ipos+i][stone.Infos.Jpos+j].White != stone.White {
+		if del && ite < lim && dat.Board_res.Stones[stone.Infos.Ipos+i][stone.Infos.Jpos+j].Color != stone.Color {
 			iniI, iniJ := i, j
 			i = augmentPos(i)
 			j = augmentPos(j)
@@ -61,14 +61,14 @@ func CheckAlignement(dat *window.Drawer, stone *window.Stone, i, j, lim, ite int
 				}
 				return true
 			}
-		} else if !del && ite < lim && dat.Board_res.Stones[stone.Infos.Ipos+i][stone.Infos.Jpos+j].White ==
-			stone.White {
+		} else if !del && ite < lim && dat.Board_res.Stones[stone.Infos.Ipos+i][stone.Infos.Jpos+j].Color ==
+			stone.Color {
 			i = augmentPos(i)
 			j = augmentPos(j)
 			if CheckAlignement(dat, stone, i, j, lim, ite+1, del) {
 				return true
 			}
-		} else if ite == lim && dat.Board_res.Stones[stone.Infos.Ipos+i][stone.Infos.Jpos+j].White == stone.White {
+		} else if ite == lim && dat.Board_res.Stones[stone.Infos.Ipos+i][stone.Infos.Jpos+j].Color == stone.Color {
 			return true
 		}
 	}
@@ -80,7 +80,7 @@ func TakeTwoStones(dat *window.Drawer, game *GomokuGame, stone *window.Stone) bo
 	for i := -1; i <= 1; i++ {
 		for j := -1; j <= 1; j++ {
 			if CheckAlignement(dat, stone, i, j, 2, 0, true) {
-				if stone.White {
+				if stone.Color {
 					game.Players[0].Points += 2
 				} else {
 					game.Players[1].Points += 2
@@ -93,21 +93,23 @@ func TakeTwoStones(dat *window.Drawer, game *GomokuGame, stone *window.Stone) bo
 }
 
 func CheckWinAlignment(dat *window.Drawer, game *GomokuGame, color bool) bool {
+	ret := false
 	for x := range dat.Board_res.Stones {
 		for y := range dat.Board_res.Stones[x] {
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
 					if !(i == 0 && j == 0) &&
-						dat.Board_res.Stones[x][y].Visible &&
-						dat.Board_res.Stones[x][y].White == color &&
-						CheckAlignement(dat, dat.Board_res.Stones[x][y], i, j, 3, 0, false) {
-						return true
+						dat.Board_res.Stones[x][y].Visible {
+						if dat.Board_res.Stones[x][y].Color == color &&
+							CheckAlignement(dat, dat.Board_res.Stones[x][y], i, j, 3, 0, false) {
+							ret = true
+						}
 					}
 				}
 			}
 		}
 	}
-	return false
+	return ret
 }
 
 func AppearStone(dat *window.Drawer, x, y, size int) bool {
@@ -148,7 +150,7 @@ func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 	if game.End != 2 {
 		st := IsStoneHere(pane, x, y, size)
 		if st != nil && !st.Visible {
-			st.White = game.Turn
+			st.Color = game.Turn
 			st.Visible = true
 			if TakeTwoStones(pane, game, st) {
 				if game.End == 1 {
