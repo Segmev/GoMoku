@@ -1,7 +1,6 @@
 package arbitre
 
 import (
-	"fmt"
 	"gomoku/window"
 	"strconv"
 )
@@ -26,6 +25,7 @@ func (game *GomokuGame) Restart(pane *window.Drawer) bool {
 			pane.Board_res.Stones[i][j].Visible = false
 		}
 	}
+	game.End = 0
 	game.Players[0].Points, game.Players[1].Points = 0, 0
 	pane.Board_res.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
 	pane.Board_res.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
@@ -40,20 +40,21 @@ func IsStoneAtPos(dat *window.Drawer, i, j int) bool {
 	return false
 }
 
+func augmentPos(pos int) int {
+	if pos > 0 {
+		return pos + 1
+	} else if pos < 0 {
+		return pos - 1
+	}
+	return pos
+}
+
 func CheckAlignement(dat *window.Drawer, stone *window.Stone, i, j, lim, ite int, del bool) bool {
 	if IsStoneAtPos(dat, stone.Infos.Ipos+i, stone.Infos.Jpos+j) {
 		if del && ite < lim && dat.Board_res.Stones[stone.Infos.Ipos+i][stone.Infos.Jpos+j].White != stone.White {
 			iniI, iniJ := i, j
-			if i > 0 {
-				i++
-			} else if i < 0 {
-				i--
-			}
-			if j > 0 {
-				j++
-			} else if j < 0 {
-				j--
-			}
+			i = augmentPos(i)
+			j = augmentPos(j)
 			if CheckAlignement(dat, stone, i, j, lim, ite+1, del) {
 				if del {
 					dat.Board_res.Stones[stone.Infos.Ipos+iniI][stone.Infos.Jpos+iniJ].Visible = false
@@ -62,16 +63,8 @@ func CheckAlignement(dat *window.Drawer, stone *window.Stone, i, j, lim, ite int
 			}
 		} else if !del && ite < lim && dat.Board_res.Stones[stone.Infos.Ipos+i][stone.Infos.Jpos+j].White ==
 			stone.White {
-			if i > 0 {
-				i++
-			} else if i < 0 {
-				i--
-			}
-			if j > 0 {
-				j++
-			} else if j < 0 {
-				j--
-			}
+			i = augmentPos(i)
+			j = augmentPos(j)
 			if CheckAlignement(dat, stone, i, j, lim, ite+1, del) {
 				return true
 			}
@@ -151,31 +144,12 @@ func HasTakenEnoughStones(pane *window.Drawer, game *GomokuGame) {
 	}
 }
 
-func fillStoneInfo(dat *window.Drawer, stone *window.Stone) {
-	for i := -1; i <= 1; i++ {
-		for j := -1; j <= 1; j++ {
-			if !(i == 0 && j == 0) {
-				if IsStoneAtPos(dat, stone.Infos.Ipos+i, stone.Infos.Jpos+j) {
-					if dat.Board_res.Stones[stone.Infos.Ipos+i][stone.Infos.Jpos+j].White == stone.White {
-						stone.Infos.TeamSt[i+1][j+1] += 1
-						fmt.Println(stone.Infos.TeamSt)
-					} else {
-						stone.Infos.OppoSt[i+1][j+1] += 1
-						fmt.Println(stone.Infos.OppoSt)
-					}
-				}
-			}
-		}
-	}
-}
-
 func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 	if game.End != 2 {
 		st := IsStoneHere(pane, x, y, size)
 		if st != nil && !st.Visible {
 			st.White = game.Turn
 			st.Visible = true
-			fillStoneInfo(pane, st)
 			if TakeTwoStones(pane, game, st) {
 				if game.End == 1 {
 					t := CheckWinAlignment(pane, game, !game.Turn)
