@@ -108,6 +108,7 @@ func CheckBreakable(dat *window.Drawer, stone *window.Stone) bool {
 		for j := -1; j <= 1; j++ {
 			if !(i == 0 && j == 0) && stone.Infos.TeamSt[1+j][1+i] == 1 &&
 				((IsStoneAtPos(dat, stone.Infos.Ipos+i, stone.Infos.Jpos+j) &&
+					IsStoneAtPos(dat, stone.Infos.Ipos+i+i, stone.Infos.Jpos+j+j) &&
 					dat.Board_res.Stones[stone.Infos.Ipos+i+i][stone.Infos.Jpos+j+j].Color != stone.Color) ||
 					stone.Infos.OppoSt[1+(-1*j)][1+(-1*i)] >= 1) {
 				stone.Infos.Breakable = true
