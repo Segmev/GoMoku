@@ -193,11 +193,22 @@ func ThreeBlockNear(dat *window.Drawer, game *GomokuGame, st *window.Stone) int 
 	for i := -1; i <= 1; i++ {
 		for j := -1; j <= 1; j++ {
 			if !(i == 0 && j == 0) {
-				if IsStoneAtPos(dat, st.Infos.Ipos+i, st.Infos.Jpos+j) &&
-					st.Color == dat.Board_res.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Color {
-					fmt.Println("ok")
-					if dat.Board_res.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Infos.OppoSt[1+j][1+i] == 1 {
-						cpt += 1
+				if IsStoneAtPos(dat, st.Infos.Ipos+i, st.Infos.Jpos+j) {
+					if st.Color == dat.Board_res.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Color {
+						if dat.Board_res.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Infos.TeamSt[1+j][1+i] <= 1 {
+							if dat.Board_res.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Infos.TeamSt[1+j][1+i] == 1 ||
+								(IsStoneAtPos(dat, st.Infos.Ipos+i+i+i, st.Infos.Jpos+j+j+j) &&
+									st.Color == dat.Board_res.Stones[st.Infos.Ipos+i+i+i][st.Infos.Jpos+j+j+j].Color &&
+									dat.Board_res.Stones[st.Infos.Ipos+i+i+i][st.Infos.Jpos+j+j+j].Infos.TeamSt[1+j][1+i] == 0) {
+								cpt += 1
+							}
+						}
+					}
+				} else if IsStoneAtPos(dat, st.Infos.Ipos+i+i, st.Infos.Jpos+j+j) {
+					if st.Color == dat.Board_res.Stones[st.Infos.Ipos+i+i][st.Infos.Jpos+j+j].Color {
+						if dat.Board_res.Stones[st.Infos.Ipos+i+i][st.Infos.Jpos+j+j].Infos.TeamSt[1+j][1+i] == 1 {
+							cpt += 1
+						}
 					}
 				}
 			}
@@ -211,8 +222,11 @@ func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 	if game.End != 2 {
 		st := IsStoneHere(pane, x, y, size)
 		if st != nil && !st.Visible {
-			ThreeBlockNear(pane, game, st)
 			st.Color = game.Turn
+			if ThreeBlockNear(pane, game, st) == 2 {
+				return
+			}
+
 			st.Visible = true
 			if TakeTwoStones(pane, game, st) {
 				if game.End == 1 {
