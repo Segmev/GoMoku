@@ -1,6 +1,7 @@
 package arbitre
 
 import (
+	"fmt"
 	"gomoku/window"
 	"strconv"
 )
@@ -106,8 +107,9 @@ func CheckBreakable(dat *window.Drawer, stone *window.Stone) bool {
 	for i := -1; i <= 1; i++ {
 		for j := -1; j <= 1; j++ {
 			if !(i == 0 && j == 0) && stone.Infos.TeamSt[1+j][1+i] == 1 &&
-				((IsStoneAtPos(dat, stone.Infos.Ipos+i, stone.Infos.Jpos+j) &&
-					dat.Board_res.Stones[stone.Infos.Ipos+i+i][stone.Infos.Jpos+j+j].Color != stone.Color) ||
+				IsStoneAtPos(dat, stone.Infos.Ipos+i, stone.Infos.Jpos+j) &&
+				IsStoneAtPos(dat, stone.Infos.Ipos+i+i, stone.Infos.Jpos+j+j) &&
+				(dat.Board_res.Stones[stone.Infos.Ipos+i+i][stone.Infos.Jpos+j+j].Color != stone.Color ||
 					stone.Infos.OppoSt[1+(-1*j)][1+(-1*i)] >= 1) {
 				stone.Infos.Breakable = true
 				return true
@@ -125,7 +127,7 @@ func CheckWinAlignment(dat *window.Drawer, game *GomokuGame, color bool) bool {
 			totOpp, totTeam := 0, 0
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
-					if !(i == 0 && j == 0) && dat.Board_res.Stones[x][y].Visible {
+					if !(i == 0 && j == 0) && IsStoneAtPos(dat, x, y) {
 						if dat.Board_res.Stones[x][y].Color == color {
 							dat.Board_res.Stones[x][y].Infos.TeamSt[1+j][1+i] =
 								getInfosNbStonesDirection(dat, dat.Board_res.Stones[x][y],
@@ -186,10 +188,29 @@ func HasTakenEnoughStones(pane *window.Drawer, game *GomokuGame) {
 	}
 }
 
+func ThreeBlockNear(dat *window.Drawer, game *GomokuGame, st *window.Stone) int {
+	cpt := 0
+	for i := -1; i <= 1; i++ {
+		for j := -1; j <= 1; j++ {
+			if !(i == 0 && j == 0) {
+				if IsStoneAtPos(dat, st.Infos.Ipos+i, st.Infos.Jpos+j) &&
+					st.Color == dat.Board_res.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Color {
+					if dat.Board_res.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Infos.OppoSt[1+j][1+i] == 1 {
+						cpt += 1
+					}
+				}
+			}
+		}
+	}
+	fmt.Println(cpt)
+	return cpt
+}
+
 func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 	if game.End != 2 {
 		st := IsStoneHere(pane, x, y, size)
 		if st != nil && !st.Visible {
+			ThreeBlockNear(pane, game, st)
 			st.Color = game.Turn
 			st.Visible = true
 			if TakeTwoStones(pane, game, st) {
