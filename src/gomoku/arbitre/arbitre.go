@@ -107,9 +107,8 @@ func CheckBreakable(dat *window.Drawer, stone *window.Stone) bool {
 	for i := -1; i <= 1; i++ {
 		for j := -1; j <= 1; j++ {
 			if !(i == 0 && j == 0) && stone.Infos.TeamSt[1+j][1+i] == 1 &&
-				IsStoneAtPos(dat, stone.Infos.Ipos+i, stone.Infos.Jpos+j) &&
-				IsStoneAtPos(dat, stone.Infos.Ipos+i+i, stone.Infos.Jpos+j+j) &&
-				(dat.Board_res.Stones[stone.Infos.Ipos+i+i][stone.Infos.Jpos+j+j].Color != stone.Color ||
+				((IsStoneAtPos(dat, stone.Infos.Ipos+i, stone.Infos.Jpos+j) &&
+					dat.Board_res.Stones[stone.Infos.Ipos+i+i][stone.Infos.Jpos+j+j].Color != stone.Color) ||
 					stone.Infos.OppoSt[1+(-1*j)][1+(-1*i)] >= 1) {
 				stone.Infos.Breakable = true
 				return true
@@ -195,6 +194,7 @@ func ThreeBlockNear(dat *window.Drawer, game *GomokuGame, st *window.Stone) int 
 			if !(i == 0 && j == 0) {
 				if IsStoneAtPos(dat, st.Infos.Ipos+i, st.Infos.Jpos+j) &&
 					st.Color == dat.Board_res.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Color {
+					fmt.Println("ok")
 					if dat.Board_res.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Infos.OppoSt[1+j][1+i] == 1 {
 						cpt += 1
 					}
