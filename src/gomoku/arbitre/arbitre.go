@@ -133,8 +133,23 @@ func CheckBreakable(dat *window.Drawer, stone *window.Stone) bool {
 	return false
 }
 
+func ResetTeamInfos(dat *window.Drawer, color bool) {
+	for x := range dat.Board_res.Stones {
+		for _, st := range dat.Board_res.Stones[x] {
+			if st.Color == color {
+				for i := -1; i <= 1; i++ {
+					for j := -1; j <= 1; j++ {
+						st.Infos.TeamSt[1+i][1+j], st.Infos.OppoSt[1+i][1+j] = 0, 0
+					}
+				}
+			}
+		}
+	}
+}
+
 func CheckWinAlignment(dat *window.Drawer, game *GomokuGame, color bool) {
 	game.Players[GetPlayerNb(game, color)].FiveAligned = game.Players[GetPlayerNb(game, color)].FiveAligned[:0]
+	ResetTeamInfos(dat, color)
 	for x := range dat.Board_res.Stones {
 		for y := range dat.Board_res.Stones[x] {
 			totOpp, totTeam := 0, 0
@@ -250,20 +265,22 @@ func isDraw(pane *window.Drawer, game *GomokuGame) {
 }
 
 func CheckBreakableAlign(game *GomokuGame, color bool) bool {
-	cpt := 0
+	tot := 0
 	for _, line := range game.Players[GetPlayerNb(game, color)].FiveAligned {
+		cpt := 0
 		for _, st := range line {
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
 					if !(i == 0 && j == 0) &&
-						st.Infos.TeamSt[i+1][j+1] == 1 && st.Infos.OppoSt[1+(-1*j)][1+(-1*j)] >= 1 {
-						cpt += 1
+						st.Infos.TeamSt[i+1][j+1] == 1 && st.Infos.OppoSt[1+(-1*i)][1+(-1*j)] >= 1 {
+						cpt = 1
 					}
 				}
 			}
 		}
+		tot += cpt
 	}
-	if cpt < len(game.Players[GetPlayerNb(game, game.Turn)].FiveAligned) {
+	if tot < len(game.Players[GetPlayerNb(game, game.Turn)].FiveAligned) {
 		return true
 	}
 	return false
