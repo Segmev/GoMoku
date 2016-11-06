@@ -1,7 +1,6 @@
 package arbitre
 
 import (
-	"fmt"
 	"gomoku/window"
 	"strconv"
 )
@@ -36,9 +35,9 @@ func (game *GomokuGame) Restart(pane *window.Drawer) bool {
 
 func GetPlayerNb(game *GomokuGame, color bool) int {
 	if color {
-		return 0
+		return 1
 	}
-	return 1
+	return 0
 }
 
 func isElemInAlignedArray(s [][5]*window.Stone, e [5]*window.Stone) bool {
@@ -157,7 +156,6 @@ func CheckWinAlignment(dat *window.Drawer, game *GomokuGame, color bool) {
 									dat.Board_res.Stones[x+i+i+i+i][y+j+j+j+j]}
 								game.Players[GetPlayerNb(game, color)].FiveAligned =
 									append(game.Players[GetPlayerNb(game, color)].FiveAligned, StonesTab)
-								fmt.Println(game.Players[GetPlayerNb(game, color)].FiveAligned)
 							} else {
 								dat.Board_res.Stones[x][y].Infos.OppoSt[1+j][1+i] =
 									getInfosNbStonesDirection(dat, dat.Board_res.Stones[x][y],
@@ -201,8 +199,7 @@ func HasTakenEnoughStones(pane *window.Drawer, game *GomokuGame) {
 	if game.Players[0].Points >= 10 {
 		game.End = 2
 		pane.WinnerColor = true
-	}
-	if game.Players[1].Points >= 10 {
+	} else if game.Players[1].Points >= 10 {
 		game.End = 2
 		pane.WinnerColor = false
 	}
@@ -252,6 +249,26 @@ func isDraw(pane *window.Drawer, game *GomokuGame) {
 	}
 }
 
+func CheckBreakableAlign(game *GomokuGame, color bool) bool {
+	cpt := 0
+	for _, line := range game.Players[GetPlayerNb(game, color)].FiveAligned {
+		for _, st := range line {
+			for i := -1; i <= 1; i++ {
+				for j := -1; j <= 1; j++ {
+					if !(i == 0 && j == 0) &&
+						st.Infos.TeamSt[i+1][j+1] == 1 && st.Infos.OppoSt[1+(-1*j)][1+(-1*j)] >= 1 {
+						cpt += 1
+					}
+				}
+			}
+		}
+	}
+	if cpt < len(game.Players[GetPlayerNb(game, game.Turn)].FiveAligned) {
+		return true
+	}
+	return false
+}
+
 func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 	if game.End != 2 {
 		st := IsStoneHere(pane, x, y, size)
@@ -260,20 +277,12 @@ func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 			if ThreeBlockNear(pane, game, st) == 2 {
 				return
 			}
-
 			st.Visible = true
-			if TakeTwoStones(pane, game, st) {
-				if game.End == 1 {
-					t := CheckWinAlignment(pane, game, !game.Turn)
-					if !t {
-						game.End = 0
-					}
-				}
-			}
-			if game.End == 1 {
+			TakeTwoStones(pane, game, st)
+			CheckWinAlignment(pane, game, game.Turn)
+			if len(game.Players[GetPlayerNb(game, game.Turn)].FiveAligned) > 0 &&
+				CheckBreakableAlign(game, st.Color) {
 				game.End = 2
-			} else if CheckWinAlignment(pane, game, game.Turn) {
-				game.End = 1
 				pane.WinnerColor = game.Turn
 			}
 			game.Turn = !game.Turn
