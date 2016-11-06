@@ -142,14 +142,14 @@ func ResetTeamInfos(dat *window.Drawer, color bool) {
 						st.Infos.TeamSt[1+i][1+j], st.Infos.OppoSt[1+i][1+j] = 0, 0
 					}
 				}
+				st.Infos.Breakable = false
 			}
 		}
 	}
 }
 
-func CheckWinAlignment(dat *window.Drawer, game *GomokuGame, color bool) {
-	game.Players[GetPlayerNb(game, color)].FiveAligned = game.Players[GetPlayerNb(game, color)].FiveAligned[:0]
-	ResetTeamInfos(dat, color)
+func UpdateInfos(dat *window.Drawer, game *GomokuGame, color bool) {
+	//ResetTeamInfos(dat, color)
 	for x := range dat.Board_res.Stones {
 		for y := range dat.Board_res.Stones[x] {
 			totOpp, totTeam := 0, 0
@@ -161,7 +161,29 @@ func CheckWinAlignment(dat *window.Drawer, game *GomokuGame, color bool) {
 								getInfosNbStonesDirection(dat, dat.Board_res.Stones[x][y],
 									dat.Board_res.Stones[x][y].Color, i, j)
 							totTeam += dat.Board_res.Stones[x][y].Infos.TeamSt[1+j][1+i]
-							CheckBreakable(dat, dat.Board_res.Stones[x][y])
+						} else {
+							dat.Board_res.Stones[x][y].Infos.OppoSt[1+j][1+i] =
+								getInfosNbStonesDirection(dat, dat.Board_res.Stones[x][y],
+									!dat.Board_res.Stones[x][y].Color, i, j)
+							totOpp += dat.Board_res.Stones[x][y].Infos.OppoSt[1+j][1+i]
+						}
+					}
+				}
+			}
+			dat.Board_res.Stones[x][y].Infos.TeamSt[1][1] = totTeam
+			dat.Board_res.Stones[x][y].Infos.OppoSt[1][1] = totOpp
+		}
+	}
+}
+
+func CheckWinAlignment(dat *window.Drawer, game *GomokuGame, color bool) {
+	game.Players[GetPlayerNb(game, color)].FiveAligned = game.Players[GetPlayerNb(game, color)].FiveAligned[:0]
+	for x := range dat.Board_res.Stones {
+		for y := range dat.Board_res.Stones[x] {
+			for i := -1; i <= 1; i++ {
+				for j := -1; j <= 1; j++ {
+					if !(i == 0 && j == 0) && IsStoneAtPos(dat, x, y) {
+						if dat.Board_res.Stones[x][y].Color == color {
 							if CheckAlignement(dat, dat.Board_res.Stones[x][y], i, j, 3, 0, false) {
 								StonesTab := [5]*window.Stone{
 									dat.Board_res.Stones[x][y],
@@ -171,18 +193,11 @@ func CheckWinAlignment(dat *window.Drawer, game *GomokuGame, color bool) {
 									dat.Board_res.Stones[x+i+i+i+i][y+j+j+j+j]}
 								game.Players[GetPlayerNb(game, color)].FiveAligned =
 									append(game.Players[GetPlayerNb(game, color)].FiveAligned, StonesTab)
-							} else {
-								dat.Board_res.Stones[x][y].Infos.OppoSt[1+j][1+i] =
-									getInfosNbStonesDirection(dat, dat.Board_res.Stones[x][y],
-										!dat.Board_res.Stones[x][y].Color, i, j)
-								totOpp += dat.Board_res.Stones[x][y].Infos.OppoSt[1+j][1+i]
 							}
 						}
 					}
 				}
 			}
-			dat.Board_res.Stones[x][y].Infos.TeamSt[1][1] = totTeam
-			dat.Board_res.Stones[x][y].Infos.OppoSt[1][1] = totOpp
 		}
 	}
 }
@@ -264,7 +279,7 @@ func isDraw(pane *window.Drawer, game *GomokuGame) {
 	}
 }
 
-func CheckBreakableAlign(game *GomokuGame, color bool) bool {
+func CheckBreakableAlign(dat *window.Drawer, game *GomokuGame, color bool) bool {
 	tot := 0
 	for _, line := range game.Players[GetPlayerNb(game, color)].FiveAligned {
 		cpt := 0
@@ -272,7 +287,11 @@ func CheckBreakableAlign(game *GomokuGame, color bool) bool {
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
 					if !(i == 0 && j == 0) &&
-						st.Infos.TeamSt[i+1][j+1] == 1 && st.Infos.OppoSt[1+(-1*i)][1+(-1*j)] >= 1 {
+						st.Infos.TeamSt[i+1][j+1] == 1 &&
+						(st.Infos.OppoSt[1+(-1*i)][1+(-1*j)] >= 1 ||
+							dat.Board_res.Stones[st.Infos.Ipos+j][st.Infos.Jpos+i].Infos.OppoSt[1+i][1+j] >= 1 &&
+								!IsStoneAtPos(dat, st.Infos.Ipos+(-1*j), st.Infos.Jpos+(-1*i))) {
+						st.Infos.Breakable = true
 						cpt = 1
 					}
 				}
@@ -299,9 +318,10 @@ func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 			}
 			st.Visible = true
 			TakeTwoStones(pane, game, st)
+			UpdateInfos(pane, game, game.Turn)
 			CheckWinAlignment(pane, game, game.Turn)
 			if len(game.Players[GetPlayerNb(game, game.Turn)].FiveAligned) > 0 &&
-				CheckBreakableAlign(game, st.Color) {
+				CheckBreakableAlign(pane, game, st.Color) {
 				game.End = 2
 				pane.WinnerColor = game.Turn
 			}
