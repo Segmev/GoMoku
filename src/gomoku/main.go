@@ -23,7 +23,8 @@ func exists(path string) bool {
 func checkFiles() bool {
 	if !exists("ressources/board.png") || !exists("ressources/bstone.png") ||
 		!exists("ressources/woodback.jpg") || !exists("ressources/MotionControl-Bold.otf") ||
-		!exists("ressources/wstone.png") {
+		!exists("ressources/wstone.png") || !exists("ressources/Red.png") ||
+		!exists("ressources/Empty.png") {
 		return false
 	}
 	return true

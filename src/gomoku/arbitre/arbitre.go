@@ -292,7 +292,10 @@ func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 		if st != nil && !st.Visible {
 			st.Color = game.Turn
 			if ThreeBlockNear(pane, game, st) == 2 {
+				pane.Board_res.BadX, pane.Board_res.BadY = st.X, st.Y
 				return
+			} else {
+				pane.Board_res.BadX, pane.Board_res.BadY = 0, 0
 			}
 			st.Visible = true
 			TakeTwoStones(pane, game, st)

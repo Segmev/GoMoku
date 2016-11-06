@@ -3,6 +3,7 @@ package window
 import (
 	//	"os"
 	//	"fmt"
+
 	"strconv"
 
 	"github.com/gtalent/starfish/gfx"
@@ -34,12 +35,14 @@ type EndRes struct {
 }
 
 type BoardRes struct {
-	board   *gfx.Image
-	Wscore  *gfx.Text
-	Bscore  *gfx.Text
-	Restart *gfx.Text
-	St      bool
-	Stones  [][]*Stone
+	badmove    *gfx.Animation
+	BadX, BadY int
+	board      *gfx.Image
+	Wscore     *gfx.Text
+	Bscore     *gfx.Text
+	Restart    *gfx.Text
+	St         bool
+	Stones     [][]*Stone
 }
 
 type Drawer struct {
@@ -67,6 +70,10 @@ func (me *Drawer) initMenu() bool {
 }
 
 func (me *Drawer) initGame() bool {
+	me.Board_res.badmove = gfx.NewAnimation(500)
+	me.Board_res.badmove.LoadImageSize("ressources/Red.png", gfx.DisplayHeight()/20, gfx.DisplayHeight()/20)
+	me.Board_res.badmove.LoadImageSize("ressources/Red.png", gfx.DisplayHeight()/20, gfx.DisplayHeight()/20)
+	me.Board_res.badmove.LoadImageSize("ressources/Empty.png", gfx.DisplayHeight()/20, gfx.DisplayHeight()/20)
 	me.Board_res.board = gfx.LoadImageSize("ressources/board.png", gfx.DisplayHeight(), gfx.DisplayHeight())
 	me.black_stone = gfx.LoadImageSize("ressources/bstone.png", gfx.DisplayHeight()/20,
 		gfx.DisplayHeight()/20)
@@ -140,6 +147,9 @@ func (me *Drawer) drawGameBoard(c *gfx.Canvas) {
 		}
 	}
 	c.PopViewport()
+	if me.Board_res.BadX > 0 {
+		c.DrawAnimation(me.Board_res.badmove, me.Board_res.BadX, me.Board_res.BadY)
+	}
 	c.SetRGBA(133, 94, 66, 140)
 	c.FillRect(10*gfx.DisplayWidth()/14, gfx.DisplayHeight()*10/11,
 		8*gfx.DisplayWidth()/18, gfx.DisplayHeight()/11)
