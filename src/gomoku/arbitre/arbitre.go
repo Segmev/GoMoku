@@ -27,6 +27,7 @@ func (game *GomokuGame) Restart(pane *window.Drawer) bool {
 		}
 	}
 	game.End = 0
+	pane.End_res.DrawEnd = false
 	game.Players[0].Points, game.Players[1].Points = 0, 0
 	pane.Board_res.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
 	pane.Board_res.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
@@ -218,6 +219,21 @@ func ThreeBlockNear(dat *window.Drawer, game *GomokuGame, st *window.Stone) int 
 	return cpt
 }
 
+func isDraw(pane *window.Drawer, game *GomokuGame) {
+	state := true
+	for _, stonesCol := range pane.Board_res.Stones {
+		for _, stone := range stonesCol {
+			if stone.Visible == false {
+				state = false
+			}
+		}
+	}
+	if state == true {
+		game.End = 2
+		pane.End_res.DrawEnd = true
+	}
+}
+
 func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 	if game.End != 2 {
 		st := IsStoneHere(pane, x, y, size)
@@ -246,6 +262,7 @@ func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 		}
 	}
 	HasTakenEnoughStones(pane, game)
+	isDraw(pane, game)
 	if game.End == 2 {
 		pane.GameState = "end"
 	}

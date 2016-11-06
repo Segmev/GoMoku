@@ -28,7 +28,9 @@ type MenuRes struct {
 }
 
 type EndRes struct {
-	end *gfx.Text
+	end         *gfx.Text
+	drawEndText *gfx.Text
+	DrawEnd     bool
 }
 
 type BoardRes struct {
@@ -87,6 +89,7 @@ func (me *Drawer) initGame() bool {
 	me.Board_res.Bscore = me.Font.Write(strconv.Itoa(0))
 	me.Board_res.Restart = me.Font.Write("Restart game")
 	me.End_res.end = me.Font.Write("Winner")
+	me.End_res.drawEndText = me.Font.Write("Draw")
 	return true
 }
 
@@ -158,13 +161,20 @@ func (me *Drawer) drawMenu(c *gfx.Canvas) {
 func (me *Drawer) drawEnd(c *gfx.Canvas) {
 	c.SetRGBA(255, 255, 255, 60)
 	c.FillRect(0, gfx.DisplayHeight()*20/50, gfx.DisplayWidth(), gfx.DisplayHeight()*10/50)
-	c.DrawText(me.End_res.end, 91*gfx.DisplayWidth()/200, 8*gfx.DisplayHeight()/20)
-	if me.WinnerColor {
-		c.DrawImage(me.white_stone, gfx.DisplayWidth()/2, gfx.DisplayHeight()/2)
+	if !me.End_res.DrawEnd {
+		c.DrawText(me.End_res.end, 91*gfx.DisplayWidth()/200, 8*gfx.DisplayHeight()/20)
+		if me.WinnerColor {
+			c.DrawImage(me.white_stone, gfx.DisplayWidth()/2, gfx.DisplayHeight()/2)
+		} else {
+			c.DrawImage(me.black_stone, gfx.DisplayWidth()/2, gfx.DisplayHeight()/2)
+		}
 	} else {
-		c.DrawImage(me.black_stone, gfx.DisplayWidth()/2, gfx.DisplayHeight()/2)
+		c.DrawText(me.End_res.drawEndText, 91*gfx.DisplayWidth()/200, 8*gfx.DisplayHeight()/20)
 	}
-	c.DrawText(me.quitGame, 6*gfx.DisplayWidth()/22, gfx.DisplayHeight()*9/10)
+	c.FillRect(10*gfx.DisplayWidth()/14, gfx.DisplayHeight()*10/11,
+		8*gfx.DisplayWidth()/18, gfx.DisplayHeight()/11)
+	c.DrawText(me.Board_res.Restart, 14*gfx.DisplayWidth()/19, gfx.DisplayHeight()*11/12)
+	c.DrawText(me.quitGame, 4*gfx.DisplayWidth()/22, gfx.DisplayHeight()*11/12)
 	c.SetRGBA(255, 255, 255, 255)
 }
 

@@ -63,7 +63,7 @@ func addInput(pane *window.Drawer, game *arbitre.GomokuGame) {
 					pane.GameState = "gameOn"
 				}
 			}
-		} else if pane.GameState == "gameOn" {
+		} else if pane.GameState == "gameOn" || pane.GameState == "end" {
 			if 10*gfx.DisplayWidth()/14 <= e.X && gfx.DisplayHeight()*10/11 <= e.Y {
 				game.Restart(pane)
 				pane.GameState = "menu"
