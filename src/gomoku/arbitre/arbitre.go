@@ -289,8 +289,8 @@ func CheckBreakableAlign(dat *window.Drawer, game *GomokuGame, color bool) bool 
 					if !(i == 0 && j == 0) &&
 						st.Infos.TeamSt[i+1][j+1] == 1 &&
 						(st.Infos.OppoSt[1+(-1*i)][1+(-1*j)] >= 1 ||
-							dat.Board_res.Stones[st.Infos.Ipos+j][st.Infos.Jpos+i].Infos.OppoSt[1+i][1+j] >= 1 &&
-								!IsStoneAtPos(dat, st.Infos.Ipos+(-1*j), st.Infos.Jpos+(-1*i))) {
+							(dat.Board_res.Stones[st.Infos.Ipos+j][st.Infos.Jpos+i].Infos.OppoSt[1+i][1+j] >= 1 &&
+								!IsStoneAtPos(dat, st.Infos.Ipos+(-1*j), st.Infos.Jpos+(-1*i)))) {
 						st.Infos.Breakable = true
 						cpt = 1
 					}
