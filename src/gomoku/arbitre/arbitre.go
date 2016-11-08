@@ -1,6 +1,7 @@
 package arbitre
 
 import (
+	"gomoku/bmap"
 	"gomoku/window"
 	"strconv"
 )
@@ -51,7 +52,10 @@ func isElemInAlignedArray(s [][5]*window.Stone, e [5]*window.Stone) bool {
 
 func IsStoneAtPos(dat *window.Drawer, i, j int) bool {
 	if i >= 0 && i <= 18 && j >= 0 && j <= 18 {
-		return dat.Board_res.Stones[i][j].Visible
+		if bmap.Map[(i*bmap.Map_size)+j]&(1<<bmap.VISIBLE) > 0 {
+			return true
+		}
+		//return dat.Board_res.Stones[i][j].Visible
 	}
 	return false
 }
@@ -73,6 +77,7 @@ func CheckAlignement(dat *window.Drawer, stone *window.Stone, i, j, lim, ite int
 			if CheckAlignement(dat, stone, i, j, lim, ite+1, del) {
 				if del {
 					dat.Board_res.Stones[stone.Infos.Ipos+iniI][stone.Infos.Jpos+iniJ].Visible = false
+					bmap.SetVisibility(stone.Infos.Ipos+iniI, stone.Infos.Jpos+iniJ, false)
 				}
 				return true
 			}
@@ -317,7 +322,8 @@ func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 				pane.Board_res.BadX, pane.Board_res.BadY = 0, 0
 			}
 			st.Visible = true
-			window.Map[(st.Infos.Ipos * window.Map_size) + st.Infos.Jpos] |= (1 << window.VISIBLE)
+			bmap.SetVisibility(st.Infos.Ipos, st.Infos.Jpos, true)
+			//bmap.Map[(st.Infos.Ipos*bmap.Map_size)+st.Infos.Jpos] |= (1 << bmap.VISIBLE)
 			TakeTwoStones(pane, game, st)
 			UpdateInfos(pane, game, game.Turn)
 			CheckWinAlignment(pane, game, game.Turn)

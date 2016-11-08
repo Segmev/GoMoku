@@ -4,21 +4,9 @@ import (
 	//	"os"
 	//	"fmt"
 	"strconv"
+
 	"github.com/gtalent/starfish/gfx"
 )
-
-const Map_size	= 19
-
-const (
-	VISIBLE		= 0
-	COLOR		= 1
-	SOLO		= 2
-	INTWOGROUP	= 3
-	INTHREEGROUP	= 4
-	BREAKABLE	= 5
-)
-
-var	Map [Map_size * Map_size]uint32
 
 type InfosStone struct {
 	Ipos, Jpos int
