@@ -317,6 +317,7 @@ func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 				pane.Board_res.BadX, pane.Board_res.BadY = 0, 0
 			}
 			st.Visible = true
+			window.Map[(st.Infos.Ipos * window.Map_size) + st.Infos.Jpos] |= (1 << window.VISIBLE)
 			TakeTwoStones(pane, game, st)
 			UpdateInfos(pane, game, game.Turn)
 			CheckWinAlignment(pane, game, game.Turn)
