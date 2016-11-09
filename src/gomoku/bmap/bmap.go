@@ -2,6 +2,8 @@ package bmap
 
 const Map_size = 19
 
+var Map [Map_size * Map_size]uint8
+
 const (
 	VISIBLE      = 0
 	COLOR        = 1
@@ -10,8 +12,6 @@ const (
 	INTHREEGROUP = 4
 	BREAKABLE    = 5
 )
-
-var Map [Map_size * Map_size]uint8
 
 func IsBreakable(i, j int) bool {
 	return Map[(i*Map_size)+j]&(1<<BREAKABLE) != 0
