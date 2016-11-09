@@ -23,6 +23,7 @@ func (game *GomokuGame) Restart(pane *window.Drawer) bool {
 	for i := range pane.Board_res.Stones {
 		for j := range pane.Board_res.Stones[i] {
 			pane.Board_res.Stones[i][j].Visible = false
+			bmap.SetVisibility(i, j, false)
 		}
 	}
 	game.End = 0
@@ -52,9 +53,7 @@ func isElemInAlignedArray(s [][5]*window.Stone, e [5]*window.Stone) bool {
 
 func IsStoneAtPos(dat *window.Drawer, i, j int) bool {
 	if i >= 0 && i <= 18 && j >= 0 && j <= 18 {
-		if bmap.Map[(i*bmap.Map_size)+j]&(1<<bmap.VISIBLE) > 0 {
-			return true
-		}
+		return bmap.IsVisible(i, j)
 		//return dat.Board_res.Stones[i][j].Visible
 	}
 	return false
@@ -130,11 +129,13 @@ func CheckBreakable(dat *window.Drawer, stone *window.Stone) bool {
 					dat.Board_res.Stones[stone.Infos.Ipos+i+i][stone.Infos.Jpos+j+j].Color != stone.Color) ||
 					stone.Infos.OppoSt[1+(-1*j)][1+(-1*i)] >= 1) {
 				stone.Infos.Breakable = true
+				bmap.SetBreakable(stone.Infos.Ipos, stone.Infos.Jpos, true)
 				return true
 			}
 		}
 	}
 	stone.Infos.Breakable = false
+	bmap.SetBreakable(stone.Infos.Ipos, stone.Infos.Jpos, false)
 	return false
 }
 
@@ -148,6 +149,7 @@ func ResetTeamInfos(dat *window.Drawer, color bool) {
 					}
 				}
 				st.Infos.Breakable = false
+				bmap.SetBreakable(st.Infos.Ipos, st.Infos.Jpos, false)
 			}
 		}
 	}
@@ -211,6 +213,7 @@ func AppearStone(dat *window.Drawer, x, y, size int) bool {
 	stone := IsStoneHere(dat, x, y, size)
 	if stone != nil {
 		stone.Visible = true
+		bmap.SetVisibility(stone.Infos.Ipos, stone.Infos.Jpos, true)
 		return true
 	}
 	return false
@@ -218,12 +221,10 @@ func AppearStone(dat *window.Drawer, x, y, size int) bool {
 
 func IsStoneHere(dat *window.Drawer, x, y, size int) *window.Stone {
 	for i := range dat.Board_res.Stones {
-		for j := range dat.Board_res.Stones[i] {
-			if x >= dat.Board_res.Stones[i][j].X &&
-				x <= dat.Board_res.Stones[i][j].X+size*2 &&
-				y >= dat.Board_res.Stones[i][j].Y &&
-				y <= dat.Board_res.Stones[i][j].Y+size*2 {
-				return dat.Board_res.Stones[i][j]
+		for _, st := range dat.Board_res.Stones[i] {
+			if x >= st.X && x <= st.X+size*2 &&
+				y >= st.Y && y <= st.Y+size*2 {
+				return st
 			}
 		}
 	}
@@ -315,6 +316,7 @@ func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 		st := IsStoneHere(pane, x, y, size)
 		if st != nil && !st.Visible {
 			st.Color = game.Turn
+			bmap.SetColor(st.Infos.Ipos, st.Infos.Jpos, game.Turn)
 			if ThreeBlockNear(pane, game, st) == 2 {
 				pane.Board_res.BadX, pane.Board_res.BadY = st.X, st.Y
 				return

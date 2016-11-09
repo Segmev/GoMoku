@@ -3,6 +3,7 @@ package window
 import (
 	//	"os"
 	//	"fmt"
+	"gomoku/bmap"
 	"strconv"
 
 	"github.com/gtalent/starfish/gfx"
@@ -131,10 +132,10 @@ func (me *Drawer) drawGameBoard(c *gfx.Canvas) {
 	{
 		c.DrawImage(me.Board_res.board, 0, 0)
 
-		for i := range me.Board_res.Stones {
-			for j := range me.Board_res.Stones[i] {
-				if me.Board_res.Stones[i][j].Visible {
-					if me.Board_res.Stones[i][j].Color == true {
+		for i := 0; i < bmap.Map_size; i++ {
+			for j := 0; j < bmap.Map_size; j++ {
+				if bmap.IsVisible(i, j) {
+					if bmap.IsWhite(i, j) {
 						c.DrawImage(me.white_stone, me.Board_res.Stones[i][j].X,
 							me.Board_res.Stones[i][j].Y)
 					} else {
@@ -144,6 +145,20 @@ func (me *Drawer) drawGameBoard(c *gfx.Canvas) {
 				}
 			}
 		}
+
+		// for i := range me.Board_res.Stones {
+		// 	for j := range me.Board_res.Stones[i] {
+		// 		if me.Board_res.Stones[i][j].Visible {
+		// 			if me.Board_res.Stones[i][j].Color == true {
+		// 				c.DrawImage(me.white_stone, me.Board_res.Stones[i][j].X,
+		// 					me.Board_res.Stones[i][j].Y)
+		// 			} else {
+		// 				c.DrawImage(me.black_stone, me.Board_res.Stones[i][j].X,
+		// 					me.Board_res.Stones[i][j].Y)
+		// 			}
+		// 		}
+		// 	}
+		//}
 	}
 	c.PopViewport()
 	if me.Board_res.BadX > 0 {
