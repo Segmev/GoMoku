@@ -96,3 +96,7 @@ func SetVisibility(i, j int, vis bool) {
 		}
 	}
 }
+
+func ClearStone(i, j int) {
+	Map[(i*Map_size)+j] = 0
+}

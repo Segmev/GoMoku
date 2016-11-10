@@ -23,7 +23,7 @@ func (game *GomokuGame) Restart(pane *window.Drawer) bool {
 	for i := range pane.Board_res.Stones {
 		for j := range pane.Board_res.Stones[i] {
 			pane.Board_res.Stones[i][j].Visible = false
-			bmap.SetVisibility(i, j, false)
+			bmap.ClearStone(i, j)
 		}
 	}
 	game.End = 0
@@ -70,7 +70,7 @@ func augmentPos(pos int) int {
 
 func CheckAlignement(dat *window.Drawer, stone *window.Stone, i, j, lim, ite int, del bool) bool {
 	if IsStoneAtPos(dat, stone.Infos.Ipos+i, stone.Infos.Jpos+j) {
-		if del && ite < lim && dat.Board_res.Stones[stone.Infos.Ipos+i][stone.Infos.Jpos+j].Color != stone.Color {
+		if del && ite < lim && bmap.IsWhite(stone.Infos.Ipos+i, stone.Infos.Jpos+j) != stone.Color {
 			iniI, iniJ := i, j
 			i, j = augmentPos(i), augmentPos(j)
 			if CheckAlignement(dat, stone, i, j, lim, ite+1, del) {
@@ -80,13 +80,12 @@ func CheckAlignement(dat *window.Drawer, stone *window.Stone, i, j, lim, ite int
 				}
 				return true
 			}
-		} else if !del && ite < lim && dat.Board_res.Stones[stone.Infos.Ipos+i][stone.Infos.Jpos+j].Color ==
-			stone.Color {
+		} else if !del && ite < lim && bmap.IsWhite(stone.Infos.Ipos+i, stone.Infos.Jpos+j) == stone.Color {
 			i, j = augmentPos(i), augmentPos(j)
 			if CheckAlignement(dat, stone, i, j, lim, ite+1, del) {
 				return true
 			}
-		} else if ite == lim && dat.Board_res.Stones[stone.Infos.Ipos+i][stone.Infos.Jpos+j].Color == stone.Color {
+		} else if ite == lim && bmap.IsWhite(stone.Infos.Ipos+i, stone.Infos.Jpos+j) == stone.Color {
 			return true
 		}
 	}
@@ -113,7 +112,7 @@ func TakeTwoStones(dat *window.Drawer, game *GomokuGame, stone *window.Stone) bo
 func getInfosNbStonesDirection(dat *window.Drawer, st *window.Stone, color bool, i, j int) int {
 	cpt := 0
 	for IsStoneAtPos(dat, st.Infos.Ipos+i, st.Infos.Jpos+j) &&
-		dat.Board_res.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Color == color {
+		bmap.IsWhite(st.Infos.Ipos+i, st.Infos.Jpos+j) == color {
 		cpt += 1
 		i, j = augmentPos(i), augmentPos(j)
 	}
@@ -126,7 +125,7 @@ func CheckBreakable(dat *window.Drawer, stone *window.Stone) bool {
 			if !(i == 0 && j == 0) && stone.Infos.TeamSt[1+j][1+i] == 1 &&
 				((IsStoneAtPos(dat, stone.Infos.Ipos+i, stone.Infos.Jpos+j) &&
 					IsStoneAtPos(dat, stone.Infos.Ipos+i+i, stone.Infos.Jpos+j+j) &&
-					dat.Board_res.Stones[stone.Infos.Ipos+i+i][stone.Infos.Jpos+j+j].Color != stone.Color) ||
+					bmap.IsWhite(stone.Infos.Ipos+i+i, stone.Infos.Jpos+j+j) != stone.Color) ||
 					stone.Infos.OppoSt[1+(-1*j)][1+(-1*i)] >= 1) {
 				stone.Infos.Breakable = true
 				bmap.SetBreakable(stone.Infos.Ipos, stone.Infos.Jpos, true)
@@ -163,15 +162,15 @@ func UpdateInfos(dat *window.Drawer, game *GomokuGame, color bool) {
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
 					if !(i == 0 && j == 0) && IsStoneAtPos(dat, x, y) {
-						if dat.Board_res.Stones[x][y].Color == color {
+						if bmap.IsWhite(x, y) == color {
 							dat.Board_res.Stones[x][y].Infos.TeamSt[1+j][1+i] =
 								getInfosNbStonesDirection(dat, dat.Board_res.Stones[x][y],
-									dat.Board_res.Stones[x][y].Color, i, j)
+									bmap.IsWhite(x, y), i, j)
 							totTeam += dat.Board_res.Stones[x][y].Infos.TeamSt[1+j][1+i]
 						} else {
 							dat.Board_res.Stones[x][y].Infos.OppoSt[1+j][1+i] =
 								getInfosNbStonesDirection(dat, dat.Board_res.Stones[x][y],
-									!dat.Board_res.Stones[x][y].Color, i, j)
+									!bmap.IsWhite(x, y), i, j)
 							totOpp += dat.Board_res.Stones[x][y].Infos.OppoSt[1+j][1+i]
 						}
 					}
