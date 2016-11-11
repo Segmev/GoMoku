@@ -23,9 +23,20 @@ type Stone struct {
 	Infos   InfosStone
 }
 
+type OptionsRes struct {
+	op1, op2, ext bool
+	cross         *gfx.Image
+	optionRule1   *gfx.Text
+	optionRule2   *gfx.Text
+	restart       *gfx.Text
+	back          *gfx.Text
+	exit          *gfx.Text
+}
+
 type MenuRes struct {
-	solo *gfx.Text
-	duo  *gfx.Text
+	solo    *gfx.Text
+	duo     *gfx.Text
+	options *gfx.Text
 }
 
 type EndRes struct {
@@ -46,6 +57,10 @@ type BoardRes struct {
 }
 
 type Drawer struct {
+	BoardRes
+	MenuRes
+	EndRes
+	OptionsRes
 	backgrnd    *gfx.Image
 	title       *gfx.Text
 	quitGame    *gfx.Text
@@ -58,28 +73,36 @@ type Drawer struct {
 	Turn        bool
 	GameState   string
 	WinnerColor bool
-	Board_res   BoardRes
-	Menu_res    MenuRes
-	End_res     EndRes
+}
+
+func (me *Drawer) initOptions() bool {
+	me.OptionsRes.op1, me.OptionsRes.op2 = true, true
+	me.OptionsRes.optionRule1 = me.Font.Write("Unbroken row")
+	me.OptionsRes.optionRule2 = me.Font.Write("Three and three")
+	me.OptionsRes.exit = me.Font.Write("Exit game")
+	me.OptionsRes.restart = me.Font.Write("Restart")
+	return true
 }
 
 func (me *Drawer) initMenu() bool {
-	me.Menu_res.solo = me.Font.Write("Play against Computer")
-	me.Menu_res.duo = me.Font.Write("Play against Human")
+	me.MenuRes.solo = me.Font.Write("Play against Computer")
+	me.MenuRes.duo = me.Font.Write("Play against Human")
+	me.MenuRes.options = me.Font.Write("Options")
 	return true
 }
 
 func (me *Drawer) initGame() bool {
-	me.Board_res.badmove = gfx.NewAnimation(500)
-	me.Board_res.badmove.LoadImageSize("ressources/Red.png", gfx.DisplayHeight()/20, gfx.DisplayHeight()/20)
-	me.Board_res.badmove.LoadImageSize("ressources/Red.png", gfx.DisplayHeight()/20, gfx.DisplayHeight()/20)
-	me.Board_res.badmove.LoadImageSize("ressources/Empty.png", gfx.DisplayHeight()/20, gfx.DisplayHeight()/20)
-	me.Board_res.board = gfx.LoadImageSize("ressources/board.png", gfx.DisplayHeight(), gfx.DisplayHeight())
+	me.OptionsRes.cross = gfx.LoadImageSize("ressources/Cross.png", gfx.DisplayHeight()/25, gfx.DisplayHeight()/25)
+	me.BoardRes.badmove = gfx.NewAnimation(500)
+	me.BoardRes.badmove.LoadImageSize("ressources/Red.png", gfx.DisplayHeight()/20, gfx.DisplayHeight()/20)
+	me.BoardRes.badmove.LoadImageSize("ressources/Red.png", gfx.DisplayHeight()/20, gfx.DisplayHeight()/20)
+	me.BoardRes.badmove.LoadImageSize("ressources/Empty.png", gfx.DisplayHeight()/20, gfx.DisplayHeight()/20)
+	me.BoardRes.board = gfx.LoadImageSize("ressources/board.png", gfx.DisplayHeight(), gfx.DisplayHeight())
 	me.black_stone = gfx.LoadImageSize("ressources/bstone.png", gfx.DisplayHeight()/20,
 		gfx.DisplayHeight()/20)
 	me.white_stone = gfx.LoadImageSize("ressources/wstone.png", gfx.DisplayHeight()/20,
 		gfx.DisplayHeight()/20)
-	me.Board_res.Stones = nil
+	me.BoardRes.Stones = nil
 	for i := 0; i <= 18; i++ {
 		row := []*Stone{}
 		for j := 0; j <= 18; j++ {
@@ -90,13 +113,13 @@ func (me *Drawer) initGame() bool {
 			stone.Color, stone.Visible = true, false
 			row = append(row, stone)
 		}
-		me.Board_res.Stones = append(me.Board_res.Stones, row)
+		me.BoardRes.Stones = append(me.BoardRes.Stones, row)
 	}
-	me.Board_res.Wscore = me.Font.Write(strconv.Itoa(0))
-	me.Board_res.Bscore = me.Font.Write(strconv.Itoa(0))
-	me.Board_res.Restart = me.Font.Write("Restart game")
-	me.End_res.end = me.Font.Write("Winner")
-	me.End_res.drawEndText = me.Font.Write("Draw")
+	me.BoardRes.Wscore = me.Font.Write(strconv.Itoa(0))
+	me.BoardRes.Bscore = me.Font.Write(strconv.Itoa(0))
+	me.BoardRes.Restart = me.Font.Write("Restart game")
+	me.EndRes.end = me.Font.Write("Winner")
+	me.EndRes.drawEndText = me.Font.Write("Draw")
 	return true
 }
 
@@ -108,7 +131,7 @@ func (me *Drawer) Init() bool {
 	me.score = me.Font.Write("Taken")
 	me.mturn = me.Font.Write("Turn")
 	me.quitGame = me.Font.Write("Press escape key to quit")
-	if me.initGame() && me.initMenu() {
+	if me.initGame() && me.initMenu() && me.initOptions() {
 		return true
 	}
 	return false
@@ -124,50 +147,36 @@ func (me *Drawer) drawGameBoard(c *gfx.Canvas) {
 	}
 	c.DrawText(me.score, gfx.DisplayWidth()*3/4, 4*gfx.DisplayHeight()/10)
 	c.DrawImage(me.black_stone, gfx.DisplayWidth()*10/13, 6*gfx.DisplayHeight()/12+8)
-	c.DrawText(me.Board_res.Wscore, gfx.DisplayWidth()*5/6, 6*gfx.DisplayHeight()/12)
+	c.DrawText(me.BoardRes.Wscore, gfx.DisplayWidth()*5/6, 6*gfx.DisplayHeight()/12)
 	c.DrawImage(me.white_stone, gfx.DisplayWidth()*10/13, 7*gfx.DisplayHeight()/12+8)
-	c.DrawText(me.Board_res.Bscore, gfx.DisplayWidth()*5/6, 7*gfx.DisplayHeight()/12)
+	c.DrawText(me.BoardRes.Bscore, gfx.DisplayWidth()*5/6, 7*gfx.DisplayHeight()/12)
 
 	c.PushViewport(0, 0, gfx.DisplayWidth(), gfx.DisplayWidth())
 	{
-		c.DrawImage(me.Board_res.board, 0, 0)
+		c.DrawImage(me.BoardRes.board, 0, 0)
 
 		for i := 0; i < bmap.Map_size; i++ {
 			for j := 0; j < bmap.Map_size; j++ {
 				if bmap.IsVisible(i, j) {
 					if bmap.IsWhite(i, j) {
-						c.DrawImage(me.white_stone, me.Board_res.Stones[i][j].X,
-							me.Board_res.Stones[i][j].Y)
+						c.DrawImage(me.white_stone, me.BoardRes.Stones[i][j].X,
+							me.BoardRes.Stones[i][j].Y)
 					} else {
-						c.DrawImage(me.black_stone, me.Board_res.Stones[i][j].X,
-							me.Board_res.Stones[i][j].Y)
+						c.DrawImage(me.black_stone, me.BoardRes.Stones[i][j].X,
+							me.BoardRes.Stones[i][j].Y)
 					}
 				}
 			}
 		}
-
-		// for i := range me.Board_res.Stones {
-		// 	for j := range me.Board_res.Stones[i] {
-		// 		if me.Board_res.Stones[i][j].Visible {
-		// 			if me.Board_res.Stones[i][j].Color == true {
-		// 				c.DrawImage(me.white_stone, me.Board_res.Stones[i][j].X,
-		// 					me.Board_res.Stones[i][j].Y)
-		// 			} else {
-		// 				c.DrawImage(me.black_stone, me.Board_res.Stones[i][j].X,
-		// 					me.Board_res.Stones[i][j].Y)
-		// 			}
-		// 		}
-		// 	}
-		//}
 	}
 	c.PopViewport()
-	if me.Board_res.BadX > 0 {
-		c.DrawAnimation(me.Board_res.badmove, me.Board_res.BadX, me.Board_res.BadY)
+	if me.BoardRes.BadX > 0 {
+		c.DrawAnimation(me.BoardRes.badmove, me.BoardRes.BadX, me.BoardRes.BadY)
 	}
 	c.SetRGBA(133, 94, 66, 140)
 	c.FillRect(10*gfx.DisplayWidth()/14, gfx.DisplayHeight()*10/11,
 		8*gfx.DisplayWidth()/18, gfx.DisplayHeight()/11)
-	c.DrawText(me.Board_res.Restart, 14*gfx.DisplayWidth()/19, gfx.DisplayHeight()*11/12)
+	c.DrawText(me.BoardRes.Restart, 14*gfx.DisplayWidth()/19, gfx.DisplayHeight()*11/12)
 }
 
 func (me *Drawer) drawMenu(c *gfx.Canvas) {
@@ -177,29 +186,40 @@ func (me *Drawer) drawMenu(c *gfx.Canvas) {
 		8*gfx.DisplayWidth()/18, gfx.DisplayHeight()/11, 10)
 	c.FillRoundedRect(4*gfx.DisplayWidth()/14, gfx.DisplayHeight()*5/10,
 		8*gfx.DisplayWidth()/18, gfx.DisplayHeight()/11, 10)
-	c.DrawText(me.Menu_res.solo, 6*gfx.DisplayWidth()/20, gfx.DisplayHeight()*4/10)
-	c.DrawText(me.Menu_res.duo, 6*gfx.DisplayWidth()/19, gfx.DisplayHeight()*5/10)
+	c.FillRoundedRect(4*gfx.DisplayWidth()/14, gfx.DisplayHeight()*6/10,
+		8*gfx.DisplayWidth()/18, gfx.DisplayHeight()/11, 10)
+	c.DrawText(me.MenuRes.solo, 6*gfx.DisplayWidth()/20, gfx.DisplayHeight()*4/10)
+	c.DrawText(me.MenuRes.duo, 6*gfx.DisplayWidth()/19, gfx.DisplayHeight()*5/10)
+	c.DrawText(me.MenuRes.options, 5*gfx.DisplayWidth()/12, gfx.DisplayHeight()*6/10)
 	c.DrawText(me.quitGame, 6*gfx.DisplayWidth()/22, gfx.DisplayHeight()*9/10)
 }
 
 func (me *Drawer) drawEnd(c *gfx.Canvas) {
 	c.SetRGBA(255, 255, 255, 60)
 	c.FillRect(0, gfx.DisplayHeight()*20/50, gfx.DisplayWidth(), gfx.DisplayHeight()*10/50)
-	if !me.End_res.DrawEnd {
-		c.DrawText(me.End_res.end, 91*gfx.DisplayWidth()/200, 8*gfx.DisplayHeight()/20)
+	if !me.EndRes.DrawEnd {
+		c.DrawText(me.EndRes.end, 91*gfx.DisplayWidth()/200, 8*gfx.DisplayHeight()/20)
 		if me.WinnerColor {
 			c.DrawImage(me.white_stone, gfx.DisplayWidth()/2, gfx.DisplayHeight()/2)
 		} else {
 			c.DrawImage(me.black_stone, gfx.DisplayWidth()/2, gfx.DisplayHeight()/2)
 		}
 	} else {
-		c.DrawText(me.End_res.drawEndText, 91*gfx.DisplayWidth()/200, 8*gfx.DisplayHeight()/20)
+		c.DrawText(me.EndRes.drawEndText, 91*gfx.DisplayWidth()/200, 8*gfx.DisplayHeight()/20)
 	}
 	c.FillRect(10*gfx.DisplayWidth()/14, gfx.DisplayHeight()*10/11,
 		8*gfx.DisplayWidth()/18, gfx.DisplayHeight()/11)
-	c.DrawText(me.Board_res.Restart, 14*gfx.DisplayWidth()/19, gfx.DisplayHeight()*11/12)
+	c.DrawText(me.BoardRes.Restart, 14*gfx.DisplayWidth()/19, gfx.DisplayHeight()*11/12)
 	c.DrawText(me.quitGame, 4*gfx.DisplayWidth()/22, gfx.DisplayHeight()*11/12)
 	c.SetRGBA(255, 255, 255, 255)
+}
+
+func (me *Drawer) drawOptions(c *gfx.Canvas) {
+	c.SetRGBA(0, 0, 0, 100)
+	c.FillRect(gfx.DisplayHeight()*20/50, 0, gfx.DisplayHeight()*30/50, gfx.DisplayWidth())
+	c.SetRGBA(0, 0, 0, 150)
+	c.FillRect(gfx.DisplayHeight()*21/50, 0, gfx.DisplayHeight()*28/50, gfx.DisplayWidth()/25)
+	c.DrawImage(me.OptionsRes.cross, 50, 50)
 }
 
 func (me *Drawer) Draw(c *gfx.Canvas) {
@@ -213,5 +233,7 @@ func (me *Drawer) Draw(c *gfx.Canvas) {
 		me.drawMenu(c)
 	} else if me.GameState == "end" {
 		me.drawEnd(c)
+	} else if me.GameState == "options" {
+		me.drawOptions(c)
 	}
 }

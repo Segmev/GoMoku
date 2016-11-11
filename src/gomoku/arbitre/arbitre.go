@@ -20,17 +20,17 @@ type GomokuGame struct {
 }
 
 func (game *GomokuGame) Restart(pane *window.Drawer) bool {
-	for i := range pane.Board_res.Stones {
-		for j := range pane.Board_res.Stones[i] {
-			pane.Board_res.Stones[i][j].Visible = false
+	for i := range pane.BoardRes.Stones {
+		for j := range pane.BoardRes.Stones[i] {
+			pane.BoardRes.Stones[i][j].Visible = false
 			bmap.ClearStone(i, j)
 		}
 	}
 	game.End = 0
-	pane.End_res.DrawEnd = false
+	pane.EndRes.DrawEnd = false
 	game.Players[0].Points, game.Players[1].Points = 0, 0
-	pane.Board_res.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
-	pane.Board_res.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
+	pane.BoardRes.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
+	pane.BoardRes.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
 	pane.GameState = "menu"
 	return true
 }
@@ -54,7 +54,7 @@ func isElemInAlignedArray(s [][5]*window.Stone, e [5]*window.Stone) bool {
 func IsStoneAtPos(dat *window.Drawer, i, j int) bool {
 	if i >= 0 && i <= 18 && j >= 0 && j <= 18 {
 		return bmap.IsVisible(i, j)
-		//return dat.Board_res.Stones[i][j].Visible
+		//return dat.BoardRes.Stones[i][j].Visible
 	}
 	return false
 }
@@ -75,7 +75,7 @@ func CheckAlignement(dat *window.Drawer, stone *window.Stone, i, j, lim, ite int
 			i, j = augmentPos(i), augmentPos(j)
 			if CheckAlignement(dat, stone, i, j, lim, ite+1, del) {
 				if del {
-					dat.Board_res.Stones[stone.Infos.Ipos+iniI][stone.Infos.Jpos+iniJ].Visible = false
+					dat.BoardRes.Stones[stone.Infos.Ipos+iniI][stone.Infos.Jpos+iniJ].Visible = false
 					bmap.SetVisibility(stone.Infos.Ipos+iniI, stone.Infos.Jpos+iniJ, false)
 				}
 				return true
@@ -139,8 +139,8 @@ func CheckBreakable(dat *window.Drawer, stone *window.Stone) bool {
 }
 
 func ResetTeamInfos(dat *window.Drawer, color bool) {
-	for x := range dat.Board_res.Stones {
-		for _, st := range dat.Board_res.Stones[x] {
+	for x := range dat.BoardRes.Stones {
+		for _, st := range dat.BoardRes.Stones[x] {
 			if st.Color == color {
 				for i := -1; i <= 1; i++ {
 					for j := -1; j <= 1; j++ {
@@ -156,47 +156,47 @@ func ResetTeamInfos(dat *window.Drawer, color bool) {
 
 func UpdateInfos(dat *window.Drawer, game *GomokuGame, color bool) {
 	//ResetTeamInfos(dat, color)
-	for x := range dat.Board_res.Stones {
-		for y := range dat.Board_res.Stones[x] {
+	for x := range dat.BoardRes.Stones {
+		for y := range dat.BoardRes.Stones[x] {
 			totOpp, totTeam := 0, 0
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
 					if !(i == 0 && j == 0) && IsStoneAtPos(dat, x, y) {
 						if bmap.IsWhite(x, y) == color {
-							dat.Board_res.Stones[x][y].Infos.TeamSt[1+j][1+i] =
-								getInfosNbStonesDirection(dat, dat.Board_res.Stones[x][y],
+							dat.BoardRes.Stones[x][y].Infos.TeamSt[1+j][1+i] =
+								getInfosNbStonesDirection(dat, dat.BoardRes.Stones[x][y],
 									bmap.IsWhite(x, y), i, j)
-							totTeam += dat.Board_res.Stones[x][y].Infos.TeamSt[1+j][1+i]
+							totTeam += dat.BoardRes.Stones[x][y].Infos.TeamSt[1+j][1+i]
 						} else {
-							dat.Board_res.Stones[x][y].Infos.OppoSt[1+j][1+i] =
-								getInfosNbStonesDirection(dat, dat.Board_res.Stones[x][y],
+							dat.BoardRes.Stones[x][y].Infos.OppoSt[1+j][1+i] =
+								getInfosNbStonesDirection(dat, dat.BoardRes.Stones[x][y],
 									!bmap.IsWhite(x, y), i, j)
-							totOpp += dat.Board_res.Stones[x][y].Infos.OppoSt[1+j][1+i]
+							totOpp += dat.BoardRes.Stones[x][y].Infos.OppoSt[1+j][1+i]
 						}
 					}
 				}
 			}
-			dat.Board_res.Stones[x][y].Infos.TeamSt[1][1] = totTeam
-			dat.Board_res.Stones[x][y].Infos.OppoSt[1][1] = totOpp
+			dat.BoardRes.Stones[x][y].Infos.TeamSt[1][1] = totTeam
+			dat.BoardRes.Stones[x][y].Infos.OppoSt[1][1] = totOpp
 		}
 	}
 }
 
 func CheckWinAlignment(dat *window.Drawer, game *GomokuGame, color bool) {
 	game.Players[GetPlayerNb(game, color)].FiveAligned = game.Players[GetPlayerNb(game, color)].FiveAligned[:0]
-	for x := range dat.Board_res.Stones {
-		for y := range dat.Board_res.Stones[x] {
+	for x := range dat.BoardRes.Stones {
+		for y := range dat.BoardRes.Stones[x] {
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
 					if !(i == 0 && j == 0) && IsStoneAtPos(dat, x, y) {
-						if dat.Board_res.Stones[x][y].Color == color {
-							if CheckAlignement(dat, dat.Board_res.Stones[x][y], i, j, 3, 0, false) {
+						if dat.BoardRes.Stones[x][y].Color == color {
+							if CheckAlignement(dat, dat.BoardRes.Stones[x][y], i, j, 3, 0, false) {
 								StonesTab := [5]*window.Stone{
-									dat.Board_res.Stones[x][y],
-									dat.Board_res.Stones[x+i][y+j],
-									dat.Board_res.Stones[x+i+i][y+j+j],
-									dat.Board_res.Stones[x+i+i+i][y+j+j+j],
-									dat.Board_res.Stones[x+i+i+i+i][y+j+j+j+j]}
+									dat.BoardRes.Stones[x][y],
+									dat.BoardRes.Stones[x+i][y+j],
+									dat.BoardRes.Stones[x+i+i][y+j+j],
+									dat.BoardRes.Stones[x+i+i+i][y+j+j+j],
+									dat.BoardRes.Stones[x+i+i+i+i][y+j+j+j+j]}
 								game.Players[GetPlayerNb(game, color)].FiveAligned =
 									append(game.Players[GetPlayerNb(game, color)].FiveAligned, StonesTab)
 							}
@@ -219,8 +219,8 @@ func AppearStone(dat *window.Drawer, x, y, size int) bool {
 }
 
 func IsStoneHere(dat *window.Drawer, x, y, size int) *window.Stone {
-	for i := range dat.Board_res.Stones {
-		for _, st := range dat.Board_res.Stones[i] {
+	for i := range dat.BoardRes.Stones {
+		for _, st := range dat.BoardRes.Stones[i] {
 			if x >= st.X && x <= st.X+size*2 &&
 				y >= st.Y && y <= st.Y+size*2 {
 				return st
@@ -246,19 +246,19 @@ func ThreeBlockNear(dat *window.Drawer, game *GomokuGame, st *window.Stone) int 
 		for j := -1; j <= 1; j++ {
 			if !(i == 0 && j == 0) {
 				if IsStoneAtPos(dat, st.Infos.Ipos+i, st.Infos.Jpos+j) {
-					if st.Color == dat.Board_res.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Color {
-						if dat.Board_res.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Infos.TeamSt[1+j][1+i] <= 1 {
-							if dat.Board_res.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Infos.TeamSt[1+j][1+i] == 1 ||
+					if st.Color == dat.BoardRes.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Color {
+						if dat.BoardRes.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Infos.TeamSt[1+j][1+i] <= 1 {
+							if dat.BoardRes.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Infos.TeamSt[1+j][1+i] == 1 ||
 								(IsStoneAtPos(dat, st.Infos.Ipos+i+i+i, st.Infos.Jpos+j+j+j) &&
-									st.Color == dat.Board_res.Stones[st.Infos.Ipos+i+i+i][st.Infos.Jpos+j+j+j].Color &&
-									dat.Board_res.Stones[st.Infos.Ipos+i+i+i][st.Infos.Jpos+j+j+j].Infos.TeamSt[1+j][1+i] == 0) {
+									st.Color == dat.BoardRes.Stones[st.Infos.Ipos+i+i+i][st.Infos.Jpos+j+j+j].Color &&
+									dat.BoardRes.Stones[st.Infos.Ipos+i+i+i][st.Infos.Jpos+j+j+j].Infos.TeamSt[1+j][1+i] == 0) {
 								cpt += 1
 							}
 						}
 					}
 				} else if IsStoneAtPos(dat, st.Infos.Ipos+i+i, st.Infos.Jpos+j+j) {
-					if st.Color == dat.Board_res.Stones[st.Infos.Ipos+i+i][st.Infos.Jpos+j+j].Color {
-						if dat.Board_res.Stones[st.Infos.Ipos+i+i][st.Infos.Jpos+j+j].Infos.TeamSt[1+j][1+i] == 1 {
+					if st.Color == dat.BoardRes.Stones[st.Infos.Ipos+i+i][st.Infos.Jpos+j+j].Color {
+						if dat.BoardRes.Stones[st.Infos.Ipos+i+i][st.Infos.Jpos+j+j].Infos.TeamSt[1+j][1+i] == 1 {
 							cpt += 1
 						}
 					}
@@ -271,7 +271,7 @@ func ThreeBlockNear(dat *window.Drawer, game *GomokuGame, st *window.Stone) int 
 
 func isDraw(pane *window.Drawer, game *GomokuGame) {
 	state := true
-	for _, stonesCol := range pane.Board_res.Stones {
+	for _, stonesCol := range pane.BoardRes.Stones {
 		for _, stone := range stonesCol {
 			if stone.Visible == false {
 				state = false
@@ -280,7 +280,7 @@ func isDraw(pane *window.Drawer, game *GomokuGame) {
 	}
 	if state == true {
 		game.End = 2
-		pane.End_res.DrawEnd = true
+		pane.EndRes.DrawEnd = true
 	}
 }
 
@@ -294,7 +294,7 @@ func CheckBreakableAlign(dat *window.Drawer, game *GomokuGame, color bool) bool 
 					if !(i == 0 && j == 0) &&
 						st.Infos.TeamSt[i+1][j+1] == 1 &&
 						(st.Infos.OppoSt[1+(-1*i)][1+(-1*j)] >= 1 ||
-							(dat.Board_res.Stones[st.Infos.Ipos+j][st.Infos.Jpos+i].Infos.OppoSt[1+i][1+j] >= 1 &&
+							(dat.BoardRes.Stones[st.Infos.Ipos+j][st.Infos.Jpos+i].Infos.OppoSt[1+i][1+j] >= 1 &&
 								!IsStoneAtPos(dat, st.Infos.Ipos+(-1*j), st.Infos.Jpos+(-1*i)))) {
 						st.Infos.Breakable = true
 						cpt = 1
@@ -317,14 +317,13 @@ func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 			st.Color = game.Turn
 			bmap.SetColor(st.Infos.Ipos, st.Infos.Jpos, game.Turn)
 			if ThreeBlockNear(pane, game, st) == 2 {
-				pane.Board_res.BadX, pane.Board_res.BadY = st.X, st.Y
+				pane.BoardRes.BadX, pane.BoardRes.BadY = st.X, st.Y
 				return
 			} else {
-				pane.Board_res.BadX, pane.Board_res.BadY = 0, 0
+				pane.BoardRes.BadX, pane.BoardRes.BadY = 0, 0
 			}
 			st.Visible = true
 			bmap.SetVisibility(st.Infos.Ipos, st.Infos.Jpos, true)
-			//bmap.Map[(st.Infos.Ipos*bmap.Map_size)+st.Infos.Jpos] |= (1 << bmap.VISIBLE)
 			TakeTwoStones(pane, game, st)
 			UpdateInfos(pane, game, game.Turn)
 			CheckWinAlignment(pane, game, game.Turn)
@@ -341,7 +340,7 @@ func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 	if game.End == 2 {
 		pane.GameState = "end"
 	}
-	pane.Board_res.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
-	pane.Board_res.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
+	pane.BoardRes.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
+	pane.BoardRes.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
 	pane.Turn = game.Turn
 }

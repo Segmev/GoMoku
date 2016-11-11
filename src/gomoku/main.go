@@ -24,7 +24,7 @@ func checkFiles() bool {
 	if !exists("ressources/board.png") || !exists("ressources/bstone.png") ||
 		!exists("ressources/woodback.jpg") || !exists("ressources/MotionControl-Bold.otf") ||
 		!exists("ressources/wstone.png") || !exists("ressources/Red.png") ||
-		!exists("ressources/Empty.png") {
+		!exists("ressources/Empty.png") || !exists("ressources/Cross.png") {
 		return false
 	}
 	return true
@@ -54,15 +54,15 @@ func addInput(pane *window.Drawer, game *arbitre.GomokuGame) {
 	})
 	input.AddMouseReleaseFunc(func(e input.MouseEvent) {
 		if pane.GameState == "menu" {
-			if e.X >= 4*gfx.DisplayWidth()/14 && e.X <= 4*gfx.DisplayWidth()/14+
-				8*gfx.DisplayWidth()/18 {
-				if gfx.DisplayHeight()*4/10 <= e.Y && e.Y <= gfx.DisplayHeight()*4/10+
-					gfx.DisplayHeight()/11 {
+			if e.X >= 4*gfx.DisplayWidth()/14 && e.X <= 4*gfx.DisplayWidth()/14+8*gfx.DisplayWidth()/18 {
+				if gfx.DisplayHeight()*4/10 <= e.Y && e.Y <= gfx.DisplayHeight()*4/10+gfx.DisplayHeight()/11 {
 					pane.GameState = "gameOn"
-				} else if gfx.DisplayHeight()*5/10 <= e.Y && e.Y <= gfx.DisplayHeight()*
-					5/10+gfx.DisplayHeight()/11 {
+				} else if gfx.DisplayHeight()*5/10 <= e.Y && e.Y <= gfx.DisplayHeight()*5/10+gfx.DisplayHeight()/11 {
 					pane.GameState = "gameOn"
+				} else if gfx.DisplayHeight()*6/10 <= e.Y && e.Y <= gfx.DisplayHeight()*6/10+gfx.DisplayHeight()/11 {
+					pane.GameState = "options"
 				}
+
 			}
 		} else if pane.GameState == "gameOn" || pane.GameState == "end" {
 			if 10*gfx.DisplayWidth()/14 <= e.X && gfx.DisplayHeight()*10/11 <= e.Y {
@@ -96,6 +96,6 @@ func main() {
 	if checkFiles() && launchWindow(900, 640) {
 		gfx.Main()
 	} else {
-		os.Stderr.WriteString("Couldn't launch the game\n")
+		os.Stderr.WriteString("Couldn't launch the game, missing ressources or window can't be opened.\n")
 	}
 }
