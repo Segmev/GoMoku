@@ -289,6 +289,9 @@ func isDraw(pane *window.Drawer, game *GomokuGame) {
 }
 
 func CheckBreakableAlign(dat *window.Drawer, game *GomokuGame, color bool) bool {
+	if dat.OptionsRes.Op1 == false {
+		return true
+	}
 	tot := 0
 	for _, line := range game.Players[GetPlayerNb(game, color)].FiveAligned {
 		cpt := 0
@@ -320,7 +323,7 @@ func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 		if st != nil && !st.Visible {
 			st.Color = game.Turn
 			bmap.SetColor(st.Infos.Ipos, st.Infos.Jpos, game.Turn)
-			if ThreeBlockNear(pane, game, st) == 2 {
+			if pane.OptionsRes.Op2 && ThreeBlockNear(pane, game, st) == 2 {
 				pane.BoardRes.BadX, pane.BoardRes.BadY = st.X, st.Y
 				return
 			} else {
@@ -331,10 +334,11 @@ func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 			TakeTwoStones(pane, game, st)
 			UpdateInfos(pane, game, game.Turn)
 			CheckWinAlignment(pane, game, game.Turn)
-			if len(game.Players[GetPlayerNb(game, game.Turn)].FiveAligned) > 0 &&
-				CheckBreakableAlign(pane, game, st.Color) {
-				game.End = 2
-				pane.WinnerColor = game.Turn
+			if len(game.Players[GetPlayerNb(game, game.Turn)].FiveAligned) > 0 {
+				if CheckBreakableAlign(pane, game, st.Color) {
+					game.End = 2
+					pane.WinnerColor = game.Turn
+				}
 			}
 			game.Turn = !game.Turn
 		}

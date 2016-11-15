@@ -54,7 +54,9 @@ func addInput(pane *window.Drawer, game *arbitre.GomokuGame) {
 			if e.X >= 4*gfx.DisplayWidth()/14 && e.X <= 4*gfx.DisplayWidth()/14+8*gfx.DisplayWidth()/18 {
 				if gfx.DisplayHeight()*4/10 <= e.Y && e.Y <= gfx.DisplayHeight()*4/10+gfx.DisplayHeight()/11 {
 					pane.GameState = "gameOn"
+					pane.GameType = "Human"
 				} else if gfx.DisplayHeight()*5/10 <= e.Y && e.Y <= gfx.DisplayHeight()*5/10+gfx.DisplayHeight()/11 {
+					pane.GameType = "IA"
 					pane.GameState = "gameOn"
 				} else if gfx.DisplayHeight()*6/10 <= e.Y && e.Y <= gfx.DisplayHeight()*6/10+gfx.DisplayHeight()/11 {
 					pane.GameState = "options"
@@ -65,6 +67,35 @@ func addInput(pane *window.Drawer, game *arbitre.GomokuGame) {
 			if 10*gfx.DisplayWidth()/14 <= e.X && gfx.DisplayHeight()*10/11 <= e.Y {
 				game.Restart(pane)
 				pane.GameState = "menu"
+			} else if 10*gfx.DisplayWidth()/14 <= e.X && gfx.DisplayHeight()*9/11 <= e.Y &&
+				e.Y <= gfx.DisplayHeight()*10/11 {
+				pane.GameState = "options"
+			}
+		} else if pane.GameState == "options" {
+			if e.X >= gfx.DisplayHeight()*22/50 && e.X <= gfx.DisplayHeight()*22/50+50 {
+				if e.Y >= gfx.DisplayHeight()/4 && e.Y <= gfx.DisplayHeight()/4+50 {
+					pane.OptionsRes.Op1 = !pane.OptionsRes.Op1
+				} else if e.Y >= gfx.DisplayHeight()/4+gfx.DisplayHeight()/9 &&
+					e.Y <= gfx.DisplayHeight()/4+gfx.DisplayHeight()/9+50 {
+					pane.OptionsRes.Op2 = !pane.OptionsRes.Op2
+				}
+			} else if e.X >= gfx.DisplayHeight()*27/50 && e.X <= gfx.DisplayHeight()*27/50+150 {
+				if gfx.DisplayHeight()/4+(2*gfx.DisplayHeight()/9) <= e.Y &&
+					e.Y <= gfx.DisplayHeight()/4+(2*gfx.DisplayHeight()/9)+50 {
+					game.Restart(pane)
+					pane.GameState = "gameOn"
+				} else if gfx.DisplayHeight()/4+(3*gfx.DisplayHeight()/9) <= e.Y &&
+					e.Y <= gfx.DisplayHeight()/4+(3*gfx.DisplayHeight()/9)+50 {
+					quit()
+				} else if gfx.DisplayHeight()/4+(4*gfx.DisplayHeight()/9) <= e.Y &&
+					e.Y <= gfx.DisplayHeight()/4+(4*gfx.DisplayHeight()/9)+50 {
+					if pane.GameType != "" {
+						pane.GameState = "gameOn"
+					} else {
+						pane.GameState = "menu"
+					}
+
+				}
 			}
 		}
 	})

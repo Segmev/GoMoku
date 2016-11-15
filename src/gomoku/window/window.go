@@ -24,7 +24,7 @@ type Stone struct {
 }
 
 type OptionsRes struct {
-	op1, op2    bool
+	Op1, Op2    bool
 	cross       *gfx.Image
 	optionRule1 *gfx.Text
 	optionRule2 *gfx.Text
@@ -71,12 +71,13 @@ type Drawer struct {
 	anim        *gfx.Animation
 	Font        *gfx.Font
 	Turn        bool
+	GameType    string
 	GameState   string
 	WinnerColor bool
 }
 
 func (me *Drawer) initOptions() bool {
-	me.OptionsRes.op1, me.OptionsRes.op2 = true, true
+	me.OptionsRes.Op1, me.OptionsRes.Op2 = true, true
 	me.OptionsRes.optionRule1 = me.Font.Write("Unbroken row")
 	me.OptionsRes.optionRule2 = me.Font.Write("Three and three")
 	me.OptionsRes.exit = me.Font.Write("Exit...")
@@ -174,7 +175,14 @@ func (me *Drawer) drawGameBoard(c *gfx.Canvas) {
 	if me.BoardRes.BadX > 0 {
 		c.DrawAnimation(me.BoardRes.badmove, me.BoardRes.BadX, me.BoardRes.BadY)
 	}
+
 	c.SetRGBA(133, 94, 66, 140)
+
+	c.FillRect(10*gfx.DisplayWidth()/14, gfx.DisplayHeight()*9/11,
+		8*gfx.DisplayWidth()/18, gfx.DisplayHeight()/11)
+	c.DrawText(me.MenuRes.options, 14*gfx.DisplayWidth()/19, gfx.DisplayHeight()*10/12)
+
+	c.SetRGBA(133, 120, 76, 140)
 	c.FillRect(10*gfx.DisplayWidth()/14, gfx.DisplayHeight()*10/11,
 		8*gfx.DisplayWidth()/18, gfx.DisplayHeight()/11)
 	c.DrawText(me.BoardRes.Restart, 14*gfx.DisplayWidth()/19, gfx.DisplayHeight()*11/12)
@@ -241,11 +249,11 @@ func (me *Drawer) drawOptions(c *gfx.Canvas) {
 		gfx.DisplayHeight()/4+(0*gfx.DisplayHeight()/9), 50, 50)
 	c.FillRect(gfx.DisplayHeight()*22/50,
 		gfx.DisplayHeight()/4+(1*gfx.DisplayHeight()/9), 50, 50)
-	if me.OptionsRes.op1 {
+	if me.OptionsRes.Op1 {
 		c.DrawImage(me.OptionsRes.cross, gfx.DisplayHeight()*22/50,
 			gfx.DisplayHeight()/4+(0*gfx.DisplayHeight()/9))
 	}
-	if me.OptionsRes.op1 {
+	if me.OptionsRes.Op2 {
 		c.DrawImage(me.OptionsRes.cross, gfx.DisplayHeight()*22/50,
 			gfx.DisplayHeight()/4+(1*gfx.DisplayHeight()/9))
 	}

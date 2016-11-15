@@ -5,8 +5,10 @@ const Map_size = 19
 var Map [Map_size * Map_size](uint64)
 
 const (
-	VISIBLE    = 0
-	COLOR      = 1
+	VISIBLE = 0
+	COLOR   = 1
+
+	// TODO: Update infos in arbitre, not done for now
 	INTWOGROUP = 2
 	BREAKABLE  = 3
 
