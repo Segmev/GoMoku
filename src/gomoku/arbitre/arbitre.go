@@ -166,16 +166,20 @@ func UpdateInfos(dat *window.Drawer, game *GomokuGame, color bool) {
 							dat.BoardRes.Stones[x][y].Infos.TeamSt[1+j][1+i] =
 								getInfosNbStonesDirection(dat, dat.BoardRes.Stones[x][y],
 									bmap.IsWhite(x, y), i, j)
+							bmap.SetNbTeamAt(x, y, 1+j, 1+i, uint64(dat.BoardRes.Stones[x][y].Infos.TeamSt[1+j][1+i]))
 							totTeam += dat.BoardRes.Stones[x][y].Infos.TeamSt[1+j][1+i]
 						} else {
 							dat.BoardRes.Stones[x][y].Infos.OppoSt[1+j][1+i] =
 								getInfosNbStonesDirection(dat, dat.BoardRes.Stones[x][y],
 									!bmap.IsWhite(x, y), i, j)
+							bmap.SetNbOppoAt(x, y, 1+j, 1+i, uint64(dat.BoardRes.Stones[x][y].Infos.OppoSt[1+j][1+i]))
 							totOpp += dat.BoardRes.Stones[x][y].Infos.OppoSt[1+j][1+i]
 						}
 					}
 				}
 			}
+			bmap.SetNbTeamAt(x, y, 1, 1, uint64(totTeam))
+			bmap.SetNbOppoAt(x, y, 1, 1, uint64(totOpp))
 			dat.BoardRes.Stones[x][y].Infos.TeamSt[1][1] = totTeam
 			dat.BoardRes.Stones[x][y].Infos.OppoSt[1][1] = totOpp
 		}

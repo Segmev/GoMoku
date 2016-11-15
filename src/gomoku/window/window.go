@@ -24,13 +24,13 @@ type Stone struct {
 }
 
 type OptionsRes struct {
-	op1, op2, ext bool
-	cross         *gfx.Image
-	optionRule1   *gfx.Text
-	optionRule2   *gfx.Text
-	restart       *gfx.Text
-	back          *gfx.Text
-	exit          *gfx.Text
+	op1, op2    bool
+	cross       *gfx.Image
+	optionRule1 *gfx.Text
+	optionRule2 *gfx.Text
+	restart     *gfx.Text
+	back        *gfx.Text
+	exit        *gfx.Text
 }
 
 type MenuRes struct {
@@ -79,8 +79,9 @@ func (me *Drawer) initOptions() bool {
 	me.OptionsRes.op1, me.OptionsRes.op2 = true, true
 	me.OptionsRes.optionRule1 = me.Font.Write("Unbroken row")
 	me.OptionsRes.optionRule2 = me.Font.Write("Three and three")
-	me.OptionsRes.exit = me.Font.Write("Exit game")
+	me.OptionsRes.exit = me.Font.Write("Exit...")
 	me.OptionsRes.restart = me.Font.Write("Restart")
+	me.OptionsRes.back = me.Font.Write("Back")
 	return true
 }
 
@@ -92,7 +93,7 @@ func (me *Drawer) initMenu() bool {
 }
 
 func (me *Drawer) initGame() bool {
-	me.OptionsRes.cross = gfx.LoadImageSize("ressources/Cross.png", gfx.DisplayHeight()/25, gfx.DisplayHeight()/25)
+	me.OptionsRes.cross = gfx.LoadImageSize("ressources/Cross.png", gfx.DisplayHeight()/13, gfx.DisplayHeight()/13)
 	me.BoardRes.badmove = gfx.NewAnimation(500)
 	me.BoardRes.badmove.LoadImageSize("ressources/Red.png", gfx.DisplayHeight()/20, gfx.DisplayHeight()/20)
 	me.BoardRes.badmove.LoadImageSize("ressources/Red.png", gfx.DisplayHeight()/20, gfx.DisplayHeight()/20)
@@ -215,11 +216,39 @@ func (me *Drawer) drawEnd(c *gfx.Canvas) {
 }
 
 func (me *Drawer) drawOptions(c *gfx.Canvas) {
-	c.SetRGBA(0, 0, 0, 100)
+	c.SetRGBA(150, 150, 150, 70)
 	c.FillRect(gfx.DisplayHeight()*20/50, 0, gfx.DisplayHeight()*30/50, gfx.DisplayWidth())
-	c.SetRGBA(0, 0, 0, 150)
-	c.FillRect(gfx.DisplayHeight()*21/50, 0, gfx.DisplayHeight()*28/50, gfx.DisplayWidth()/25)
-	c.DrawImage(me.OptionsRes.cross, 50, 50)
+	elems := []*gfx.Text{
+		me.OptionsRes.optionRule1,
+		me.OptionsRes.optionRule2,
+		me.OptionsRes.restart,
+		me.OptionsRes.exit,
+		me.OptionsRes.back,
+	}
+	c.SetRGBA(150, 150, 150, 70)
+	c.SetRGBA(133, 94, 66, 150)
+
+	for i, elem := range elems {
+		if i >= 2 {
+			c.FillRoundedRect(gfx.DisplayHeight()*27/50, gfx.DisplayHeight()/4+(i*gfx.DisplayHeight()/9), 150, 50, 7)
+		}
+		c.DrawText(elem, gfx.DisplayHeight()*28/50,
+			gfx.DisplayHeight()/4+(i*gfx.DisplayHeight()/9))
+	}
+
+	c.SetRGBA(0, 0, 0, 120)
+	c.FillRect(gfx.DisplayHeight()*22/50,
+		gfx.DisplayHeight()/4+(0*gfx.DisplayHeight()/9), 50, 50)
+	c.FillRect(gfx.DisplayHeight()*22/50,
+		gfx.DisplayHeight()/4+(1*gfx.DisplayHeight()/9), 50, 50)
+	if me.OptionsRes.op1 {
+		c.DrawImage(me.OptionsRes.cross, gfx.DisplayHeight()*22/50,
+			gfx.DisplayHeight()/4+(0*gfx.DisplayHeight()/9))
+	}
+	if me.OptionsRes.op1 {
+		c.DrawImage(me.OptionsRes.cross, gfx.DisplayHeight()*22/50,
+			gfx.DisplayHeight()/4+(1*gfx.DisplayHeight()/9))
+	}
 }
 
 func (me *Drawer) Draw(c *gfx.Canvas) {
