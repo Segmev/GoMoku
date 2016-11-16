@@ -204,7 +204,7 @@ func UpdateInfos(dat *window.Drawer, game *GomokuGame, color bool) {
 	//ResetTeamInfos(dat, color)
 	for x := range dat.BoardRes.Stones {
 		for y := range dat.BoardRes.Stones[x] {
-			ThreeGroups(dat, game, x, y, color)
+			//	ThreeGroups(dat, game, x, y, color)
 			totOpp, totTeam := 0, 0
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
@@ -353,7 +353,7 @@ func CheckBreakableAlign(dat *window.Drawer, game *GomokuGame, color bool) bool 
 								!IsStoneAtPos(dat, st.Infos.Ipos+(-1*j), st.Infos.Jpos+(-1*i)))) {
 						bmap.SetBreakable(i, j, true)
 						cpt = 1
-					} else {
+					} else if IsStoneAtPos(dat, i, j) {
 						bmap.SetBreakable(i, j, false)
 					}
 				}
