@@ -51,10 +51,13 @@ func isElemInAlignedArray(s [][5]*window.Stone, e [5]*window.Stone) bool {
 	return false
 }
 
+func ValableCoor(i, j int) bool {
+	return (i >= 0 && i <= 18 && j >= 0 && j <= 18)
+}
+
 func IsStoneAtPos(dat *window.Drawer, i, j int) bool {
-	if i >= 0 && i <= 18 && j >= 0 && j <= 18 {
+	if ValableCoor(i, j) {
 		return bmap.IsVisible(i, j)
-		//return dat.BoardRes.Stones[i][j].Visible
 	}
 	return false
 }
@@ -178,6 +181,7 @@ func UpdateInfos(dat *window.Drawer, game *GomokuGame, color bool) {
 					}
 				}
 			}
+
 			bmap.SetNbTeamAt(x, y, 1, 1, uint64(totTeam))
 			bmap.SetNbOppoAt(x, y, 1, 1, uint64(totOpp))
 			dat.BoardRes.Stones[x][y].Infos.TeamSt[1][1] = totTeam
@@ -303,8 +307,10 @@ func CheckBreakableAlign(dat *window.Drawer, game *GomokuGame, color bool) bool 
 						(st.Infos.OppoSt[1+(-1*i)][1+(-1*j)] >= 1 ||
 							(dat.BoardRes.Stones[st.Infos.Ipos+j][st.Infos.Jpos+i].Infos.OppoSt[1+i][1+j] >= 1 &&
 								!IsStoneAtPos(dat, st.Infos.Ipos+(-1*j), st.Infos.Jpos+(-1*i)))) {
-						st.Infos.Breakable = true
+						bmap.SetBreakable(i, j, true)
 						cpt = 1
+					} else {
+						bmap.SetBreakable(i, j, false)
 					}
 				}
 			}

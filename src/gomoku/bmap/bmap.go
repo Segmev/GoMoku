@@ -12,6 +12,8 @@ const (
 	INTWOGROUP = 2
 	BREAKABLE  = 3
 
+	INDOUBLETHREE = 6
+
 	ULT, UT, URT = 6 + (3 * 1), 6 + (3 * 2), 6 + (3 * 3)
 	MLT, MT, MRT = 6 + (3 * 4), 6 + (3 * 5), 6 + (3 * 6)
 	DLT, DT, DRT = 6 + (3 * 7), 6 + (3 * 8), 6 + (3 * 9)
@@ -81,6 +83,20 @@ func SetBreakable(i, j int, val bool) {
 			Map[(i*Map_size)+j] |= (1 << BREAKABLE)
 		} else {
 			Map[(i*Map_size)+j] &^= (1 << BREAKABLE)
+		}
+	}
+}
+
+func IsInDoubleThree(i, j int) bool {
+	return Map[(i*Map_size)+j]&(1<<INDOUBLETHREE) != 0
+}
+
+func SetInDoubleThree(i, j int, val bool) {
+	if val != IsBreakable(i, j) {
+		if val {
+			Map[(i*Map_size)+j] |= (1 << INDOUBLETHREE)
+		} else {
+			Map[(i*Map_size)+j] &^= (1 << INDOUBLETHREE)
 		}
 	}
 }
