@@ -9,9 +9,9 @@ const (
 	COLOR   = 1
 
 	// TODO: Update infos in arbitre, not done for now
-	INTWOGROUP = 2
-	BREAKABLE  = 3
-
+	INTWOGROUP    = 2
+	BREAKABLE     = 3
+	INTHREEGROUP  = 4
 	INDOUBLETHREE = 6
 
 	ULT, UT, URT = 6 + (3 * 1), 6 + (3 * 2), 6 + (3 * 3)
@@ -71,6 +71,20 @@ func SetNbTeamAt(i, j int, posx, posy int, nb uint64) {
 	setAtPos(i, j, info+0, (nb>>2)&(1))
 	setAtPos(i, j, info+1, (nb>>1)&(1))
 	setAtPos(i, j, info+2, (nb>>0)&(1))
+}
+
+func IsInThreeGroup(i, j int) bool {
+	return Map[(i*Map_size)+j]&(1<<INTHREEGROUP) != 0
+}
+
+func SetInThreeGroup(i, j int, val bool) {
+	if val != IsBreakable(i, j) {
+		if val {
+			Map[(i*Map_size)+j] |= (1 << INTHREEGROUP)
+		} else {
+			Map[(i*Map_size)+j] &^= (1 << INTHREEGROUP)
+		}
+	}
 }
 
 func IsBreakable(i, j int) bool {

@@ -1,6 +1,7 @@
 package arbitre
 
 import (
+	"fmt"
 	"gomoku/bmap"
 	"gomoku/window"
 	"strconv"
@@ -157,10 +158,53 @@ func ResetTeamInfos(dat *window.Drawer, color bool) {
 	}
 }
 
+func ThreeGroups(dat *window.Drawer, game *GomokuGame, x, y int, color bool) {
+	start := 0
+	if IsStoneAtPos(dat, x, y) && bmap.IsWhite(x, y) == color {
+		start = 1
+	}
+	for a := -1; a <= 1; a++ {
+		for b := -1; b <= 1; b++ {
+			if !(a == 0 && b == 0) {
+				i, j := a, b
+				cpt, othercpt := start, 0
+				for c := 0; c <= 2; c++ {
+					i = augmentPos(i)
+					j = augmentPos(j)
+					if IsStoneAtPos(dat, x+i, y+j) && color == bmap.IsWhite(x+i, y+j) {
+						cpt++
+					} else if IsStoneAtPos(dat, x+i, y+j) && color != bmap.IsWhite(x+i, y+j) {
+						c = 3
+					}
+				}
+				if a <= 0 && b <= 0 && IsStoneAtPos(dat, x+a, y+b) && IsStoneAtPos(dat, x-a, y-b) &&
+					!IsStoneAtPos(dat, x-a-a, y-b-b) && !IsStoneAtPos(dat, x+a+a, y+a+a) {
+					if bmap.IsWhite(x-a, y-a) == color && bmap.IsWhite(x+a, y+a) == color {
+						othercpt++
+					}
+				}
+				if a == 1 && b == -1 && IsStoneAtPos(dat, x+a, y+b) && IsStoneAtPos(dat, x-a, y-b) &&
+					!IsStoneAtPos(dat, x-a-a, y-b-b) && !IsStoneAtPos(dat, x+a+a, y+a+a) {
+					if bmap.IsWhite(x-a, y-a) == color && bmap.IsWhite(x+a, y+a) == color {
+						othercpt++
+					}
+				}
+				if cpt == 2 || othercpt > 0 {
+					bmap.SetInThreeGroup(x, y, true)
+					fmt.Println("hey ", x, y, IsStoneAtPos(dat, x, y))
+				} else {
+					bmap.SetInThreeGroup(x, y, false)
+				}
+			}
+		}
+	}
+}
+
 func UpdateInfos(dat *window.Drawer, game *GomokuGame, color bool) {
 	//ResetTeamInfos(dat, color)
 	for x := range dat.BoardRes.Stones {
 		for y := range dat.BoardRes.Stones[x] {
+			ThreeGroups(dat, game, x, y, color)
 			totOpp, totTeam := 0, 0
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
