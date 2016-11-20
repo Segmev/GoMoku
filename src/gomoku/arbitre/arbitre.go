@@ -182,6 +182,7 @@ func UpdateInfos(Map *[361](uint64), game *GomokuGame, color bool) {
 							bmap.SetNbTeamAt(&bmap.Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
 								bmap.IsWhite(&bmap.Map, x, y), i, j)))
 							totTeam += bmap.GetNbT(Map, x, y, 1+j, 1+i)
+
 						} else {
 							bmap.SetNbOppoAt(&bmap.Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
 								!bmap.IsWhite(&bmap.Map, x, y), i, j)))
@@ -203,7 +204,7 @@ func CheckWinAlignment(dat *window.Drawer, Map *[361](uint64), game *GomokuGame,
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
 					if !(i == 0 && j == 0) && IsStoneAtPos(&bmap.Map, x, y) {
-						if dat.BoardRes.Stones[x][y].Color == color {
+						if bmap.IsWhite(&bmap.Map, x, y) == color {
 							if CheckAlignement(Map, dat.BoardRes.Stones[x][y], i, j, 3, 0, false) {
 								StonesTab := [5]*window.Stone{
 									dat.BoardRes.Stones[x][y],
