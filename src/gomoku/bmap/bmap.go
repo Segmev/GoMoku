@@ -12,7 +12,8 @@ const (
 	INTWOGROUP    = 2
 	BREAKABLE     = 3
 	INTHREEGROUP  = 4
-	INDOUBLETHREE = 6
+	INDOUBLETHREE = 5
+	INFOURGROUP   = 6
 
 	ULT, UT, URT = 6 + (3 * 1), 6 + (3 * 2), 6 + (3 * 3)
 	MLT, MT, MRT = 6 + (3 * 4), 6 + (3 * 5), 6 + (3 * 6)
@@ -71,6 +72,20 @@ func SetNbTeamAt(i, j int, posx, posy int, nb uint64) {
 	setAtPos(i, j, info+0, (nb>>2)&(1))
 	setAtPos(i, j, info+1, (nb>>1)&(1))
 	setAtPos(i, j, info+2, (nb>>0)&(1))
+}
+
+func IsInFourGroup(i, j int) bool {
+	return Map[(i*Map_size)+j]&(1<<INFOURGROUP) != 0
+}
+
+func SetInFourGroup(i, j int, val bool) {
+	if val != IsBreakable(i, j) {
+		if val {
+			Map[(i*Map_size)+j] |= (1 << INFOURGROUP)
+		} else {
+			Map[(i*Map_size)+j] &^= (1 << INFOURGROUP)
+		}
+	}
 }
 
 func IsInThreeGroup(i, j int) bool {

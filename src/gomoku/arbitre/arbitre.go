@@ -1,7 +1,6 @@
 package arbitre
 
 import (
-	"fmt"
 	"gomoku/bmap"
 	"gomoku/window"
 	"strconv"
@@ -33,6 +32,7 @@ func (game *GomokuGame) Restart(pane *window.Drawer) bool {
 	pane.BoardRes.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
 	pane.BoardRes.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
 	pane.GameState = "menu"
+	pane.BoardRes.BadX, pane.BoardRes.BadY = 0, 0
 	return true
 }
 
@@ -158,53 +158,15 @@ func ResetTeamInfos(dat *window.Drawer, color bool) {
 	}
 }
 
-func ThreeGroups(dat *window.Drawer, game *GomokuGame, x, y int, color bool) {
-	start := 0
-	if IsStoneAtPos(dat, x, y) && bmap.IsWhite(x, y) == color {
-		start = 1
-	}
-	for a := -1; a <= 1; a++ {
-		for b := -1; b <= 1; b++ {
-			if !(a == 0 && b == 0) {
-				i, j := a, b
-				cpt, othercpt := start, 0
-				for c := 0; c <= 2; c++ {
-					i = augmentPos(i)
-					j = augmentPos(j)
-					if IsStoneAtPos(dat, x+i, y+j) && color == bmap.IsWhite(x+i, y+j) {
-						cpt++
-					} else if IsStoneAtPos(dat, x+i, y+j) && color != bmap.IsWhite(x+i, y+j) {
-						c = 3
-					}
-				}
-				if a <= 0 && b <= 0 && IsStoneAtPos(dat, x+a, y+b) && IsStoneAtPos(dat, x-a, y-b) &&
-					!IsStoneAtPos(dat, x-a-a, y-b-b) && !IsStoneAtPos(dat, x+a+a, y+a+a) {
-					if bmap.IsWhite(x-a, y-a) == color && bmap.IsWhite(x+a, y+a) == color {
-						othercpt++
-					}
-				}
-				if a == 1 && b == -1 && IsStoneAtPos(dat, x+a, y+b) && IsStoneAtPos(dat, x-a, y-b) &&
-					!IsStoneAtPos(dat, x-a-a, y-b-b) && !IsStoneAtPos(dat, x+a+a, y+a+a) {
-					if bmap.IsWhite(x-a, y-a) == color && bmap.IsWhite(x+a, y+a) == color {
-						othercpt++
-					}
-				}
-				if cpt == 2 || othercpt > 0 {
-					bmap.SetInThreeGroup(x, y, true)
-					fmt.Println("hey ", x, y, IsStoneAtPos(dat, x, y))
-				} else {
-					bmap.SetInThreeGroup(x, y, false)
-				}
-			}
-		}
-	}
+func SetTwoGroups(dat *window.Drawer, game *GomokuGame, x, y int, color bool) {
+
 }
 
 func UpdateInfos(dat *window.Drawer, game *GomokuGame, color bool) {
 	//ResetTeamInfos(dat, color)
 	for x := range dat.BoardRes.Stones {
 		for y := range dat.BoardRes.Stones[x] {
-			//	ThreeGroups(dat, game, x, y, color)
+			UpdateThreeGroups(dat, game, x, y, color)
 			totOpp, totTeam := 0, 0
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
@@ -292,33 +254,103 @@ func HasTakenEnoughStones(pane *window.Drawer, game *GomokuGame) {
 	}
 }
 
-func ThreeBlockNear(dat *window.Drawer, game *GomokuGame, st *window.Stone) int {
-	cpt := 0
+// if IsStoneAtPos(dat, st.Infos.Ipos+i, st.Infos.Jpos+j) {
+// 	if st.Color == dat.BoardRes.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Color {
+// 		if dat.BoardRes.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Infos.TeamSt[1+j][1+i] <= 1 {
+// 			if dat.BoardRes.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Infos.TeamSt[1+j][1+i] == 1 ||
+// 				(IsStoneAtPos(dat, st.Infos.Ipos+i+i+i, st.Infos.Jpos+j+j+j) &&
+// 					st.Color == dat.BoardRes.Stones[st.Infos.Ipos+i+i+i][st.Infos.Jpos+j+j+j].Color &&
+// 					dat.BoardRes.Stones[st.Infos.Ipos+i+i+i][st.Infos.Jpos+j+j+j].Infos.TeamSt[1+j][1+i] == 0) {
+// 				cpt += 1
+// 			}
+// 		}
+// 	}
+// } else if IsStoneAtPos(dat, st.Infos.Ipos+i+i, st.Infos.Jpos+j+j) {
+// 	if st.Color == dat.BoardRes.Stones[st.Infos.Ipos+i+i][st.Infos.Jpos+j+j].Color {
+// 		if dat.BoardRes.Stones[st.Infos.Ipos+i+i][st.Infos.Jpos+j+j].Infos.TeamSt[1+j][1+i] == 1 {
+// 			cpt += 1
+// 		}
+// 	}
+
+func ThreeBlockNear(dat *window.Drawer, game *GomokuGame, x, y int, color bool) bool {
+	if UpdateThreeGroups(dat, game, x, y, color) {
+		return true
+	}
+	ret := false
+	bmap.SetVisibility(x, y, true)
 	for i := -1; i <= 1; i++ {
 		for j := -1; j <= 1; j++ {
 			if !(i == 0 && j == 0) {
-				if IsStoneAtPos(dat, st.Infos.Ipos+i, st.Infos.Jpos+j) {
-					if st.Color == dat.BoardRes.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Color {
-						if dat.BoardRes.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Infos.TeamSt[1+j][1+i] <= 1 {
-							if dat.BoardRes.Stones[st.Infos.Ipos+i][st.Infos.Jpos+j].Infos.TeamSt[1+j][1+i] == 1 ||
-								(IsStoneAtPos(dat, st.Infos.Ipos+i+i+i, st.Infos.Jpos+j+j+j) &&
-									st.Color == dat.BoardRes.Stones[st.Infos.Ipos+i+i+i][st.Infos.Jpos+j+j+j].Color &&
-									dat.BoardRes.Stones[st.Infos.Ipos+i+i+i][st.Infos.Jpos+j+j+j].Infos.TeamSt[1+j][1+i] == 0) {
-								cpt += 1
-							}
+				a, b := i, j
+				for c := 0; c <= 2; c++ {
+					if IsStoneAtPos(dat, x+a, y+b) &&
+						color == bmap.IsWhite(x+a, y+b) {
+						if UpdateThreeGroups(dat, game, x+a, y+b, color) {
+							bmap.SetVisibility(x, y, false)
+							ret = true
 						}
 					}
-				} else if IsStoneAtPos(dat, st.Infos.Ipos+i+i, st.Infos.Jpos+j+j) {
-					if st.Color == dat.BoardRes.Stones[st.Infos.Ipos+i+i][st.Infos.Jpos+j+j].Color {
-						if dat.BoardRes.Stones[st.Infos.Ipos+i+i][st.Infos.Jpos+j+j].Infos.TeamSt[1+j][1+i] == 1 {
-							cpt += 1
-						}
-					}
+					a, b = augmentPos(a), augmentPos(b)
 				}
 			}
 		}
 	}
-	return cpt
+	return ret
+}
+
+func updateThreeGroupLoop(dat *window.Drawer, color bool, x, y, dirI, dirJ, cptHowManyThreeGroups, cptFourGroups int) (int, int) {
+	cpt := 0
+	if !(dirI == 0 && dirJ == 0) {
+		i, j := dirI, dirJ
+		end := 2
+		if (i <= 0 && j <= 0) || (i == 1 && j == -1) {
+			if IsStoneAtPos(dat, x-dirI, y-dirJ) && color == bmap.IsWhite(x-dirI, y-dirJ) {
+				cpt++
+				end = 1
+			}
+		}
+		for c := 0; c <= end; c++ {
+			if IsStoneAtPos(dat, x+i, y+j) {
+				if color == bmap.IsWhite(x+i, y+j) {
+					cpt++
+				} else {
+					c = 3
+					cpt = 0
+				}
+			}
+			i, j = augmentPos(i), augmentPos(j)
+		}
+		if cpt == 2 && !IsStoneAtPos(dat, i+x, j+y) {
+			cptHowManyThreeGroups++
+		}
+		if cpt == 3 {
+			cptFourGroups++
+		}
+	}
+	return cptHowManyThreeGroups, cptFourGroups
+}
+
+func UpdateThreeGroups(dat *window.Drawer, game *GomokuGame, x, y int, color bool) bool {
+	cptHowManyThreeGroups, cptFourGroups := 0, 0
+	for dirI := -1; dirI <= 0; dirI++ {
+		for dirJ := -1; dirJ <= 0; dirJ++ {
+			cptHowManyThreeGroups, cptFourGroups =
+				updateThreeGroupLoop(dat, color, x, y, dirI, dirJ, cptHowManyThreeGroups, cptFourGroups)
+		}
+	}
+	cptHowManyThreeGroups, cptFourGroups =
+		updateThreeGroupLoop(dat, color, x, y, -1, 1, cptHowManyThreeGroups, cptFourGroups)
+	if cptFourGroups > 0 {
+		bmap.SetInFourGroup(x, y, true)
+	} else {
+		bmap.SetInFourGroup(x, y, false)
+	}
+	if cptHowManyThreeGroups > 0 {
+		bmap.SetInThreeGroup(x, y, true)
+	} else {
+		bmap.SetInThreeGroup(x, y, false)
+	}
+	return cptHowManyThreeGroups == 2
 }
 
 func isDraw(pane *window.Drawer, game *GomokuGame) {
@@ -373,7 +405,7 @@ func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 		if st != nil && !st.Visible {
 			st.Color = game.Turn
 			bmap.SetColor(st.Infos.Ipos, st.Infos.Jpos, game.Turn)
-			if pane.OptionsRes.Op2 && ThreeBlockNear(pane, game, st) == 2 {
+			if pane.OptionsRes.Op2 && ThreeBlockNear(pane, game, st.Infos.Ipos, st.Infos.Jpos, game.Turn) == true {
 				pane.BoardRes.BadX, pane.BoardRes.BadY = st.X, st.Y
 				return
 			} else {
