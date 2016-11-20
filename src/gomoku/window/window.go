@@ -159,8 +159,8 @@ func (me *Drawer) drawGameBoard(c *gfx.Canvas) {
 
 		for i := 0; i < bmap.Map_size; i++ {
 			for j := 0; j < bmap.Map_size; j++ {
-				if bmap.IsVisible(i, j) {
-					if bmap.IsWhite(i, j) {
+				if bmap.IsVisible(&bmap.Map, i, j) {
+					if bmap.IsWhite(&bmap.Map, i, j) {
 						c.DrawImage(me.white_stone, me.BoardRes.Stones[i][j].X,
 							me.BoardRes.Stones[i][j].Y)
 					} else {

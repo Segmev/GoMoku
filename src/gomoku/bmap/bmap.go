@@ -27,151 +27,151 @@ const (
 var TabTeam = [][]int{{ULT, UT, URT}, {MLT, MT, MRT}, {DLT, DT, DRT}}
 var TabOppo = [][]int{{ULO, UO, URO}, {MLO, MO, MRO}, {DLO, DO, DRO}}
 
-func getValAt(i, j int, info uint) int {
-	if Map[(i*Map_size)+j]&(1<<info) == 0 {
+func getValAt(MMap *[Map_size * Map_size](uint64), i, j int, info uint) int {
+	if MMap[(i*Map_size)+j]&(1<<info) == 0 {
 		return 0
 	}
 	return 1
 }
 
-func GetValStones(i, j int, info uint) int {
+func GetValStones(MMap *[Map_size * Map_size](uint64), i, j int, info uint) int {
 	res := 0
-	res = (res << 1) | getValAt(i, j, info)
-	res = (res << 1) | getValAt(i, j, info+1)
-	res = (res << 1) | getValAt(i, j, info+2)
+	res = (res << 1) | getValAt(MMap, i, j, info)
+	res = (res << 1) | getValAt(MMap, i, j, info+1)
+	res = (res << 1) | getValAt(MMap, i, j, info+2)
 	return res
 }
 
-func GetNbO(i, j int, posx, posy int) int {
-	return GetValStones(i, j, uint(TabOppo[posx][posy]))
+func GetNbO(MMap *[Map_size * Map_size](uint64), i, j int, posx, posy int) int {
+	return GetValStones(MMap, i, j, uint(TabOppo[posx][posy]))
 }
 
-func GetNbT(i, j int, posx, posy int) int {
-	return GetValStones(i, j, uint(TabTeam[posx][posy]))
+func GetNbT(MMap *[Map_size * Map_size](uint64), i, j int, posx, posy int) int {
+	return GetValStones(MMap, i, j, uint(TabTeam[posx][posy]))
 }
 
-func setAtPos(i, j int, infos uint, val uint64) {
-	if val != Map[(i*Map_size)+j]&(1<<infos) {
+func setAtPos(MMap *[Map_size * Map_size](uint64), i, j int, infos uint, val uint64) {
+	if val != MMap[(i*Map_size)+j]&(1<<infos) {
 		if val == 1 {
-			Map[(i*Map_size)+j] |= (val << infos)
+			MMap[(i*Map_size)+j] |= (val << infos)
 		} else {
-			Map[(i*Map_size)+j] &^= (val << infos)
+			MMap[(i*Map_size)+j] &^= (val << infos)
 		}
 	}
 }
 
-func SetNbOppoAt(i, j int, posx, posy int, nb uint64) {
+func SetNbOppoAt(MMap *[Map_size * Map_size](uint64), i, j int, posx, posy int, nb uint64) {
 	var info uint = uint(TabOppo[posx][posy])
-	setAtPos(i, j, info+0, (nb>>2)&(1))
-	setAtPos(i, j, info+1, (nb>>1)&(1))
-	setAtPos(i, j, info+2, (nb>>0)&(1))
+	setAtPos(MMap, i, j, info+0, (nb>>2)&(1))
+	setAtPos(MMap, i, j, info+1, (nb>>1)&(1))
+	setAtPos(MMap, i, j, info+2, (nb>>0)&(1))
 }
 
-func SetNbTeamAt(i, j int, posx, posy int, nb uint64) {
+func SetNbTeamAt(MMap *[Map_size * Map_size](uint64), i, j int, posx, posy int, nb uint64) {
 	var info uint = uint(TabTeam[posx][posy])
-	setAtPos(i, j, info+0, (nb>>2)&(1))
-	setAtPos(i, j, info+1, (nb>>1)&(1))
-	setAtPos(i, j, info+2, (nb>>0)&(1))
+	setAtPos(MMap, i, j, info+0, (nb>>2)&(1))
+	setAtPos(MMap, i, j, info+1, (nb>>1)&(1))
+	setAtPos(MMap, i, j, info+2, (nb>>0)&(1))
 }
 
-func IsInFourGroup(i, j int) bool {
-	return Map[(i*Map_size)+j]&(1<<INFOURGROUP) != 0
+func IsInFourGroup(MMap *[Map_size * Map_size](uint64), i, j int) bool {
+	return MMap[(i*Map_size)+j]&(1<<INFOURGROUP) != 0
 }
 
-func SetInFourGroup(i, j int, val bool) {
-	if val != IsBreakable(i, j) {
+func SetInFourGroup(MMap *[Map_size * Map_size](uint64), i, j int, val bool) {
+	if val != IsInFourGroup(MMap, i, j) {
 		if val {
-			Map[(i*Map_size)+j] |= (1 << INFOURGROUP)
+			MMap[(i*Map_size)+j] |= (1 << INFOURGROUP)
 		} else {
-			Map[(i*Map_size)+j] &^= (1 << INFOURGROUP)
+			MMap[(i*Map_size)+j] &^= (1 << INFOURGROUP)
 		}
 	}
 }
 
-func IsInThreeGroup(i, j int) bool {
-	return Map[(i*Map_size)+j]&(1<<INTHREEGROUP) != 0
+func IsInThreeGroup(MMap *[Map_size * Map_size](uint64), i, j int) bool {
+	return MMap[(i*Map_size)+j]&(1<<INTHREEGROUP) != 0
 }
 
-func SetInThreeGroup(i, j int, val bool) {
-	if val != IsBreakable(i, j) {
+func SetInThreeGroup(MMap *[Map_size * Map_size](uint64), i, j int, val bool) {
+	if val != IsInThreeGroup(MMap, i, j) {
 		if val {
-			Map[(i*Map_size)+j] |= (1 << INTHREEGROUP)
+			MMap[(i*Map_size)+j] |= (1 << INTHREEGROUP)
 		} else {
-			Map[(i*Map_size)+j] &^= (1 << INTHREEGROUP)
+			MMap[(i*Map_size)+j] &^= (1 << INTHREEGROUP)
 		}
 	}
 }
 
-func IsBreakable(i, j int) bool {
-	return Map[(i*Map_size)+j]&(1<<BREAKABLE) != 0
+func IsBreakable(MMap *[Map_size * Map_size](uint64), i, j int) bool {
+	return MMap[(i*Map_size)+j]&(1<<BREAKABLE) != 0
 }
 
-func SetBreakable(i, j int, val bool) {
-	if val != IsBreakable(i, j) {
+func SetBreakable(MMap *[Map_size * Map_size](uint64), i, j int, val bool) {
+	if val != IsBreakable(MMap, i, j) {
 		if val {
-			Map[(i*Map_size)+j] |= (1 << BREAKABLE)
+			MMap[(i*Map_size)+j] |= (1 << BREAKABLE)
 		} else {
-			Map[(i*Map_size)+j] &^= (1 << BREAKABLE)
+			MMap[(i*Map_size)+j] &^= (1 << BREAKABLE)
 		}
 	}
 }
 
-func IsInDoubleThree(i, j int) bool {
-	return Map[(i*Map_size)+j]&(1<<INDOUBLETHREE) != 0
+func IsInDoubleThree(MMap *[Map_size * Map_size](uint64), i, j int) bool {
+	return MMap[(i*Map_size)+j]&(1<<INDOUBLETHREE) != 0
 }
 
-func SetInDoubleThree(i, j int, val bool) {
-	if val != IsBreakable(i, j) {
+func SetInDoubleThree(MMap *[Map_size * Map_size](uint64), i, j int, val bool) {
+	if val != IsInDoubleThree(MMap, i, j) {
 		if val {
-			Map[(i*Map_size)+j] |= (1 << INDOUBLETHREE)
+			MMap[(i*Map_size)+j] |= (1 << INDOUBLETHREE)
 		} else {
-			Map[(i*Map_size)+j] &^= (1 << INDOUBLETHREE)
+			MMap[(i*Map_size)+j] &^= (1 << INDOUBLETHREE)
 		}
 	}
 }
 
-func IsInTwoGroup(i, j int) bool {
-	return Map[(i*Map_size)+j]&(1<<INTWOGROUP) != 0
+func IsInTwoGroup(MMap *[Map_size * Map_size](uint64), i, j int) bool {
+	return MMap[(i*Map_size)+j]&(1<<INTWOGROUP) != 0
 }
 
-func SetInTwoGroup(i, j int, val bool) {
-	if val != IsInTwoGroup(i, j) {
+func SetInTwoGroup(MMap *[Map_size * Map_size](uint64), i, j int, val bool) {
+	if val != IsInTwoGroup(MMap, i, j) {
 		if val {
-			Map[(i*Map_size)+j] |= (1 << INTWOGROUP)
+			MMap[(i*Map_size)+j] |= (1 << INTWOGROUP)
 		} else {
-			Map[(i*Map_size)+j] &^= (1 << INTWOGROUP)
+			MMap[(i*Map_size)+j] &^= (1 << INTWOGROUP)
 		}
 	}
 }
 
-func IsWhite(i, j int) bool {
-	return Map[(i*Map_size)+j]&(1<<COLOR) != 0
+func IsWhite(MMap *[Map_size * Map_size](uint64), i, j int) bool {
+	return MMap[(i*Map_size)+j]&(1<<COLOR) != 0
 }
 
-func SetColor(i, j int, val bool) {
-	if val != IsWhite(i, j) {
+func SetColor(MMap *[Map_size * Map_size](uint64), i, j int, val bool) {
+	if val != IsWhite(MMap, i, j) {
 		if val {
-			Map[(i*Map_size)+j] |= (1 << COLOR)
+			MMap[(i*Map_size)+j] |= (1 << COLOR)
 		} else {
-			Map[(i*Map_size)+j] &^= (1 << COLOR)
+			MMap[(i*Map_size)+j] &^= (1 << COLOR)
 		}
 	}
 }
 
-func IsVisible(i, j int) bool {
-	return Map[(i*Map_size)+j]&(1<<VISIBLE) != 0
+func IsVisible(MMap *[Map_size * Map_size](uint64), i, j int) bool {
+	return MMap[(i*Map_size)+j]&(1<<VISIBLE) != 0
 }
 
-func SetVisibility(i, j int, vis bool) {
-	if vis != IsVisible(i, j) {
+func SetVisibility(MMap *[Map_size * Map_size](uint64), i, j int, vis bool) {
+	if vis != IsVisible(MMap, i, j) {
 		if vis {
-			Map[(i*Map_size)+j] |= (1 << VISIBLE)
+			MMap[(i*Map_size)+j] |= (1 << VISIBLE)
 		} else {
-			Map[(i*Map_size)+j] &^= (1 << VISIBLE)
+			MMap[(i*Map_size)+j] &^= (1 << VISIBLE)
 		}
 	}
 }
 
-func ClearStone(i, j int) {
-	Map[(i*Map_size)+j] = 0
+func ClearStone(MMap *[Map_size * Map_size](uint64), i, j int) {
+	MMap[(i*Map_size)+j] = 0
 }
