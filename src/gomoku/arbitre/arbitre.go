@@ -348,8 +348,8 @@ func CheckBreakableAlign(Map *[361]uint64, game *GomokuGame, color bool) bool {
 				for j := -1; j <= 1; j++ {
 					if !(i == 0 && j == 0) &&
 						bmap.GetNbT(Map, st.Infos.Ipos, st.Infos.Jpos, i+1, j+1) == 1 &&
-						(bmap.GetNbO(Map, st.Infos.Ipos, st.Infos.Jpos, 1+(-1*i), 1+(-1*j)) >= 1 ||
-							(bmap.GetNbO(Map, st.Infos.Ipos, st.Infos.Jpos, 1+i, 1+j) >= 1 &&
+						((bmap.GetNbO(Map, st.Infos.Ipos, st.Infos.Jpos, 1+(-1*i), 1+(-1*j)) >= 1) ||
+							(bmap.GetNbO(Map, st.Infos.Ipos+j, st.Infos.Jpos+i, 1+i, 1+j) >= 1 &&
 								!IsStoneAtPos(Map, st.Infos.Ipos+(-1*j), st.Infos.Jpos+(-1*i)))) {
 						bmap.SetBreakable(Map, st.Infos.Ipos, st.Infos.Jpos, true)
 						cpt = 1
