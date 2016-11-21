@@ -341,27 +341,27 @@ func CheckWinAlignment(dat *window.Drawer, Map *[361](uint64), game *GomokuGame,
 
 func CheckBreakableAlign(Map *[361]uint64, game *GomokuGame, color bool) bool {
 	tot := 0
-	for x, line := range game.Players[GetPlayerNb(game, color)].FiveAligned {
+	for _, line := range game.Players[GetPlayerNb(game, color)].FiveAligned {
 		cpt := 0
-		for y := range line {
+		for _, st := range line {
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
 					if !(i == 0 && j == 0) &&
-						bmap.GetNbT(Map, x, y, i+1, j+1) == 1 &&
-						(bmap.GetNbO(Map, x, y, 1+(-1*i), 1+(-1*j)) >= 1 ||
-							(bmap.GetNbO(Map, x, y, 1+i, 1+j) >= 1 &&
-								!IsStoneAtPos(Map, x+(-1*j), y+(-1*i)))) {
-						bmap.SetBreakable(Map, i, j, true)
+						bmap.GetNbT(Map, st.Infos.Ipos, st.Infos.Jpos, i+1, j+1) == 1 &&
+						(bmap.GetNbO(Map, st.Infos.Ipos, st.Infos.Jpos, 1+(-1*i), 1+(-1*j)) >= 1 ||
+							(bmap.GetNbO(Map, st.Infos.Ipos, st.Infos.Jpos, 1+i, 1+j) >= 1 &&
+								!IsStoneAtPos(Map, st.Infos.Ipos+(-1*j), st.Infos.Jpos+(-1*i)))) {
+						bmap.SetBreakable(Map, st.Infos.Ipos, st.Infos.Jpos, true)
 						cpt = 1
-					} else if IsStoneAtPos(Map, i, j) {
-						bmap.SetBreakable(Map, i, j, false)
+					} else if IsStoneAtPos(Map, st.Infos.Ipos, st.Infos.Jpos) {
+						bmap.SetBreakable(Map, st.Infos.Ipos, st.Infos.Jpos, false)
 					}
 				}
 			}
 		}
 		tot += cpt
 	}
-	if tot < len(game.Players[GetPlayerNb(game, game.Turn)].FiveAligned) {
+	if tot < len(game.Players[GetPlayerNb(game, color)].FiveAligned) {
 		return true
 	}
 	return false
