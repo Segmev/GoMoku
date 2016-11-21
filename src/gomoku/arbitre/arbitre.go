@@ -84,35 +84,35 @@ func augmentPos(pos int) int {
 	return pos
 }
 
-func CheckAlignement(Map *[361](uint64), stone *window.Stone, i, j, lim, ite int, del bool) bool {
-	if IsStoneAtPos(Map, stone.Infos.Ipos+i, stone.Infos.Jpos+j) {
-		if del && ite < lim && bmap.IsWhite(&bmap.Map, stone.Infos.Ipos+i, stone.Infos.Jpos+j) != stone.Color {
+func CheckAlignement(Map *[361](uint64), x, y, i, j, lim, ite int, del bool) bool {
+	if IsStoneAtPos(Map, x+i, y+j) {
+		if del && ite < lim && bmap.IsWhite(&bmap.Map, x+i, y+j) != bmap.IsWhite(Map, x, y) {
 			iniI, iniJ := i, j
 			i, j = augmentPos(i), augmentPos(j)
-			if CheckAlignement(Map, stone, i, j, lim, ite+1, del) {
+			if CheckAlignement(Map, x, y, i, j, lim, ite+1, del) {
 				if del {
-					bmap.SetVisibility(&bmap.Map, stone.Infos.Ipos+iniI, stone.Infos.Jpos+iniJ, false)
+					bmap.SetVisibility(&bmap.Map, x+iniI, y+iniJ, false)
 				}
 				return true
 			}
-		} else if !del && ite < lim && bmap.IsWhite(&bmap.Map, stone.Infos.Ipos+i, stone.Infos.Jpos+j) == stone.Color {
+		} else if !del && ite < lim && bmap.IsWhite(&bmap.Map, x+i, y+j) == bmap.IsWhite(Map, x, y) {
 			i, j = augmentPos(i), augmentPos(j)
-			if CheckAlignement(Map, stone, i, j, lim, ite+1, del) {
+			if CheckAlignement(Map, x, y, i, j, lim, ite+1, del) {
 				return true
 			}
-		} else if ite == lim && bmap.IsWhite(&bmap.Map, stone.Infos.Ipos+i, stone.Infos.Jpos+j) == stone.Color {
+		} else if ite == lim && bmap.IsWhite(&bmap.Map, x+i, y+j) == bmap.IsWhite(Map, x, y) {
 			return true
 		}
 	}
 	return false
 }
 
-func TakeTwoStones(dat *window.Drawer, Map *[361](uint64), game *GomokuGame, stone *window.Stone) bool {
+func TakeTwoStones(Map *[361](uint64), game *GomokuGame, x, y int, color bool) bool {
 	hap := false
 	for i := -1; i <= 1; i++ {
 		for j := -1; j <= 1; j++ {
-			if CheckAlignement(Map, stone, i, j, 2, 0, true) {
-				if stone.Color {
+			if CheckAlignement(Map, x, y, i, j, 2, 0, true) {
+				if bmap.IsWhite(Map, x, y) {
 					game.Players[0].Points += 2
 				} else {
 					game.Players[1].Points += 2
@@ -205,7 +205,7 @@ func CheckWinAlignment(dat *window.Drawer, Map *[361](uint64), game *GomokuGame,
 				for j := -1; j <= 1; j++ {
 					if !(i == 0 && j == 0) && IsStoneAtPos(&bmap.Map, x, y) {
 						if bmap.IsWhite(&bmap.Map, x, y) == color {
-							if CheckAlignement(Map, dat.BoardRes.Stones[x][y], i, j, 3, 0, false) {
+							if CheckAlignement(Map, x, y, i, j, 3, 0, false) {
 								StonesTab := [5]*window.Stone{
 									dat.BoardRes.Stones[x][y],
 									dat.BoardRes.Stones[x+i][y+j],
@@ -367,21 +367,25 @@ func CheckBreakableAlign(Map *[361]uint64, game *GomokuGame, color bool) bool {
 	return false
 }
 
+func ApplyRules(game *GomokuGame, Map *[361](uint64), i, j int, color bool, rule1, rule2 bool) bool {
+	bmap.SetColor(Map, i, j, color)
+	if rule2 && ThreeBlockNear(Map, game, i, j, color) == true {
+		return false
+	}
+	bmap.SetVisibility(Map, i, j, true)
+	TakeTwoStones(Map, game, i, j, color)
+	UpdateInfos(Map, game, game.Turn)
+	return true
+}
+
 func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 	if game.End != 2 {
 		st := IsStoneHere(pane, x, y, size)
 		if st != nil && !bmap.IsVisible(&bmap.Map, st.Infos.Ipos, st.Infos.Jpos) {
-			st.Color = game.Turn
-			bmap.SetColor(&bmap.Map, st.Infos.Ipos, st.Infos.Jpos, game.Turn)
-			if pane.OptionsRes.Op2 && ThreeBlockNear(&bmap.Map, game, st.Infos.Ipos, st.Infos.Jpos, game.Turn) == true {
+			if !ApplyRules(game, &bmap.Map, st.Infos.Ipos, st.Infos.Jpos, game.Turn, pane.OptionsRes.Op1, pane.OptionsRes.Op2) {
 				pane.BoardRes.BadX, pane.BoardRes.BadY = st.X, st.Y
 				return
-			} else {
-				pane.BoardRes.BadX, pane.BoardRes.BadY = 0, 0
 			}
-			bmap.SetVisibility(&bmap.Map, st.Infos.Ipos, st.Infos.Jpos, true)
-			TakeTwoStones(pane, &bmap.Map, game, st)
-			UpdateInfos(&bmap.Map, game, game.Turn)
 			CheckWinAlignment(pane, &bmap.Map, game, game.Turn)
 			if len(game.Players[GetPlayerNb(game, game.Turn)].FiveAligned) > 0 {
 				if pane.OptionsRes.Op1 && CheckBreakableAlign(&bmap.Map, game, st.Color) {
