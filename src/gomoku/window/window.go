@@ -211,16 +211,42 @@ func (me *Drawer) drawMenu(c *gfx.Canvas) {
 }
 
 func (me *Drawer) drawEnd(c *gfx.Canvas) {
-	c.SetRGBA(255, 255, 255, 60)
+	c.PushViewport(0, 0, gfx.DisplayWidth(), gfx.DisplayWidth())
+	{
+		c.DrawImage(me.BoardRes.board, 0, 0)
+
+		for i := 0; i < bmap.Map_size; i++ {
+			for j := 0; j < bmap.Map_size; j++ {
+				if bmap.IsVisible(&bmap.Map, i, j) {
+					if bmap.IsWhite(&bmap.Map, i, j) {
+						c.DrawImage(me.white_stone, me.BoardRes.Stones[i][j].X,
+							me.BoardRes.Stones[i][j].Y)
+					} else {
+						c.DrawImage(me.black_stone, me.BoardRes.Stones[i][j].X,
+							me.BoardRes.Stones[i][j].Y)
+					}
+				}
+			}
+		}
+	}
+	c.PopViewport()
+
+	c.SetRGBA(255, 255, 255, 160)
 	c.FillRect(0, gfx.DisplayHeight()*20/50, gfx.DisplayWidth(), gfx.DisplayHeight()*10/50)
 	if !me.EndRes.DrawEnd {
-		c.DrawText(me.EndRes.end, 91*gfx.DisplayWidth()/200, 8*gfx.DisplayHeight()/20)
 		if me.WinnerColor {
+			c.SetRGBA(55, 55, 55, 160)
+			c.FillRect(0, gfx.DisplayHeight()*20/50, gfx.DisplayWidth(), gfx.DisplayHeight()*10/50)
 			c.DrawImage(me.white_stone, gfx.DisplayWidth()/2, gfx.DisplayHeight()/2)
 		} else {
+			c.SetRGBA(255, 255, 255, 100)
+			c.FillRect(0, gfx.DisplayHeight()*20/50, gfx.DisplayWidth(), gfx.DisplayHeight()*10/50)
 			c.DrawImage(me.black_stone, gfx.DisplayWidth()/2, gfx.DisplayHeight()/2)
 		}
+		c.DrawText(me.EndRes.end, 91*gfx.DisplayWidth()/200, 8*gfx.DisplayHeight()/20)
 	} else {
+		c.SetRGBA(255, 255, 255, 100)
+		c.FillRect(0, gfx.DisplayHeight()*20/50, gfx.DisplayWidth(), gfx.DisplayHeight()*10/50)
 		c.DrawText(me.EndRes.drawEndText, 91*gfx.DisplayWidth()/200, 8*gfx.DisplayHeight()/20)
 	}
 	c.FillRect(10*gfx.DisplayWidth()/14, gfx.DisplayHeight()*10/11,
