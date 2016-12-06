@@ -3,6 +3,8 @@ package main
 import (
 	"gomoku/arbitre"
 	"gomoku/window"
+	"net/http"
+	_ "net/http/pprof"
 	"os"
 
 	"github.com/gtalent/starfish/gfx"
@@ -122,6 +124,7 @@ func launchWindow(h, w int) bool {
 
 func main() {
 	if checkFiles() && launchWindow(900, 640) {
+		go http.ListenAndServe(":8080", http.DefaultServeMux)
 		gfx.Main()
 	} else {
 		os.Stderr.WriteString("Couldn't launch the game, missing ressources or window can't be opened.\n")
