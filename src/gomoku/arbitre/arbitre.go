@@ -91,7 +91,8 @@ func CheckAlignement(Map *[361](uint64), x, y, i, j, lim, ite int, del bool) boo
 			i, j = augmentPos(i), augmentPos(j)
 			if CheckAlignement(Map, x, y, i, j, lim, ite+1, del) {
 				if del {
-					bmap.SetVisibility(Map, x+iniI, y+iniJ, false)
+					bmap.ResetStone(Map, x+iniI, y+iniJ)
+					//bmap.SetVisibility(Map, x+iniI, y+iniJ, false)
 				}
 				return true
 			}

@@ -27,6 +27,10 @@ const (
 var TabTeam = [][]int{{ULT, UT, URT}, {MLT, MT, MRT}, {DLT, DT, DRT}}
 var TabOppo = [][]int{{ULO, UO, URO}, {MLO, MO, MRO}, {DLO, DO, DRO}}
 
+func ResetStone(MMap *[Map_size * Map_size](uint64), i, j int) {
+	MMap[(i*Map_size)+j] = 0
+}
+
 func getValAt(MMap *[Map_size * Map_size](uint64), i, j int, info uint) int {
 	if MMap[(i*Map_size)+j]&(1<<info) == 0 {
 		return 0
