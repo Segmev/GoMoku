@@ -135,36 +135,36 @@ func getInfosNbStonesDirection(Map *[361]uint64, x, y int, color bool, i, j int)
 	return cpt
 }
 
-func CheckBreakable(dat *window.Drawer, stone *window.Stone) bool {
-	for i := -1; i <= 1; i++ {
-		for j := -1; j <= 1; j++ {
-			if !(i == 0 && j == 0) && stone.Infos.TeamSt[1+j][1+i] == 1 &&
-				((IsStoneAtPos(&bmap.Map, stone.Infos.Ipos+i, stone.Infos.Jpos+j) &&
-					IsStoneAtPos(&bmap.Map, stone.Infos.Ipos+i+i, stone.Infos.Jpos+j+j) &&
-					bmap.IsWhite(&bmap.Map, stone.Infos.Ipos+i+i, stone.Infos.Jpos+j+j) != stone.Color) ||
-					stone.Infos.OppoSt[1+(-1*j)][1+(-1*i)] >= 1) {
-				stone.Infos.Breakable = true
-				bmap.SetBreakable(&bmap.Map, stone.Infos.Ipos, stone.Infos.Jpos, true)
-				return true
-			}
-		}
-	}
-	stone.Infos.Breakable = false
-	bmap.SetBreakable(&bmap.Map, stone.Infos.Ipos, stone.Infos.Jpos, false)
-	return false
-}
+// func CheckBreakable(Map *[361]uint64, stone *window.Stone) bool {
+// 	for i := -1; i <= 1; i++ {
+// 		for j := -1; j <= 1; j++ {
+// 			if !(i == 0 && j == 0) && stone.Infos.TeamSt[1+j][1+i] == 1 &&
+// 				((IsStoneAtPos(Map, stone.Infos.Ipos+i, stone.Infos.Jpos+j) &&
+// 					IsStoneAtPos(Map, stone.Infos.Ipos+i+i, stone.Infos.Jpos+j+j) &&
+// 					bmap.IsWhite(Map, stone.Infos.Ipos+i+i, stone.Infos.Jpos+j+j) != stone.Color) ||
+// 					stone.Infos.OppoSt[1+(-1*j)][1+(-1*i)] >= 1) {
+// 				stone.Infos.Breakable = true
+// 				bmap.SetBreakable(Map, stone.Infos.Ipos, stone.Infos.Jpos, true)
+// 				return true
+// 			}
+// 		}
+// 	}
+// 	stone.Infos.Breakable = false
+// 	bmap.SetBreakable(Map, stone.Infos.Ipos, stone.Infos.Jpos, false)
+// 	return false
+// }
 
-func ResetTeamInfos(dat *window.Drawer, color bool) {
-	for x := range dat.BoardRes.Stones {
-		for _, st := range dat.BoardRes.Stones[x] {
-			if st.Color == color {
+func ResetTeamInfos(Map *[361]uint64, color bool) {
+	for x := 0; x <= 18; x++ {
+		for y := 0; y <= 18; y++ {
+			if bmap.IsWhite(Map, x, y) == color {
 				for i := -1; i <= 1; i++ {
 					for j := -1; j <= 1; j++ {
-						st.Infos.TeamSt[1+i][1+j], st.Infos.OppoSt[1+i][1+j] = 0, 0
+						bmap.SetNbTeamAt(Map, x, y, i+1, j+1, 0)
+						bmap.SetNbOppoAt(Map, x, y, i+1, j+1, 0)
 					}
 				}
-				st.Infos.Breakable = false
-				bmap.SetBreakable(&bmap.Map, st.Infos.Ipos, st.Infos.Jpos, false)
+				bmap.SetBreakable(Map, x, y, false)
 			}
 		}
 	}
@@ -178,22 +178,22 @@ func UpdateInfos(Map *[361](uint64), game *GomokuGame, color bool) {
 			totOpp, totTeam := 0, 0
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
-					if !(i == 0 && j == 0) && IsStoneAtPos(&bmap.Map, x, y) {
-						if bmap.IsWhite(&bmap.Map, x, y) == color {
-							bmap.SetNbTeamAt(&bmap.Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
-								bmap.IsWhite(&bmap.Map, x, y), i, j)))
+					if !(i == 0 && j == 0) && IsStoneAtPos(Map, x, y) {
+						if bmap.IsWhite(Map, x, y) == color {
+							bmap.SetNbTeamAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
+								bmap.IsWhite(Map, x, y), i, j)))
 							totTeam += bmap.GetNbT(Map, x, y, 1+j, 1+i)
 
 						} else {
-							bmap.SetNbOppoAt(&bmap.Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
-								!bmap.IsWhite(&bmap.Map, x, y), i, j)))
+							bmap.SetNbOppoAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
+								!bmap.IsWhite(Map, x, y), i, j)))
 							totOpp += bmap.GetNbO(Map, x, y, 1+j, 1+i)
 						}
 					}
 				}
 			}
-			bmap.SetNbTeamAt(&bmap.Map, x, y, 1, 1, uint64(totTeam))
-			bmap.SetNbOppoAt(&bmap.Map, x, y, 1, 1, uint64(totOpp))
+			bmap.SetNbTeamAt(Map, x, y, 1, 1, uint64(totTeam))
+			bmap.SetNbOppoAt(Map, x, y, 1, 1, uint64(totOpp))
 		}
 	}
 }
@@ -232,7 +232,7 @@ func ThreeBlockNear(Map *[361]uint64, game *GomokuGame, x, y int, color bool) bo
 					if IsStoneAtPos(Map, x+a, y+b) &&
 						color == bmap.IsWhite(Map, x+a, y+b) {
 						if UpdateThreeGroups(Map, game, x+a, y+b, color) {
-							bmap.SetVisibility(&bmap.Map, x, y, false)
+							bmap.ResetStone(Map, x, y)
 							ret = true
 						}
 					}

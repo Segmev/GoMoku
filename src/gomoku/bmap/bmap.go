@@ -5,23 +5,23 @@ const Map_size = 19
 var Map [Map_size * Map_size](uint64)
 
 const (
-	VISIBLE = 0
-	COLOR   = 1
+	VISIBLE = iota
+	COLOR
 
 	// TODO: Update infos in arbitre, not done for now
-	INTWOGROUP    = 2
-	BREAKABLE     = 3
-	INTHREEGROUP  = 4
-	INDOUBLETHREE = 5
-	INFOURGROUP   = 6
+	INTWOGROUP
+	BREAKABLE
+	INTHREEGROUP
+	INDOUBLETHREE
+	INFOURGROUP
 
-	ULT, UT, URT = 6 + (3 * 1), 6 + (3 * 2), 6 + (3 * 3)
-	MLT, MT, MRT = 6 + (3 * 4), 6 + (3 * 5), 6 + (3 * 6)
-	DLT, DT, DRT = 6 + (3 * 7), 6 + (3 * 8), 6 + (3 * 9)
+	ULT, UT, URT = 6 + (3 * iota), 6 + (3 * iota), 6 + (3 * iota)
+	MLT, MT, MRT = 6 + (3 * iota), 6 + (3 * iota), 6 + (3 * iota)
+	DLT, DT, DRT = 6 + (3 * iota), 6 + (3 * iota), 6 + (3 * iota)
 
-	ULO, UO, URO = 6 + (3 * 10), 6 + (3 * 11), 6 + (3 * 12)
-	MLO, MO, MRO = 6 + (3 * 13), 6 + (3 * 14), 6 + (3 * 15)
-	DLO, DO, DRO = 6 + (3 * 16), 6 + (3 * 17), 6 + (3 * 18)
+	ULO, UO, URO = 6 + (3 * iota), 6 + (3 * iota), 6 + (3 * iota)
+	MLO, MO, MRO = 6 + (3 * iota), 6 + (3 * iota), 6 + (3 * iota)
+	DLO, DO, DRO = 6 + (3 * iota), 6 + (3 * iota), 6 + (3 * iota)
 )
 
 var TabTeam = [][]int{{ULT, UT, URT}, {MLT, MT, MRT}, {DLT, DT, DRT}}
