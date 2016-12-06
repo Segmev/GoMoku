@@ -86,21 +86,21 @@ func augmentPos(pos int) int {
 
 func CheckAlignement(Map *[361](uint64), x, y, i, j, lim, ite int, del bool) bool {
 	if IsStoneAtPos(Map, x+i, y+j) {
-		if del && ite < lim && bmap.IsWhite(&bmap.Map, x+i, y+j) != bmap.IsWhite(Map, x, y) {
+		if del && ite < lim && bmap.IsWhite(Map, x+i, y+j) != bmap.IsWhite(Map, x, y) {
 			iniI, iniJ := i, j
 			i, j = augmentPos(i), augmentPos(j)
 			if CheckAlignement(Map, x, y, i, j, lim, ite+1, del) {
 				if del {
-					bmap.SetVisibility(&bmap.Map, x+iniI, y+iniJ, false)
+					bmap.SetVisibility(Map, x+iniI, y+iniJ, false)
 				}
 				return true
 			}
-		} else if !del && ite < lim && bmap.IsWhite(&bmap.Map, x+i, y+j) == bmap.IsWhite(Map, x, y) {
+		} else if !del && ite < lim && bmap.IsWhite(Map, x+i, y+j) == bmap.IsWhite(Map, x, y) {
 			i, j = augmentPos(i), augmentPos(j)
 			if CheckAlignement(Map, x, y, i, j, lim, ite+1, del) {
 				return true
 			}
-		} else if ite == lim && bmap.IsWhite(&bmap.Map, x+i, y+j) == bmap.IsWhite(Map, x, y) {
+		} else if ite == lim && bmap.IsWhite(Map, x+i, y+j) == bmap.IsWhite(Map, x, y) {
 			return true
 		}
 	}
@@ -319,8 +319,8 @@ func CheckWinAlignment(dat *window.Drawer, Map *[361](uint64), game *GomokuGame,
 		for y := range dat.BoardRes.Stones[x] {
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
-					if !(i == 0 && j == 0) && IsStoneAtPos(&bmap.Map, x, y) {
-						if bmap.IsWhite(&bmap.Map, x, y) == color {
+					if !(i == 0 && j == 0) && IsStoneAtPos(Map, x, y) {
+						if bmap.IsWhite(Map, x, y) == color {
 							if CheckAlignement(Map, x, y, i, j, 3, 0, false) {
 								StonesTab := [5]*window.Stone{
 									dat.BoardRes.Stones[x][y],
