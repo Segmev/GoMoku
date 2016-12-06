@@ -340,10 +340,10 @@ func CheckWinAlignment(dat *window.Drawer, Map *[361](uint64), game *GomokuGame,
 	}
 }
 
-func break_cases(Map *[361]uint64, x, y, i, j int) bool {
-	return bmap.GetNbT(Map, x, y, i+1, j+1) == 1 && !IsStoneAtPos(Map, x+i+i, y+j+j) && ((bmap.GetNbO(Map, x, y, 1+(-1*i), 1+(-1*j)) >= 1) ||
-		(bmap.GetNbO(Map, x+j, y+i, 1+i, 1+j) >= 1 &&
-			!IsStoneAtPos(Map, x+(-1*j), x+(-1*i))))
+func Break_cases(Map *[361]uint64, st *window.Stone, i, j int) bool {
+	return bmap.GetNbT(Map, st.Infos.Ipos, st.Infos.Jpos, i+1, j+1) == 1 &&
+		((!IsStoneAtPos(Map, st.Infos.Ipos-i-i, st.Infos.Jpos-j-j) && bmap.GetNbO(Map, st.Infos.Ipos, st.Infos.Jpos, 1+(-1*i), 1+(-1*j)) >= 1) ||
+			(bmap.GetNbO(Map, st.Infos.Ipos+j, st.Infos.Jpos+i, 1+i, 1+j) >= 1 && !IsStoneAtPos(Map, st.Infos.Ipos+(-1*j), st.Infos.Jpos+(-1*i))))
 }
 
 func CheckBreakableAlign(Map *[361]uint64, game *GomokuGame, color bool) bool {
@@ -354,7 +354,7 @@ func CheckBreakableAlign(Map *[361]uint64, game *GomokuGame, color bool) bool {
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
 					if !(i == 0 && j == 0) &&
-						break_cases(Map, st.Infos.Ipos, st.Infos.Jpos, i, j) {
+						Break_cases(Map, st, i, j) {
 						bmap.SetBreakable(Map, st.Infos.Ipos, st.Infos.Jpos, true)
 						cpt = 1
 					} else if IsStoneAtPos(Map, st.Infos.Ipos, st.Infos.Jpos) {
