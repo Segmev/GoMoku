@@ -15,17 +15,21 @@ func AddSon(tree *NodeTree, x int, y int, carte[361]uint64) {
 	son.father = tree;
 }
 
-func seek(carte [19 * 19]uint64, color bool) {
+func seek(carte [19 * 19]uint64, color bool, deep int) {
 	var racine NodeTree
+	var curr NodeTree
+	var cpt int
+	var x int
+	var y int
 
+	cpt = 0
 	racine.father = nil
 	racine.val = 0
 	racine.carte = carte
-	for x := 0; x < 19; x++ {
-		for y := 0; x < 19; y++ {
-			if bmap.GetValStones(&carte, x, y, bmap.MO)+bmap.GetValStones(&carte, x, y, bmap.MT) != 0 {
+	curr = racine
+	for k < cpt {
+		if bmap.GetValStones(&carte, x, y, bmap.MO)+bmap.GetValStones(&carte, x, y, bmap.MT) != 0 {
 
-			}
 		}
 	}
 }
