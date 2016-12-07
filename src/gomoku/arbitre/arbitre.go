@@ -8,6 +8,10 @@ import (
 	"time"
 )
 
+type Coor struct {
+	x, y int
+}
+
 type Player struct {
 	Name        string
 	Points      int
@@ -296,6 +300,19 @@ func isDraw(pane *window.Drawer, game *GomokuGame) {
 	}
 }
 
+func CheckWinAl(Map *[363](uint64), color bool, FiveAligned [][5]*Coor) {
+	for x := 0; x <= 18; x++ {
+		for y := 0; y <= 18; y++ {
+			if bmap.IsVisible(Map, x, y) && bmap.IsWhite(Map, x, y) == color {
+				println(x, y, bmap.GetValStones(Map, x, y, bmap.MT))
+				if bmap.GetValStones(Map, x, y, bmap.MT) >= 5 {
+					println(true)
+				}
+			}
+		}
+	}
+}
+
 func CheckWinAlignment(dat *window.Drawer, Map *[363](uint64), game *GomokuGame, color bool) {
 	game.Players[GetPlayerNb(game, color)].FiveAligned = game.Players[GetPlayerNb(game, color)].FiveAligned[:0]
 	for x := range dat.BoardRes.Stones {
@@ -378,6 +395,8 @@ func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 				pane.BoardRes.BadX, pane.BoardRes.BadY = st.X, st.Y
 				return
 			}
+			var fl [][5]*Coor
+			CheckWinAl(&bmap.Map, game.Turn, fl)
 			CheckWinAlignment(pane, &bmap.Map, game, game.Turn)
 			if len(game.Players[GetPlayerNb(game, game.Turn)].FiveAligned) > 0 {
 				if !pane.OptionsRes.Op1 || CheckBreakableAlign(&bmap.Map, game, game.Turn) {
