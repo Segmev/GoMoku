@@ -304,10 +304,18 @@ func CheckWinAl(Map *[363](uint64), color bool, FiveAligned [][5]*Coor) {
 	for x := 0; x <= 18; x++ {
 		for y := 0; y <= 18; y++ {
 			if bmap.IsVisible(Map, x, y) && bmap.IsWhite(Map, x, y) == color {
-				println(x, y, bmap.GetValStones(Map, x, y, bmap.MT))
-				if bmap.GetValStones(Map, x, y, bmap.MT) >= 5 {
-					println(true)
+				for i := 0; i <= 2; i++ {
+					for j := 0; j <= 2; j++ {
+						print(" ", bmap.GetNbT(Map, x, y, i, j))
+						if !(i == 1 && j == 1) {
+							if bmap.GetNbT(Map, x, y, i, j) >= 5 {
+								println(x, y, i, j, true)
+							}
+						}
+					}
+					println()
 				}
+				println()
 			}
 		}
 	}

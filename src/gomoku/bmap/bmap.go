@@ -41,9 +41,9 @@ func getValAt(MMap *[Map_size*Map_size + Nb_Players](uint64), i, j int, info uin
 
 func GetValStones(MMap *[Map_size*Map_size + Nb_Players](uint64), i, j int, info uint) int {
 	res := 0
-	res = (res << 1) | getValAt(MMap, i, j, info)
-	res = (res << 1) | getValAt(MMap, i, j, info+1)
-	res = (res << 1) | getValAt(MMap, i, j, info+2)
+	res = (res << 1) ^ getValAt(MMap, i, j, info)
+	res = (res << 1) ^ getValAt(MMap, i, j, info+1)
+	res = (res << 1) ^ getValAt(MMap, i, j, info+2)
 	return res
 }
 
@@ -67,16 +67,16 @@ func setAtPos(MMap *[Map_size*Map_size + Nb_Players](uint64), i, j int, infos ui
 
 func SetNbOppoAt(MMap *[Map_size*Map_size + Nb_Players](uint64), i, j int, posx, posy int, nb uint64) {
 	var info uint = uint(TabOppo[posx][posy])
-	setAtPos(MMap, i, j, info+0, (nb>>2)&(1))
-	setAtPos(MMap, i, j, info+1, (nb>>1)&(1))
 	setAtPos(MMap, i, j, info+2, (nb>>0)&(1))
+	setAtPos(MMap, i, j, info+1, (nb>>1)&(1))
+	setAtPos(MMap, i, j, info+0, (nb>>2)&(1))
 }
 
 func SetNbTeamAt(MMap *[Map_size*Map_size + Nb_Players](uint64), i, j int, posx, posy int, nb uint64) {
 	var info uint = uint(TabTeam[posx][posy])
-	setAtPos(MMap, i, j, info+0, (nb>>2)&(1))
-	setAtPos(MMap, i, j, info+1, (nb>>1)&(1))
 	setAtPos(MMap, i, j, info+2, (nb>>0)&(1))
+	setAtPos(MMap, i, j, info+1, (nb>>1)&(1))
+	setAtPos(MMap, i, j, info+0, (nb>>2)&(1))
 }
 
 func IsInFourGroup(MMap *[Map_size*Map_size + Nb_Players](uint64), i, j int) bool {
