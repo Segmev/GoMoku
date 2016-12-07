@@ -3,7 +3,9 @@ package arbitre
 import (
 	"gomoku/bmap"
 	"gomoku/window"
+	"math/rand"
 	"strconv"
+	"time"
 )
 
 type Player struct {
@@ -28,11 +30,15 @@ func (game *GomokuGame) Restart(pane *window.Drawer) bool {
 	}
 	game.End = 0
 	pane.EndRes.DrawEnd = false
-	game.Players[0].Points, game.Players[1].Points = 0, 0
+	bmap.SetPlayerTakenStones(&bmap.Map, true, 0)
+	bmap.SetPlayerTakenStones(&bmap.Map, false, 0)
 	pane.BoardRes.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
 	pane.BoardRes.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
 	pane.GameState = "menu"
 	pane.BoardRes.BadX, pane.BoardRes.BadY = 0, 0
+	rand.Seed(time.Now().UTC().UnixNano())
+	game.Turn = rand.Uint32()%2 == 0
+	pane.Turn = game.Turn
 	return true
 }
 
@@ -68,7 +74,7 @@ func ValableCoor(i, j int) bool {
 	return (i >= 0 && i <= 18 && j >= 0 && j <= 18)
 }
 
-func IsStoneAtPos(Map *[361]uint64, i, j int) bool {
+func IsStoneAtPos(Map *[363]uint64, i, j int) bool {
 	if ValableCoor(i, j) {
 		return bmap.IsVisible(Map, i, j)
 	}
@@ -84,7 +90,7 @@ func augmentPos(pos int) int {
 	return pos
 }
 
-func CheckAlignement(Map *[361](uint64), x, y, i, j, lim, ite int, del bool) bool {
+func CheckAlignement(Map *[363](uint64), x, y, i, j, lim, ite int, del bool) bool {
 	if IsStoneAtPos(Map, x+i, y+j) {
 		if del && ite < lim && bmap.IsWhite(Map, x+i, y+j) != bmap.IsWhite(Map, x, y) {
 			iniI, iniJ := i, j
@@ -108,16 +114,12 @@ func CheckAlignement(Map *[361](uint64), x, y, i, j, lim, ite int, del bool) boo
 	return false
 }
 
-func TakeTwoStones(Map *[361](uint64), game *GomokuGame, x, y int, color bool) bool {
+func TakeTwoStones(Map *[363](uint64), game *GomokuGame, x, y int, color bool) bool {
 	hap := false
 	for i := -1; i <= 1; i++ {
 		for j := -1; j <= 1; j++ {
 			if CheckAlignement(Map, x, y, i, j, 2, 0, true) {
-				if bmap.IsWhite(Map, x, y) {
-					game.Players[0].Points += 2
-				} else {
-					game.Players[1].Points += 2
-				}
+				bmap.SetPlayerTakenStones(Map, game.Turn, bmap.GetPlayerTakenStones(Map, game.Turn)+2)
 				hap = true
 			}
 		}
@@ -125,7 +127,7 @@ func TakeTwoStones(Map *[361](uint64), game *GomokuGame, x, y int, color bool) b
 	return hap
 }
 
-func getInfosNbStonesDirection(Map *[361]uint64, x, y int, color bool, i, j int) int {
+func getInfosNbStonesDirection(Map *[363]uint64, x, y int, color bool, i, j int) int {
 	cpt := 0
 	for IsStoneAtPos(Map, x+i, y+j) &&
 		bmap.IsWhite(Map, x+i, y+j) == color {
@@ -135,26 +137,7 @@ func getInfosNbStonesDirection(Map *[361]uint64, x, y int, color bool, i, j int)
 	return cpt
 }
 
-// func CheckBreakable(Map *[361]uint64, stone *window.Stone) bool {
-// 	for i := -1; i <= 1; i++ {
-// 		for j := -1; j <= 1; j++ {
-// 			if !(i == 0 && j == 0) && stone.Infos.TeamSt[1+j][1+i] == 1 &&
-// 				((IsStoneAtPos(Map, stone.Infos.Ipos+i, stone.Infos.Jpos+j) &&
-// 					IsStoneAtPos(Map, stone.Infos.Ipos+i+i, stone.Infos.Jpos+j+j) &&
-// 					bmap.IsWhite(Map, stone.Infos.Ipos+i+i, stone.Infos.Jpos+j+j) != stone.Color) ||
-// 					stone.Infos.OppoSt[1+(-1*j)][1+(-1*i)] >= 1) {
-// 				stone.Infos.Breakable = true
-// 				bmap.SetBreakable(Map, stone.Infos.Ipos, stone.Infos.Jpos, true)
-// 				return true
-// 			}
-// 		}
-// 	}
-// 	stone.Infos.Breakable = false
-// 	bmap.SetBreakable(Map, stone.Infos.Ipos, stone.Infos.Jpos, false)
-// 	return false
-// }
-
-func ResetTeamInfos(Map *[361]uint64, color bool) {
+func ResetTeamInfos(Map *[363]uint64, color bool) {
 	for x := 0; x <= 18; x++ {
 		for y := 0; y <= 18; y++ {
 			if bmap.IsWhite(Map, x, y) == color {
@@ -170,7 +153,7 @@ func ResetTeamInfos(Map *[361]uint64, color bool) {
 	}
 }
 
-func UpdateInfos(Map *[361](uint64), game *GomokuGame, color bool) {
+func UpdateInfos(Map *[363](uint64), game *GomokuGame, color bool) {
 	//ResetTeamInfos(dat, color)
 	for x := 0; x <= 18; x++ {
 		for y := 0; y <= 18; y++ {
@@ -208,17 +191,16 @@ func AppearStone(dat *window.Drawer, x, y, size int) bool {
 	return false
 }
 
-func HasTakenEnoughStones(pane *window.Drawer, game *GomokuGame) {
-	if game.Players[0].Points >= 10 {
-		game.End = 2
-		pane.WinnerColor = true
-	} else if game.Players[1].Points >= 10 {
-		game.End = 2
-		pane.WinnerColor = false
+func HasTakenEnoughStones(Map *[363]uint64) (bool, bool) {
+	if bmap.GetPlayerTakenStones(Map, true) >= 10 {
+		return true, true
+	} else if bmap.GetPlayerTakenStones(Map, false) >= 10 {
+		return true, false
 	}
+	return false, false
 }
 
-func ThreeBlockNear(Map *[361]uint64, game *GomokuGame, x, y int, color bool) bool {
+func ThreeBlockNear(Map *[363]uint64, game *GomokuGame, x, y int, color bool) bool {
 	if UpdateThreeGroups(Map, game, x, y, color) {
 		return true
 	}
@@ -244,7 +226,7 @@ func ThreeBlockNear(Map *[361]uint64, game *GomokuGame, x, y int, color bool) bo
 	return ret
 }
 
-func updateThreeGroupLoop(Map *[361]uint64, color bool, x, y, dirI, dirJ, cptHowManyThreeGroups, cptFourGroups int) (int, int) {
+func updateThreeGroupLoop(Map *[363]uint64, color bool, x, y, dirI, dirJ, cptHowManyThreeGroups, cptFourGroups int) (int, int) {
 	cpt := 0
 	if !(dirI == 0 && dirJ == 0) {
 		i, j := dirI, dirJ
@@ -276,7 +258,7 @@ func updateThreeGroupLoop(Map *[361]uint64, color bool, x, y, dirI, dirJ, cptHow
 	return cptHowManyThreeGroups, cptFourGroups
 }
 
-func UpdateThreeGroups(Map *[361]uint64, game *GomokuGame, x, y int, color bool) bool {
+func UpdateThreeGroups(Map *[363]uint64, game *GomokuGame, x, y int, color bool) bool {
 	cptHowManyThreeGroups, cptFourGroups := 0, 0
 	for dirI := -1; dirI <= 0; dirI++ {
 		for dirJ := -1; dirJ <= 0; dirJ++ {
@@ -314,7 +296,7 @@ func isDraw(pane *window.Drawer, game *GomokuGame) {
 	}
 }
 
-func CheckWinAlignment(dat *window.Drawer, Map *[361](uint64), game *GomokuGame, color bool) {
+func CheckWinAlignment(dat *window.Drawer, Map *[363](uint64), game *GomokuGame, color bool) {
 	game.Players[GetPlayerNb(game, color)].FiveAligned = game.Players[GetPlayerNb(game, color)].FiveAligned[:0]
 	for x := range dat.BoardRes.Stones {
 		for y := range dat.BoardRes.Stones[x] {
@@ -340,19 +322,19 @@ func CheckWinAlignment(dat *window.Drawer, Map *[361](uint64), game *GomokuGame,
 	}
 }
 
-func Break_cases(Map *[361]uint64, Ipos, Jpos, i, j int) bool {
+func Break_cases(Map *[363]uint64, Ipos, Jpos, i, j int) bool {
 	return bmap.GetNbT(Map, Ipos, Jpos, i+1, j+1) == 1 &&
 		((!IsStoneAtPos(Map, Ipos-i-i, Jpos-j-j) && bmap.GetNbO(Map, Ipos, Jpos, 1+(-1*i), 1+(-1*j)) >= 1) ||
 			(bmap.GetNbO(Map, Ipos+j, Jpos+i, 1+i, 1+j) >= 1 && !IsStoneAtPos(Map, Ipos+(-1*j), Jpos+(-1*i))))
 }
 
-// func Break_cases(Map *[361]uint64, st *window.Stone, i, j int) bool {
+// func Break_cases(Map *[363]uint64, st *window.Stone, i, j int) bool {
 // 	return bmap.GetNbT(Map, st.Infos.Ipos, st.Infos.Jpos, i+1, j+1) == 1 &&
 // 		((!IsStoneAtPos(Map, st.Infos.Ipos-i-i, st.Infos.Jpos-j-j) && bmap.GetNbO(Map, st.Infos.Ipos, st.Infos.Jpos, 1+(-1*i), 1+(-1*j)) >= 1) ||
 // 			(bmap.GetNbO(Map, st.Infos.Ipos+j, st.Infos.Jpos+i, 1+i, 1+j) >= 1 && !IsStoneAtPos(Map, st.Infos.Ipos+(-1*j), st.Infos.Jpos+(-1*i))))
 // }
 
-func CheckBreakableAlign(Map *[361]uint64, game *GomokuGame, color bool) bool {
+func CheckBreakableAlign(Map *[363]uint64, game *GomokuGame, color bool) bool {
 	tot := 0
 	for _, line := range game.Players[GetPlayerNb(game, color)].FiveAligned {
 		cpt := 0
@@ -377,7 +359,7 @@ func CheckBreakableAlign(Map *[361]uint64, game *GomokuGame, color bool) bool {
 	return false
 }
 
-func ApplyRules(game *GomokuGame, Map *[361](uint64), i, j int, color bool, rule1, rule2 bool) bool {
+func ApplyRules(game *GomokuGame, Map *[363](uint64), i, j int, color bool, rule1, rule2 bool) bool {
 	bmap.SetColor(Map, i, j, color)
 	if rule2 && ThreeBlockNear(Map, game, i, j, color) == true {
 		return false
@@ -406,12 +388,16 @@ func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 			game.Turn = !game.Turn
 		}
 	}
-	HasTakenEnoughStones(pane, game)
+	end, winColor := HasTakenEnoughStones(&bmap.Map)
+	if end {
+		game.End = 2
+		pane.WinnerColor = winColor
+	}
 	isDraw(pane, game)
 	if game.End == 2 {
 		pane.GameState = "end"
 	}
-	pane.BoardRes.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
-	pane.BoardRes.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
+	pane.BoardRes.Wscore = pane.Font.Write(strconv.Itoa(int(bmap.GetPlayerTakenStones(&bmap.Map, true))))
+	pane.BoardRes.Bscore = pane.Font.Write(strconv.Itoa(int(bmap.GetPlayerTakenStones(&bmap.Map, false))))
 	pane.Turn = game.Turn
 }

@@ -3,9 +3,11 @@ package main
 import (
 	"gomoku/arbitre"
 	"gomoku/window"
+	"math/rand"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
+	"time"
 
 	"github.com/gtalent/starfish/gfx"
 	"github.com/gtalent/starfish/input"
@@ -115,6 +117,9 @@ func launchWindow(h, w int) bool {
 		gfx.AddDrawer(&pane)
 	}
 	var game arbitre.GomokuGame
+	rand.Seed(time.Now().UTC().UnixNano())
+	game.Turn = rand.Uint32()%2 == 0
+	pane.Turn = game.Turn
 	game.End = 0
 	pane.GameState = "menu"
 	addInput(&pane, &game)
