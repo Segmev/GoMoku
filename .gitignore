@@ -4,8 +4,8 @@
 # exclude patterns (uncomment them if you want to use them):
 # *.[oa]
 # *~
-/pkg
-/bin
+/pkg/*
+/bin/*
 /src/*
 /Gomoku
 !/src/gomoku
