@@ -114,12 +114,12 @@ func CheckAlignement(Map *[363](uint64), x, y, i, j, lim, ite int, del bool) boo
 	return false
 }
 
-func TakeTwoStones(Map *[363](uint64), game *GomokuGame, x, y int, color bool) bool {
+func TakeTwoStones(Map *[363](uint64), x, y int, color bool) bool {
 	hap := false
 	for i := -1; i <= 1; i++ {
 		for j := -1; j <= 1; j++ {
 			if CheckAlignement(Map, x, y, i, j, 2, 0, true) {
-				bmap.SetPlayerTakenStones(Map, game.Turn, bmap.GetPlayerTakenStones(Map, game.Turn)+2)
+				bmap.SetPlayerTakenStones(Map, color, bmap.GetPlayerTakenStones(Map, color)+2)
 				hap = true
 			}
 		}
@@ -153,11 +153,11 @@ func ResetTeamInfos(Map *[363]uint64, color bool) {
 	}
 }
 
-func UpdateInfos(Map *[363](uint64), game *GomokuGame, color bool) {
+func UpdateInfos(Map *[363](uint64), color bool) {
 	//ResetTeamInfos(dat, color)
 	for x := 0; x <= 18; x++ {
 		for y := 0; y <= 18; y++ {
-			UpdateThreeGroups(Map, game, x, y, color)
+			UpdateThreeGroups(Map, x, y, color)
 			totOpp, totTeam := 0, 0
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
@@ -200,8 +200,8 @@ func HasTakenEnoughStones(Map *[363]uint64) (bool, bool) {
 	return false, false
 }
 
-func ThreeBlockNear(Map *[363]uint64, game *GomokuGame, x, y int, color bool) bool {
-	if UpdateThreeGroups(Map, game, x, y, color) {
+func ThreeBlockNear(Map *[363]uint64, x, y int, color bool) bool {
+	if UpdateThreeGroups(Map, x, y, color) {
 		return true
 	}
 	ret := false
@@ -213,7 +213,7 @@ func ThreeBlockNear(Map *[363]uint64, game *GomokuGame, x, y int, color bool) bo
 				for c := 0; c <= 2; c++ {
 					if IsStoneAtPos(Map, x+a, y+b) &&
 						color == bmap.IsWhite(Map, x+a, y+b) {
-						if UpdateThreeGroups(Map, game, x+a, y+b, color) {
+						if UpdateThreeGroups(Map, x+a, y+b, color) {
 							bmap.ResetStone(Map, x, y)
 							ret = true
 						}
@@ -258,7 +258,7 @@ func updateThreeGroupLoop(Map *[363]uint64, color bool, x, y, dirI, dirJ, cptHow
 	return cptHowManyThreeGroups, cptFourGroups
 }
 
-func UpdateThreeGroups(Map *[363]uint64, game *GomokuGame, x, y int, color bool) bool {
+func UpdateThreeGroups(Map *[363]uint64, x, y int, color bool) bool {
 	cptHowManyThreeGroups, cptFourGroups := 0, 0
 	for dirI := -1; dirI <= 0; dirI++ {
 		for dirJ := -1; dirJ <= 0; dirJ++ {
@@ -359,14 +359,14 @@ func CheckBreakableAlign(Map *[363]uint64, game *GomokuGame, color bool) bool {
 	return false
 }
 
-func ApplyRules(game *GomokuGame, Map *[363](uint64), i, j int, color bool, rule1, rule2 bool) bool {
+func ApplyRules(Map *[363](uint64), i, j int, color bool, rule1, rule2 bool) bool {
 	bmap.SetColor(Map, i, j, color)
-	if rule2 && ThreeBlockNear(Map, game, i, j, color) == true {
+	if rule2 && ThreeBlockNear(Map, i, j, color) == true {
 		return false
 	}
 	bmap.SetVisibility(Map, i, j, true)
-	TakeTwoStones(Map, game, i, j, color)
-	UpdateInfos(Map, game, game.Turn)
+	TakeTwoStones(Map, i, j, color)
+	UpdateInfos(Map, color)
 	return true
 }
 
@@ -374,7 +374,7 @@ func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 	if game.End != 2 {
 		st := IsStoneHere(pane, x, y, size)
 		if st != nil && !bmap.IsVisible(&bmap.Map, st.Infos.Ipos, st.Infos.Jpos) {
-			if !ApplyRules(game, &bmap.Map, st.Infos.Ipos, st.Infos.Jpos, game.Turn, pane.OptionsRes.Op1, pane.OptionsRes.Op2) {
+			if !ApplyRules(&bmap.Map, st.Infos.Ipos, st.Infos.Jpos, game.Turn, pane.OptionsRes.Op1, pane.OptionsRes.Op2) {
 				pane.BoardRes.BadX, pane.BoardRes.BadY = st.X, st.Y
 				return
 			}
