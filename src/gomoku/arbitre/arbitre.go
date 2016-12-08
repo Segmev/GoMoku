@@ -2,6 +2,7 @@ package arbitre
 
 import (
 	"gomoku/bmap"
+	"gomoku/ia"
 	"gomoku/window"
 	"math/rand"
 	"strconv"
@@ -414,7 +415,7 @@ func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 
 		//pane.Turn = game.Turn
 		//time.Sleep(time.Second)
-
+		bmap.SetVisibility(&bmap.Map, ia.Seek(bmap.Map, game.Turn, 3, pane.OptionsRes.Op1, pane.OptionsRes.Op2), true)
 		game.Turn = !game.Turn
 	}
 	pane.Turn = game.Turn
