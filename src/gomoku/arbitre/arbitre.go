@@ -9,7 +9,7 @@ import (
 )
 
 type Coor struct {
-	x, y int
+	X, Y int
 }
 
 type Player struct {
@@ -300,45 +300,29 @@ func isDraw(pane *window.Drawer, game *GomokuGame) {
 	}
 }
 
-func CheckWinAl(Map *[363](uint64), color bool, FiveAligned [][5]*Coor) {
-	for x := 0; x <= 18; x++ {
-		for y := 0; y <= 18; y++ {
-			if bmap.IsVisible(Map, x, y) && bmap.IsWhite(Map, x, y) == color {
-				for i := 0; i <= 2; i++ {
-					for j := 0; j <= 2; j++ {
-						print(" ", bmap.GetNbT(Map, x, y, i, j))
-						if !(i == 1 && j == 1) {
-							if bmap.GetNbT(Map, x, y, i, j) >= 5 {
-								println(x, y, i, j, true)
-							}
-						}
-					}
-					println()
-				}
-				println()
-			}
-		}
+func fillAlignedArray(FiveAligned *[][5]Coor, x, y, i, j int) {
+	if x+4*i >= 0 && x+4*i <= 18 && y+4*j >= 0 && y+4*j <= 18 {
+		StonesTab := [5]Coor{
+			Coor{x, y},
+			Coor{x + i, y + j},
+			Coor{x + i + i, y + j + j},
+			Coor{x + i + i + i, y + j + j + j},
+			Coor{x + i + i + i + i, y + j + j + j + j}}
+		*FiveAligned = append(*FiveAligned, StonesTab)
 	}
 }
 
-func CheckWinAlignment(dat *window.Drawer, Map *[363](uint64), game *GomokuGame, color bool) {
-	game.Players[GetPlayerNb(game, color)].FiveAligned = game.Players[GetPlayerNb(game, color)].FiveAligned[:0]
-	for x := range dat.BoardRes.Stones {
-		for y := range dat.BoardRes.Stones[x] {
-			for i := -1; i <= 1; i++ {
-				for j := -1; j <= 1; j++ {
-					if !(i == 0 && j == 0) && IsStoneAtPos(Map, x, y) {
-						if bmap.IsWhite(Map, x, y) == color {
-							if CheckAlignement(Map, x, y, i, j, 3, 0, false) {
-								StonesTab := [5]*window.Stone{
-									dat.BoardRes.Stones[x][y],
-									dat.BoardRes.Stones[x+i][y+j],
-									dat.BoardRes.Stones[x+i+i][y+j+j],
-									dat.BoardRes.Stones[x+i+i+i][y+j+j+j],
-									dat.BoardRes.Stones[x+i+i+i+i][y+j+j+j+j]}
-								game.Players[GetPlayerNb(game, color)].FiveAligned =
-									append(game.Players[GetPlayerNb(game, color)].FiveAligned, StonesTab)
-							}
+func CheckWinAl(Map *[363](uint64), color bool, FiveAligned *[][5]Coor) {
+	for x := 0; x <= 18; x++ {
+		for y := 0; y <= 18; y++ {
+			if bmap.IsVisible(Map, x, y) && bmap.IsWhite(Map, x, y) == color && bmap.GetValStones(Map, x, y, bmap.MT) >= 4 {
+				if bmap.GetNbT(Map, x, y, 0, 2) >= 4 {
+					fillAlignedArray(FiveAligned, x, y, 1, -1)
+				}
+				for j := 1; j <= 2; j++ {
+					for i := 1; i <= 2; i++ {
+						if !(i == 1 && j == 1) && bmap.GetNbT(Map, x, y, i, j) >= 4 {
+							fillAlignedArray(FiveAligned, x, y, i-1, j-1)
 						}
 					}
 				}
@@ -359,26 +343,26 @@ func Break_cases(Map *[363]uint64, Ipos, Jpos, i, j int) bool {
 // 			(bmap.GetNbO(Map, st.Infos.Ipos+j, st.Infos.Jpos+i, 1+i, 1+j) >= 1 && !IsStoneAtPos(Map, st.Infos.Ipos+(-1*j), st.Infos.Jpos+(-1*i))))
 // }
 
-func CheckBreakableAlign(Map *[363]uint64, game *GomokuGame, color bool) bool {
+func CheckBreakableAlign(Map *[363]uint64, fl [][5]Coor, color bool) bool {
 	tot := 0
-	for _, line := range game.Players[GetPlayerNb(game, color)].FiveAligned {
+	for _, line := range fl {
 		cpt := 0
 		for _, st := range line {
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
-					if !(i == 0 && j == 0) &&
-						Break_cases(Map, st.Infos.Ipos, st.Infos.Jpos, i, j) {
-						bmap.SetBreakable(Map, st.Infos.Ipos, st.Infos.Jpos, true)
+					if !(i == 0 && j == 0) && IsStoneAtPos(Map, st.X, st.Y) &&
+						Break_cases(Map, st.X, st.Y, i, j) {
+						bmap.SetBreakable(Map, st.X, st.Y, true)
 						cpt = 1
-					} else if IsStoneAtPos(Map, st.Infos.Ipos, st.Infos.Jpos) {
-						bmap.SetBreakable(Map, st.Infos.Ipos, st.Infos.Jpos, false)
+					} else if IsStoneAtPos(Map, st.X, st.Y) {
+						bmap.SetBreakable(Map, st.X, st.Y, false)
 					}
 				}
 			}
 		}
 		tot += cpt
 	}
-	if tot < len(game.Players[GetPlayerNb(game, color)].FiveAligned) {
+	if tot < len(fl) {
 		return true
 	}
 	return false
@@ -403,11 +387,10 @@ func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 				pane.BoardRes.BadX, pane.BoardRes.BadY = st.X, st.Y
 				return
 			}
-			var fl [][5]*Coor
-			CheckWinAl(&bmap.Map, game.Turn, fl)
-			CheckWinAlignment(pane, &bmap.Map, game, game.Turn)
-			if len(game.Players[GetPlayerNb(game, game.Turn)].FiveAligned) > 0 {
-				if !pane.OptionsRes.Op1 || CheckBreakableAlign(&bmap.Map, game, game.Turn) {
+			var fl [][5]Coor
+			CheckWinAl(&bmap.Map, game.Turn, &fl)
+			if len(fl) > 0 {
+				if !pane.OptionsRes.Op1 || CheckBreakableAlign(&bmap.Map, fl, game.Turn) {
 					game.End = 2
 					pane.WinnerColor = game.Turn
 				}

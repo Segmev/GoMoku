@@ -41,9 +41,9 @@ func getValAt(MMap *[Map_size*Map_size + Nb_Players](uint64), i, j int, info uin
 
 func GetValStones(MMap *[Map_size*Map_size + Nb_Players](uint64), i, j int, info uint) int {
 	res := 0
-	res = (res << 1) ^ getValAt(MMap, i, j, info)
-	res = (res << 1) ^ getValAt(MMap, i, j, info+1)
-	res = (res << 1) ^ getValAt(MMap, i, j, info+2)
+	res = (res << 1) | getValAt(MMap, i, j, info)
+	res = (res << 1) | getValAt(MMap, i, j, info+1)
+	res = (res << 1) | getValAt(MMap, i, j, info+2)
 	return res
 }
 
@@ -58,9 +58,9 @@ func GetNbT(MMap *[Map_size*Map_size + Nb_Players](uint64), i, j int, posx, posy
 func setAtPos(MMap *[Map_size*Map_size + Nb_Players](uint64), i, j int, infos uint, val uint64) {
 	if val != MMap[(i*Map_size)+j]&(1<<infos) {
 		if val == 1 {
-			MMap[(i*Map_size)+j] |= (val << infos)
+			MMap[(i*Map_size)+j] |= (1 << infos)
 		} else {
-			MMap[(i*Map_size)+j] &^= (val << infos)
+			MMap[(i*Map_size)+j] &^= (1 << infos)
 		}
 	}
 }
