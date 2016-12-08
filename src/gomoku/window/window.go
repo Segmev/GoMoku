@@ -297,7 +297,7 @@ func (me *Drawer) Draw(c *gfx.Canvas) {
 	c.FillRect(0, 0, gfx.DisplayWidth(), gfx.DisplayHeight())
 	c.DrawImage(me.backgrnd, gfx.DisplayWidth()*0, 0)
 
-	if me.GameState == "gameOn" {
+	if me.GameState == "gameOn" || me.GameState == "IA_Turn" {
 		me.drawGameBoard(c)
 	} else if me.GameState == "menu" {
 		me.drawMenu(c)

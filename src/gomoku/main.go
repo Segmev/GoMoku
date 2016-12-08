@@ -57,6 +57,9 @@ func addInput(pane *window.Drawer, game *arbitre.GomokuGame) {
 		}
 	})
 	input.AddMouseReleaseFunc(func(e input.MouseEvent) {
+		if pane.GameState == "IA_Turn" {
+			return
+		}
 		if pane.GameState == "menu" {
 			if e.X >= 4*gfx.DisplayWidth()/14 && e.X <= 4*gfx.DisplayWidth()/14+8*gfx.DisplayWidth()/18 {
 				if gfx.DisplayHeight()*4/10 <= e.Y && e.Y <= gfx.DisplayHeight()*4/10+gfx.DisplayHeight()/11 {
@@ -101,7 +104,6 @@ func addInput(pane *window.Drawer, game *arbitre.GomokuGame) {
 					} else {
 						pane.GameState = "menu"
 					}
-
 				}
 			}
 		}
@@ -161,14 +163,17 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 	pane.BoardRes.Wscore = pane.Font.Write(strconv.Itoa(int(bmap.GetPlayerTakenStones(&bmap.Map, true))))
 	pane.BoardRes.Bscore = pane.Font.Write(strconv.Itoa(int(bmap.GetPlayerTakenStones(&bmap.Map, false))))
 	if pane.GameType == "IA" {
+		pane.GameState = "IA_Turn"
 		// IA function here
 
 		//pane.Turn = game.Turn
 		//time.Sleep(time.Second)
+
 		println("ia")
 		ax, ay := ia.Seek(bmap.Map, game.Turn, 3, pane.OptionsRes.Op1, pane.OptionsRes.Op2)
 		println(ax, ay)
 		bmap.SetVisibility(&bmap.Map, ax, ay, true)
+		pane.GameState = "gameOn"
 		game.Turn = !game.Turn
 	}
 	pane.Turn = game.Turn
