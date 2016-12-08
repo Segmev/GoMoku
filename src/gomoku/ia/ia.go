@@ -57,8 +57,10 @@ func Seek(carte [363]uint64, t_color bool, deep int, rule1, rule2 bool) (int, in
 			cpt = cpt + 1
 			color = !color
 		}
-		if (result == nil && curr != &racine) || (result.val < curr.val && cpt < best_cpt) {
-			result = curr
+		if (result == nil) || (result.val < curr.val && cpt < best_cpt) {
+			if curr != &racine {
+				result = curr
+			}
 		}
 	}
 	if check {
