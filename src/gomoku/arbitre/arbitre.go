@@ -2,7 +2,6 @@ package arbitre
 
 import (
 	"gomoku/bmap"
-	"gomoku/ia"
 	"gomoku/window"
 	"math/rand"
 	"strconv"
@@ -286,7 +285,7 @@ func UpdateThreeGroups(Map *[363]uint64, x, y int, color bool) bool {
 	return cptHowManyThreeGroups == 2
 }
 
-func isDraw(pane *window.Drawer, game *GomokuGame) {
+func IsDraw(pane *window.Drawer, game *GomokuGame) {
 	state := true
 	for _, stonesCol := range pane.BoardRes.Stones {
 		for _, stone := range stonesCol {
@@ -378,45 +377,4 @@ func ApplyRules(Map *[363](uint64), i, j int, color bool, rule1, rule2 bool) boo
 	TakeTwoStones(Map, i, j, color)
 	UpdateInfos(Map, color)
 	return true
-}
-
-func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
-	if game.End != 2 {
-		st := IsStoneHere(pane, x, y, size)
-		if st != nil && !bmap.IsVisible(&bmap.Map, st.Infos.Ipos, st.Infos.Jpos) {
-			if !ApplyRules(&bmap.Map, st.Infos.Ipos, st.Infos.Jpos, game.Turn, pane.OptionsRes.Op1, pane.OptionsRes.Op2) {
-				pane.BoardRes.BadX, pane.BoardRes.BadY = st.X, st.Y
-				return
-			}
-			var fl [][5]Coor
-			CheckWinAl(&bmap.Map, game.Turn, &fl)
-			if len(fl) > 0 {
-				if !pane.OptionsRes.Op1 || CheckBreakableAlign(&bmap.Map, fl, game.Turn) {
-					game.End = 2
-					pane.WinnerColor = game.Turn
-				}
-			}
-			game.Turn = !game.Turn
-		}
-	}
-	end, winColor := HasTakenEnoughStones(&bmap.Map)
-	if end {
-		game.End = 2
-		pane.WinnerColor = winColor
-	}
-	isDraw(pane, game)
-	if game.End == 2 {
-		pane.GameState = "end"
-	}
-	pane.BoardRes.Wscore = pane.Font.Write(strconv.Itoa(int(bmap.GetPlayerTakenStones(&bmap.Map, true))))
-	pane.BoardRes.Bscore = pane.Font.Write(strconv.Itoa(int(bmap.GetPlayerTakenStones(&bmap.Map, false))))
-	if pane.GameType == "IA" {
-		// IA function here
-
-		//pane.Turn = game.Turn
-		//time.Sleep(time.Second)
-		bmap.SetVisibility(&bmap.Map, ia.Seek(bmap.Map, game.Turn, 3, pane.OptionsRes.Op1, pane.OptionsRes.Op2), true)
-		game.Turn = !game.Turn
-	}
-	pane.Turn = game.Turn
 }

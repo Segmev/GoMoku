@@ -2,11 +2,13 @@ package main
 
 import (
 	"gomoku/arbitre"
+	"gomoku/bmap"
 	"gomoku/window"
 	"math/rand"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/gtalent/starfish/gfx"
@@ -49,7 +51,7 @@ func addInput(pane *window.Drawer, game *arbitre.GomokuGame) {
 	input.AddMousePressFunc(func(e input.MouseEvent) {
 		if e.Button == 1 {
 			if pane.GameState == "gameOn" {
-				arbitre.GamePlay(pane, game, e.X, e.Y, gfx.DisplayWidth()/55)
+				GamePlay(pane, game, e.X, e.Y, gfx.DisplayWidth()/55)
 			}
 		}
 	})
@@ -125,6 +127,47 @@ func launchWindow(h, w int) bool {
 	addInput(&pane, &game)
 
 	return true
+}
+
+func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
+	if game.End != 2 {
+		st := arbitre.IsStoneHere(pane, x, y, size)
+		if st != nil && !bmap.IsVisible(&bmap.Map, st.Infos.Ipos, st.Infos.Jpos) {
+			if !arbitre.ApplyRules(&bmap.Map, st.Infos.Ipos, st.Infos.Jpos, game.Turn, pane.OptionsRes.Op1, pane.OptionsRes.Op2) {
+				pane.BoardRes.BadX, pane.BoardRes.BadY = st.X, st.Y
+				return
+			}
+			var fl [][5]arbitre.Coor
+			arbitre.CheckWinAl(&bmap.Map, game.Turn, &fl)
+			if len(fl) > 0 {
+				if !pane.OptionsRes.Op1 || arbitre.CheckBreakableAlign(&bmap.Map, fl, game.Turn) {
+					game.End = 2
+					pane.WinnerColor = game.Turn
+				}
+			}
+			game.Turn = !game.Turn
+		}
+	}
+	end, winColor := arbitre.HasTakenEnoughStones(&bmap.Map)
+	if end {
+		game.End = 2
+		pane.WinnerColor = winColor
+	}
+	arbitre.IsDraw(pane, game)
+	if game.End == 2 {
+		pane.GameState = "end"
+	}
+	pane.BoardRes.Wscore = pane.Font.Write(strconv.Itoa(int(bmap.GetPlayerTakenStones(&bmap.Map, true))))
+	pane.BoardRes.Bscore = pane.Font.Write(strconv.Itoa(int(bmap.GetPlayerTakenStones(&bmap.Map, false))))
+	if pane.GameType == "IA" {
+		// IA function here
+
+		//pane.Turn = game.Turn
+		//time.Sleep(time.Second)
+		//bmap.SetVisibility(&bmap.Map, ia.Seek(bmap.Map, game.Turn, 3, pane.OptionsRes.Op1, pane.OptionsRes.Op2), true)
+		game.Turn = !game.Turn
+	}
+	pane.Turn = game.Turn
 }
 
 func main() {
