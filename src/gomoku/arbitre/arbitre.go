@@ -409,5 +409,13 @@ func GamePlay(pane *window.Drawer, game *GomokuGame, x, y, size int) {
 	}
 	pane.BoardRes.Wscore = pane.Font.Write(strconv.Itoa(int(bmap.GetPlayerTakenStones(&bmap.Map, true))))
 	pane.BoardRes.Bscore = pane.Font.Write(strconv.Itoa(int(bmap.GetPlayerTakenStones(&bmap.Map, false))))
+	if pane.GameType == "IA" {
+		// IA function here
+
+		//pane.Turn = game.Turn
+		//time.Sleep(time.Second)
+
+		game.Turn = !game.Turn
+	}
 	pane.Turn = game.Turn
 }
