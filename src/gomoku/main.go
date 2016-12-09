@@ -149,9 +149,9 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 				}
 			}
 			game.Turn = !game.Turn
+		} else {
+			return
 		}
-	} else {
-		return
 	}
 	end, winColor := arbitre.HasTakenEnoughStones(&bmap.Map)
 	if end {
