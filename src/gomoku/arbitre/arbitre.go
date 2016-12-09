@@ -165,7 +165,7 @@ func UpdateInfos(Map *[363](uint64), color bool) {
 			totOpp, totTeam := 0, 0
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
-					if !(i == 0 && j == 0) && IsStoneAtPos(Map, x, y) {
+					if !(i == 0 && j == 0) {
 						if bmap.IsWhite(Map, x, y) == color {
 							bmap.SetNbTeamAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
 								bmap.IsWhite(Map, x, y), i, j)))
