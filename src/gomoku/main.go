@@ -186,7 +186,6 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 		}
 		game.Turn = !game.Turn
 	}
-
 	end, winColor = arbitre.HasTakenEnoughStones(&bmap.Map)
 	if end {
 		game.End = 2
@@ -196,7 +195,8 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 	if game.End == 2 {
 		pane.GameState = "end"
 	}
-
+	pane.BoardRes.Wscore = pane.Font.Write(strconv.Itoa(int(bmap.GetPlayerTakenStones(&bmap.Map, true))))
+	pane.BoardRes.Bscore = pane.Font.Write(strconv.Itoa(int(bmap.GetPlayerTakenStones(&bmap.Map, false))))
 	pane.Turn = game.Turn
 }
 
