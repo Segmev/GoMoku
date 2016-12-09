@@ -53,7 +53,10 @@ func Seek(carte [363]uint64, t_color bool, deep int, rule1, rule2 bool) (int, in
 	check := true
 	for curr != nil {
 		check = true
-		if !bmap.IsVisible(&curr.carte, x, y) && bmap.GetValStones(&curr.carte, x, y, bmap.MO)+bmap.GetValStones(&curr.carte, x, y, bmap.MT) != 0 && cpt < deep && (curr.val < 1000 && curr.val > -1000) {
+		if !bmap.IsVisible(&curr.carte, x, y) &&
+			bmap.GetValStones(&curr.carte, x, y, bmap.MO)+bmap.GetValStones(&curr.carte, x, y, bmap.MT) != 0 &&
+			cpt < deep &&
+			(curr.val < 1000 && curr.val > -1000) {
 			check = AddSon(curr, x, y, t_color, color, rule1, rule2)
 			if !check {
 				curr = curr.sons[len(curr.sons)-1]
@@ -69,8 +72,16 @@ func Seek(carte [363]uint64, t_color bool, deep int, rule1, rule2 bool) (int, in
 		if check {
 			if x == 18 {
 				if y == 18 {
-					x = curr.x + 1
-					y = curr.y + 1
+					if curr.x == 18 {
+						x = curr.x
+					} else {
+						x = curr.x + 1
+					}
+					if curr.y == 18 {
+						y = curr.y
+					} else {
+						y = curr.y + 1
+					}
 					curr = curr.father
 					cpt = cpt - 1
 					color = !color
