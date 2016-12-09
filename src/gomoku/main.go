@@ -143,16 +143,6 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 			var fl [][5]arbitre.Coor
 			arbitre.CheckWinAl(&bmap.Map, game.Turn, &fl)
 			if len(fl) > 0 {
-				for y := 0; y <= 18; y++ {
-					for x := 0; x <= 18; x++ {
-						if bmap.IsVisible(&bmap.Map, x, y) {
-							print("X")
-						} else {
-							print("_")
-						}
-					}
-					println()
-				}
 				if !pane.OptionsRes.Op1 || arbitre.CheckBreakableAlign(&bmap.Map, fl, game.Turn) {
 					game.End = 2
 					pane.WinnerColor = game.Turn
@@ -174,7 +164,7 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 	}
 	pane.BoardRes.Wscore = pane.Font.Write(strconv.Itoa(int(bmap.GetPlayerTakenStones(&bmap.Map, true))))
 	pane.BoardRes.Bscore = pane.Font.Write(strconv.Itoa(int(bmap.GetPlayerTakenStones(&bmap.Map, false))))
-	if pane.GameType == "IA" {
+	if pane.GameType == "IA" && game.End != 2 {
 		pane.GameState = "IA_Turn"
 		// IA function here
 
@@ -184,9 +174,29 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 		ax, ay := ia.Seek(bmap.Map, game.Turn, 3, pane.OptionsRes.Op1, pane.OptionsRes.Op2)
 		bmap.SetVisibility(&bmap.Map, ax, ay, true)
 		bmap.SetColor(&bmap.Map, ax, ay, game.Turn)
+		arbitre.ApplyRules(&bmap.Map, ax, ay, game.Turn, pane.OptionsRes.Op1, pane.OptionsRes.Op2)
 		pane.GameState = "gameOn"
+		var fl [][5]arbitre.Coor
+		arbitre.CheckWinAl(&bmap.Map, game.Turn, &fl)
+		if len(fl) > 0 {
+			if !pane.OptionsRes.Op1 || arbitre.CheckBreakableAlign(&bmap.Map, fl, game.Turn) {
+				game.End = 2
+				pane.WinnerColor = game.Turn
+			}
+		}
 		game.Turn = !game.Turn
 	}
+
+	end, winColor = arbitre.HasTakenEnoughStones(&bmap.Map)
+	if end {
+		game.End = 2
+		pane.WinnerColor = winColor
+	}
+	arbitre.IsDraw(pane, game)
+	if game.End == 2 {
+		pane.GameState = "end"
+	}
+
 	pane.Turn = game.Turn
 }
 
