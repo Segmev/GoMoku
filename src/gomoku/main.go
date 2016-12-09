@@ -143,6 +143,16 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 			var fl [][5]arbitre.Coor
 			arbitre.CheckWinAl(&bmap.Map, game.Turn, &fl)
 			if len(fl) > 0 {
+				for y := 0; y <= 18; y++ {
+					for x := 0; x <= 18; x++ {
+						if bmap.IsVisible(&bmap.Map, x, y) {
+							print("X")
+						} else {
+							print("_")
+						}
+					}
+					println()
+				}
 				if !pane.OptionsRes.Op1 || arbitre.CheckBreakableAlign(&bmap.Map, fl, game.Turn) {
 					game.End = 2
 					pane.WinnerColor = game.Turn
