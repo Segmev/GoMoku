@@ -18,9 +18,11 @@ func AddSon(tree *NodeTree, x int, y int, true_color, color, rule1, rule2 bool) 
 	son := new(NodeTree)
 
 	son.carte = tree.carte
+	println("On essaye d'ajouter")
 	if arbitre.ApplyRules(&son.carte, x, y, color, rule1, rule2) {
 		return true
 	}
+	println("On réussit d'ajouter")
 	son.x = x
 	son.y = y
 	son.father = tree
@@ -51,7 +53,10 @@ func Seek(carte [363]uint64, t_color bool, deep int, rule1, rule2 bool) (int, in
 	check := true
 	for curr != nil {
 		check = true
-		if bmap.GetValStones(&carte, x, y, bmap.MO)+bmap.GetValStones(&carte, x, y, bmap.MT) != 0 && cpt < deep {
+		if bmap.GetValStones(&carte, x, y, bmap.MO)+bmap.GetValStones(&carte, x, y, bmap.MT) != 0 {
+			println(x, y, bmap.GetValStones(&carte, x, y, bmap.MO)+bmap.GetValStones(&carte, x, y, bmap.MT))
+		}
+		if bmap.GetValStones(&carte, x, y, bmap.MO)+bmap.GetValStones(&carte, x, y, bmap.MT) != 0 && cpt < deep && (curr.val > 1000 || curr.val < -1000) {
 			check = AddSon(curr, x, y, t_color, color, rule1, rule2)
 			if !check {
 				curr = curr.sons[len(curr.sons)-1]
@@ -69,8 +74,9 @@ func Seek(carte [363]uint64, t_color bool, deep int, rule1, rule2 bool) (int, in
 				if y == 18 {
 					x = curr.x
 					y = curr.y
+					println(x, y)
 					curr = curr.father
-					cpt = cpt + 1
+					cpt = cpt - 1
 					color = !color
 				} else {
 					x = 0
@@ -81,7 +87,6 @@ func Seek(carte [363]uint64, t_color bool, deep int, rule1, rule2 bool) (int, in
 			}
 		}
 	}
-	println(result)
 	if result == nil {
 		return 9, 9
 	}
