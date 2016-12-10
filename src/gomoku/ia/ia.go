@@ -30,6 +30,7 @@ func AddSon(tree *NodeTree, x int, y int, true_color, color, rule1, rule2 bool) 
 		son.val = tree.val - Factor(son.carte, x, y, color, 0)
 	}
 	tree.sons = append(tree.sons, son)
+	println(x, y, son.val)
 	return false
 }
 
@@ -44,11 +45,10 @@ func Factor(carte [363]uint64, x int, y int, color bool, player int) int {
 	}
 	// FIN //
 
-
 	var fl [][5]arbitre.Coor
 	arbitre.CheckWinAl(&carte, color, &fl)
-	if (arbitre.CheckBreakableAlign(&carte, fl, color) == true) {
-	return 1000
+	if arbitre.CheckBreakableAlign(&carte, fl, color) == true {
+		return 1000
 	}
 
 	if bmap.IsInFourGroup(&carte, x, y) == true {
