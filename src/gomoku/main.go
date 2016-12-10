@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"gomoku/arbitre"
 	"gomoku/bmap"
 	"gomoku/ia"
@@ -10,6 +11,7 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/gtalent/starfish/gfx"
 	"github.com/gtalent/starfish/input"
@@ -172,6 +174,11 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 		}
 	}
 	if pane.GameType == "IA" && game.End != 2 {
+		timer2 := time.NewTimer(time.Millisecond * 50)
+		go func() {
+			<-timer2.C
+			fmt.Println("PA PA PAAAAAA")
+		}()
 		var iaStone window.Stone
 		pane.GameState = "IA_Turn"
 		iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia.SeekWithRoutine(bmap.Map, game.Turn, 3, pane.OptionsRes.Op1, pane.OptionsRes.Op2)
