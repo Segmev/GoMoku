@@ -3,9 +3,7 @@ package arbitre
 import (
 	"gomoku/bmap"
 	"gomoku/window"
-	"math/rand"
 	"strconv"
-	"time"
 )
 
 type Coor struct {
@@ -40,8 +38,9 @@ func (game *GomokuGame) Restart(pane *window.Drawer) bool {
 	pane.BoardRes.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
 	pane.GameState = "menu"
 	pane.BoardRes.BadX, pane.BoardRes.BadY = 0, 0
-	rand.Seed(time.Now().UTC().UnixNano())
-	game.Turn = rand.Uint32()%2 == 0
+	// rand.Seed(time.Now().UTC().UnixNano())
+	// game.Turn = rand.Uint32()%2 == 0
+	game.Turn = true
 	pane.Turn = game.Turn
 	return true
 }
