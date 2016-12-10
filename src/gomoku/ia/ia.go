@@ -47,17 +47,24 @@ func Factor(carte [363]uint64, x int, y int, color bool, player int) (int) {
 	
 	if (bmap.IsInFourGroup(&carte, x, y) == true) {
         print(s)
-     	println("crée un groupe de quatre")
+     	print("peut créer un groupe de quatre en  ")
+	println(x, y)
+	
      	return 1000
 	}
 	if (bmap.IsInThreeGroup(&carte, x, y) == true) {
 	        print(s)		
-	   println("crée un groupe de trois")
+	
+     	print("peut créer un groupe de trois en  ")
+	println(x, y)
+	
 	   return 3   
 	}
 	if (bmap.IsInTwoGroup(&carte, x, y) == true) {
 	        print(s)
-	   println("crée un groupe de deux")
+     	print("peut créer un groupe de quatre en  ")
+	println(x, y)
+	
 	   return 2
 	}
 	return 1	
