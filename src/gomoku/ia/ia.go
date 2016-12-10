@@ -25,13 +25,51 @@ func AddSon(tree *NodeTree, x int, y int, true_color, color, rule1, rule2 bool) 
 	son.y = y
 	son.father = tree
 	if color == true_color {
-		son.val = tree.val + 2
+		son.val = tree.val + Factor(son.carte, x, y, color, 1)
 	} else {
-		son.val = tree.val - 1
+		son.val = tree.val - Factor(son.carte, x, y, color, 0)
 	}
 	tree.sons = append(tree.sons, son)
 	return false
 }
+
+
+func Factor(carte [363]uint64, x int, y int, color bool, player int) (int) {
+     
+     // AFFICHAGE DE DEBUG //
+     s := "string"
+     if (player == 0) {
+     s = "Blanc joue : "
+     } else {
+	s = "Noir joue : "
+	}
+	// FIN //
+	
+	if (bmap.IsInFourGroup(&carte, x, y) == true) {
+        print(s)
+     	println("crée un groupe de quatre")
+     	return 1000
+	}
+	if (bmap.IsInThreeGroup(&carte, x, y) == true) {
+	        print(s)		
+	   println("crée un groupe de trois")
+	   return 3   
+	}
+	if (bmap.IsInTwoGroup(&carte, x, y) == true) {
+	        print(s)
+	   println("crée un groupe de deux")
+	   return 2
+	}
+	return 1	
+}
+
+
+
+
+
+
+
+
 
 func sonSeek(father *NodeTree, t_color bool, deep int, rule1, rule2 bool, ckey chan<- *NodeTree) {
 	var curr *NodeTree
