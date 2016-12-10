@@ -169,7 +169,7 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 		//pane.Turn = game.Turn
 		//time.Sleep(time.Second)
 
-		ax, ay := ia.Seek(bmap.Map, game.Turn, 3, pane.OptionsRes.Op1, pane.OptionsRes.Op2)
+		ax, ay := ia.SeekWithRoutine(bmap.Map, game.Turn, 3, pane.OptionsRes.Op1, pane.OptionsRes.Op2)
 		bmap.SetVisibility(&bmap.Map, ax, ay, true)
 		bmap.SetColor(&bmap.Map, ax, ay, game.Turn)
 		arbitre.ApplyRules(&bmap.Map, ax, ay, game.Turn, pane.OptionsRes.Op1, pane.OptionsRes.Op2)
