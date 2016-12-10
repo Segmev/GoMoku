@@ -188,6 +188,9 @@ func Seek(carte [363]uint64, t_color bool, deep int, rule1, rule2 bool) (int, in
 	check := true
 	for curr != nil {
 		check = true
+		if curr.father == &racine && bmap.GetValStones(&curr.carte, x, y, bmap.MO)+bmap.GetValStones(&curr.carte, x, y, bmap.MT) != 0 {
+			println(x, y)
+		}
 		if !bmap.IsVisible(&curr.carte, x, y) &&
 			bmap.GetValStones(&curr.carte, x, y, bmap.MO)+bmap.GetValStones(&curr.carte, x, y, bmap.MT) != 0 &&
 			cpt < deep &&
@@ -229,6 +232,7 @@ func Seek(carte [363]uint64, t_color bool, deep int, rule1, rule2 bool) (int, in
 			}
 		}
 	}
+	println("IA PLAYED")
 	if result == nil {
 		return 9, 9
 	}
