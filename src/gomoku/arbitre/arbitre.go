@@ -347,7 +347,6 @@ func CheckBreakableAlign(Map *[363]uint64, fl [][5]Coor, color bool) bool {
 	for _, line := range fl {
 		cpt := 0
 		for _, st := range line {
-			println(st.X, st.Y)
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
 					if !(i == 0 && j == 0) && IsStoneAtPos(Map, st.X, st.Y) &&
