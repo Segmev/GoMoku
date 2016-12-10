@@ -73,7 +73,6 @@ func sonSeek(father *NodeTree, t_color bool, deep int, rule1, rule2 bool, ckey c
 	var curr *NodeTree
 	var result *NodeTree
 
-	print("SUCKTHISSHIT")
 	color := !t_color
 	cpt := 0
 	best_cpt := deep
@@ -166,15 +165,15 @@ func SeekWithRoutine(carte [363]uint64, t_color bool, deep int, rule1, rule2 boo
 			break
 		}
 	}
-	println("OBAMA OUT")
 	if cpt == 0 {
 		return 9, 9
 	}
-	for cpt >= 0 {
+	for cpt > 0 {
 		tmp = <-ckey
 		if (tmp != nil) && (result == nil || result.val > tmp.val) {
 			result = tmp
 		}
+		cpt--
 	}
 	if result == nil {
 		return 9, 9

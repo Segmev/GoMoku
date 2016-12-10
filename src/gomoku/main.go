@@ -174,7 +174,7 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 	if pane.GameType == "IA" && game.End != 2 {
 		var iaStone window.Stone
 		pane.GameState = "IA_Turn"
-		iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia.Seek(bmap.Map, game.Turn, 3, pane.OptionsRes.Op1, pane.OptionsRes.Op2)
+		iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia.SeekWithRoutine(bmap.Map, game.Turn, 3, pane.OptionsRes.Op1, pane.OptionsRes.Op2)
 		pane.GameState = "gameOn"
 		PlayTurn(pane, game, &bmap.Map, &iaStone)
 	}
