@@ -136,10 +136,10 @@ func launchWindow(h, w int) bool {
 	return true
 }
 
-func PlayTurn(pane *window.Drawer, game *arbitre.GomokuGame, Map *[363]uint64, st *window.Stone) {
+func PlayTurn(pane *window.Drawer, game *arbitre.GomokuGame, Map *[363]uint64, st *window.Stone) bool {
 	if !arbitre.ApplyRules(&bmap.Map, st.Infos.Ipos, st.Infos.Jpos, game.Turn, pane.OptionsRes.Op1, pane.OptionsRes.Op2) {
 		pane.BoardRes.BadX, pane.BoardRes.BadY = st.X, st.Y
-		return
+		return false
 	}
 	var fl [][5]arbitre.Coor
 	arbitre.CheckWinAl(&bmap.Map, game.Turn, &fl)
@@ -162,19 +162,22 @@ func PlayTurn(pane *window.Drawer, game *arbitre.GomokuGame, Map *[363]uint64, s
 	pane.Turn = game.Turn
 	pane.BoardRes.Wscore = pane.Font.Write(strconv.Itoa(int(bmap.GetPlayerTakenStones(&bmap.Map, true))))
 	pane.BoardRes.Bscore = pane.Font.Write(strconv.Itoa(int(bmap.GetPlayerTakenStones(&bmap.Map, false))))
+	return true
 }
 
 func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 	if game.End != 2 {
 		st := arbitre.IsStoneHere(pane, x, y, size)
 		if st != nil && !bmap.IsVisible(&bmap.Map, st.Infos.Ipos, st.Infos.Jpos) {
-			PlayTurn(pane, game, &bmap.Map, st)
+			if !PlayTurn(pane, game, &bmap.Map, st) {
+				return
+			}
 		} else {
 			return
 		}
 	}
 	if pane.GameType == "IA" && game.End != 2 {
-		timer2 := time.NewTimer(time.Millisecond * 50)
+		timer2 := time.NewTimer(time.Millisecond * 20)
 		go func() {
 			<-timer2.C
 			fmt.Println("PA PA PAAAAAA")
