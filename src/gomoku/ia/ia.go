@@ -48,8 +48,7 @@ func Factor(carte [363]uint64, x int, y int, color bool, player int) int {
 	var fl [][5]arbitre.Coor
 	arbitre.CheckWinAl(&carte, color, &fl)
 	if (arbitre.CheckBreakableAlign(&carte, fl, color) == true) {
-	println("BREKABLE ALIGN")
-	return 500
+	return 1000
 	}
 
 	if bmap.IsInFourGroup(&carte, x, y) == true {
@@ -57,7 +56,7 @@ func Factor(carte [363]uint64, x int, y int, color bool, player int) int {
 		print("peut créer un groupe de quatre en  ")
 		println(x, y)
 
-		return 1000
+		return 500
 	}
 	if bmap.IsInThreeGroup(&carte, x, y) == true {
 		print(s)
