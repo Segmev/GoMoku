@@ -33,50 +33,41 @@ func AddSon(tree *NodeTree, x int, y int, true_color, color, rule1, rule2 bool) 
 	return false
 }
 
+func Factor(carte [363]uint64, x int, y int, color bool, player int) int {
 
-func Factor(carte [363]uint64, x int, y int, color bool, player int) (int) {
-     
-     // AFFICHAGE DE DEBUG //
-     s := "string"
-     if (player == 0) {
-     s = "Blanc joue : "
-     } else {
-	s = "Noir joue : "
+	// AFFICHAGE DE DEBUG //
+	s := "string"
+	if player == 0 {
+		s = "Blanc joue : "
+	} else {
+		s = "Noir joue : "
 	}
 	// FIN //
-	
-	if (bmap.IsInFourGroup(&carte, x, y) == true) {
-        print(s)
-     	print("peut créer un groupe de quatre en  ")
-	println(x, y)
-	
-     	return 1000
+
+	if bmap.IsInFourGroup(&carte, x, y) == true {
+		print(s)
+		print("peut créer un groupe de quatre en  ")
+		println(x, y)
+
+		return 1000
 	}
-	if (bmap.IsInThreeGroup(&carte, x, y) == true) {
-	        print(s)		
-	
-     	print("peut créer un groupe de trois en  ")
-	println(x, y)
-	
-	   return 3   
+	if bmap.IsInThreeGroup(&carte, x, y) == true {
+		print(s)
+
+		print("peut créer un groupe de trois en  ")
+		println(x, y)
+
+		return 3
 	}
-	if (bmap.IsInTwoGroup(&carte, x, y) == true) {
-	        print(s)
-     	print("peut créer un groupe de quatre en  ")
-	println(x, y)
-	
-	   return 2
+	if bmap.IsInTwoGroup(&carte, x, y) == true {
+		print(s)
+		print("peut créer un groupe de quatre en  ")
+		println(x, y)
+
+		return 2
 	}
-	return 1	
+	return 1
 }
-
-
-
-
-
-
-
-
 
 func sonSeek(father *NodeTree, t_color bool, deep int, rule1, rule2 bool, ckey chan<- *NodeTree) {
 	var curr *NodeTree
@@ -136,6 +127,7 @@ func sonSeek(father *NodeTree, t_color bool, deep int, rule1, rule2 bool, ckey c
 	}
 	if result != nil {
 		for result.father.father != nil {
+			result.father.val = result.val
 			result = result.father
 		}
 	}
@@ -146,32 +138,32 @@ func SeekWithRoutine(carte [363]uint64, t_color bool, deep int, rule1, rule2 boo
 	var racine NodeTree
 	var result *NodeTree
 	var tmp *NodeTree
+	var y int
 
 	cpt := 0
 	color := t_color
 	racine.father = nil
 	racine.carte = carte
+	racine.x = 17
+	racine.y = 17
 	result = nil
 	ckey := make(chan *NodeTree)
 	for x := 0; x < 19; x++ {
-		for y := 0; y < 19; y++ {
+		for y = 0; y < 19; y++ {
 			if !bmap.IsVisible(&racine.carte, x, y) {
 				println(x, y)
 			}
 			if !bmap.IsVisible(&racine.carte, x, y) &&
 				bmap.GetValStones(&racine.carte, x, y, bmap.MO)+bmap.GetValStones(&racine.carte, x, y, bmap.MT) != 0 {
-				print("Help")
 				if !AddSon(&racine, x, y, t_color, color, rule1, rule2) {
-					print("Halp")
 					go sonSeek(racine.sons[len(racine.sons)-1], t_color, deep-1, rule1, rule2, ckey)
 					cpt = cpt + 1
 					break
 				}
 			}
-			if y != 19 {
-				println("BREAK")
-				break
-			}
+		}
+		if y != 19 {
+			break
 		}
 	}
 	println("OBAMA OUT")
