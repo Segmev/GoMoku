@@ -25,52 +25,37 @@ func AddSon(tree *NodeTree, x int, y int, true_color, color, rule1, rule2 bool) 
 	son.y = y
 	son.father = tree
 	if color == true_color {
-		son.val = tree.val + Factor(son.carte, x, y, color, 1)
+		son.val = tree.val + Factor(son.carte, x, y, color, 1, rule1, rule2)
 	} else {
-		son.val = tree.val - Factor(son.carte, x, y, color, 0)
+		son.val = tree.val - Factor(son.carte, x, y, color, 0, rule1, rule2)
 	}
 	tree.sons = append(tree.sons, son)
 	return false
 }
 
-func Factor(carte [363]uint64, x int, y int, color bool, player int) int {
+func Factor(carte [363]uint64, x int, y int, color bool, player int, rule1 bool, rule2 bool) int {
 
-	//AFFICHAGE DE DEBUG //
-	s := "string"
-	if player == 0 {
-		s = "Blanc joue : "
-	} else {
-		s = "Noir joue : "
-	}
-	// FIN //
-
-
+        // LES CAS DE VICTOIRE //
 	var fl [][5]arbitre.Coor
 	arbitre.CheckWinAl(&carte, color, &fl)
-	if (arbitre.CheckBreakableAlign(&carte, fl, color) == true) {
-	return 1000
-	}
+	if (rule1 == true && len(fl) > 0) {
+	   if (arbitre.CheckBreakableAlign(&carte, fl, color) == true) {
+	   return 1000  }
+	   }
+	if (rule1 == false && len(fl) > 0) {
+	   return 1000 }
 
+	if bmap.GetPlayerTakenStones(&carte, true) == 10 {
+	   return 1000 }
+	// FIN //
+	
 	if bmap.IsInFourGroup(&carte, x, y) == true {
-		print(s)
-		print("peut créer un groupe de quatre en  ")
-		println(x, y)
-
 		return 500
 	}
 	if bmap.IsInThreeGroup(&carte, x, y) == true {
-		print(s)
-
-		print("peut créer un groupe de trois en  ")
-		println(x, y)
-
 		return 3
 	}
 	if bmap.IsInTwoGroup(&carte, x, y) == true {
-		print(s)
-		print("peut créer un groupe de quatre en  ")
-		println(x, y)
-
 		return 2
 	}
 	return 1
