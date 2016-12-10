@@ -26,7 +26,7 @@ func AddSon(tree *NodeTree, x int, y int, true_color, color, rule1, rule2 bool) 
 	son.y = y
 	son.father = tree
 	if color == true_color {
-		son.val = tree.val + 1
+		son.val = tree.val + 2
 	} else {
 		son.val = tree.val - 1
 	}
@@ -100,7 +100,6 @@ func sonSeek(father *NodeTree, t_color bool, deep int, rule1, rule2 bool, ckey c
 
 func SeekWithRoutine(carte [363]uint64, t_color bool, deep int, rule1, rule2 bool) (int, int) {
 	var racine NodeTree
-	var curr *NodeTree
 	var result *NodeTree
 	var tmp *NodeTree
 
@@ -114,8 +113,10 @@ func SeekWithRoutine(carte [363]uint64, t_color bool, deep int, rule1, rule2 boo
 		for y := 0; y < 19; y++ {
 			if !bmap.IsVisible(&racine.carte, x, y) &&
 				bmap.GetValStones(&racine.carte, x, y, bmap.MO)+bmap.GetValStones(&racine.carte, x, y, bmap.MT) != 0 {
-				if AddSon(&racine, x, y, t_color, color, rule1, rule2) {
-					go sonSeek(racine.sons[len(curr.sons)-1], t_color, deep-1, rule1, rule2, ckey)
+				print("Help")
+				if !AddSon(&racine, x, y, t_color, color, rule1, rule2) {
+					print("Halp")
+					go sonSeek(racine.sons[len(racine.sons)-1], t_color, deep-1, rule1, rule2, ckey)
 					cpt = cpt + 1
 					break
 				}
@@ -124,6 +125,9 @@ func SeekWithRoutine(carte [363]uint64, t_color bool, deep int, rule1, rule2 boo
 				break
 			}
 		}
+	}
+	if cpt == 0 {
+		return 9, 9
 	}
 	for cpt >= 0 {
 		tmp = <-ckey
@@ -153,9 +157,9 @@ func Seek(carte [363]uint64, t_color bool, deep int, rule1, rule2 bool) (int, in
 	curr = &racine
 	x := 0
 	y := 0
+	result = nil
+	check := true
 	for curr != nil {
-		result = nil
-		check := true
 		check = true
 		if !bmap.IsVisible(&curr.carte, x, y) &&
 			bmap.GetValStones(&curr.carte, x, y, bmap.MO)+bmap.GetValStones(&curr.carte, x, y, bmap.MT) != 0 &&
