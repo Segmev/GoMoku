@@ -25,16 +25,16 @@ func AddSon(tree *NodeTree, x int, y int, true_color, color, rule1, rule2 bool) 
 	son.y = y
 	son.father = tree
 	if color == true_color {
-		son.val = tree.val + Factor(son.carte, x, y, color, 1, rule1, rule2)
+		son.val = tree.val + Factor(son.carte, x, y, color, rule1, rule2)
 	} else {
-		son.val = tree.val - Factor(son.carte, x, y, color, 0, rule1, rule2)
+		son.val = tree.val - Factor(son.carte, x, y, color, rule1, rule2)
 	}
 	tree.sons = append(tree.sons, son)
 	println(x, y, son.val)
 	return false
 }
 
-func Factor(carte [363]uint64, x int, y int, color bool, player int, rule1 bool, rule2 bool) int {
+func Factor(carte [363]uint64, x int, y int, color bool, rule1 bool, rule2 bool) int {
 
 	// LES CAS DE VICTOIRE //
 	var fl [][5]arbitre.Coor
@@ -54,7 +54,7 @@ func Factor(carte [363]uint64, x int, y int, color bool, player int, rule1 bool,
 	// FIN //
 
 	if bmap.IsInFourGroup(&carte, x, y) == true {
-		return 500
+		return 4
 	}
 	if bmap.IsInThreeGroup(&carte, x, y) == true {
 		return 3
