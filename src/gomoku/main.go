@@ -167,14 +167,16 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 		st := arbitre.IsStoneHere(pane, x, y, size)
 		if st != nil && !bmap.IsVisible(&bmap.Map, st.Infos.Ipos, st.Infos.Jpos) {
 			PlayTurn(pane, game, &bmap.Map, st)
+		} else {
+			return
 		}
 	}
 	if pane.GameType == "IA" && game.End != 2 {
 		var iaStone window.Stone
 		pane.GameState = "IA_Turn"
 		iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia.Seek(bmap.Map, game.Turn, 3, pane.OptionsRes.Op1, pane.OptionsRes.Op2)
-		PlayTurn(pane, game, &bmap.Map, &iaStone)
 		pane.GameState = "gameOn"
+		PlayTurn(pane, game, &bmap.Map, &iaStone)
 	}
 }
 
