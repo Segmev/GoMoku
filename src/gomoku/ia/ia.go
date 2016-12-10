@@ -35,7 +35,7 @@ func AddSon(tree *NodeTree, x int, y int, true_color, color, rule1, rule2 bool) 
 
 func Factor(carte [363]uint64, x int, y int, color bool, player int) int {
 
-	// AFFICHAGE DE DEBUG //
+	//AFFICHAGE DE DEBUG //
 	s := "string"
 	if player == 0 {
 		s = "Blanc joue : "
@@ -95,9 +95,7 @@ func sonSeek(father *NodeTree, t_color bool, deep int, rule1, rule2 bool, ckey c
 			}
 		}
 		if (result == nil) || (result.val < curr.val && cpt < best_cpt) {
-			if curr != father {
-				result = curr
-			}
+			result = curr
 		}
 		if check {
 			if x == 18 {
@@ -149,9 +147,6 @@ func SeekWithRoutine(carte [363]uint64, t_color bool, deep int, rule1, rule2 boo
 	ckey := make(chan *NodeTree)
 	for x := 0; x < 19; x++ {
 		for y = 0; y < 19; y++ {
-			if !bmap.IsVisible(&racine.carte, x, y) {
-				println(x, y)
-			}
 			if !bmap.IsVisible(&racine.carte, x, y) &&
 				bmap.GetValStones(&racine.carte, x, y, bmap.MO)+bmap.GetValStones(&racine.carte, x, y, bmap.MT) != 0 {
 				if !AddSon(&racine, x, y, t_color, color, rule1, rule2) {
@@ -175,6 +170,7 @@ func SeekWithRoutine(carte [363]uint64, t_color bool, deep int, rule1, rule2 boo
 		}
 		cpt--
 	}
+	println("IA PLAYED")
 	if result == nil {
 		return 9, 9
 	}
