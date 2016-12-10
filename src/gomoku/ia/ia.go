@@ -1,7 +1,6 @@
 package ia
 
 import (
-	"fmt"
 	"gomoku/arbitre"
 	"gomoku/bmap"
 )
@@ -38,7 +37,7 @@ func sonSeek(father *NodeTree, t_color bool, deep int, rule1, rule2 bool, ckey c
 	var curr *NodeTree
 	var result *NodeTree
 
-	fmt.Print("Halp")
+	print("SUCKTHISSHIT")
 	color := !t_color
 	cpt := 0
 	best_cpt := deep
@@ -111,6 +110,9 @@ func SeekWithRoutine(carte [363]uint64, t_color bool, deep int, rule1, rule2 boo
 	ckey := make(chan *NodeTree)
 	for x := 0; x < 19; x++ {
 		for y := 0; y < 19; y++ {
+			if !bmap.IsVisible(&racine.carte, x, y) {
+				println(x, y)
+			}
 			if !bmap.IsVisible(&racine.carte, x, y) &&
 				bmap.GetValStones(&racine.carte, x, y, bmap.MO)+bmap.GetValStones(&racine.carte, x, y, bmap.MT) != 0 {
 				print("Help")
@@ -122,10 +124,12 @@ func SeekWithRoutine(carte [363]uint64, t_color bool, deep int, rule1, rule2 boo
 				}
 			}
 			if y != 19 {
+				println("BREAK")
 				break
 			}
 		}
 	}
+	println("OBAMA OUT")
 	if cpt == 0 {
 		return 9, 9
 	}
