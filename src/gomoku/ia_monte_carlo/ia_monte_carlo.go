@@ -4,7 +4,6 @@ import (
 	"gomoku/arbitre"
 	"gomoku/bmap"
 	"math/rand"
-	"time"
 )
 
 var myColor bool
@@ -115,7 +114,6 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, tmpboard [363]uint64, tes
 	win := 0
 	loose := 0
 	iCheck := 0
-	rand.Seed(time.Now().Unix())
 	initResTab()
 	findRange()
 	for cpt = 0; cpt != test_nb; cpt++ {
