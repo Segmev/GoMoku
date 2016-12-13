@@ -17,6 +17,10 @@ import (
 	"github.com/gtalent/starfish/input"
 )
 
+type Coor struct {
+	X, Y, Val int
+}
+
 func exists(path string) bool {
 	_, err := os.Stat(path)
 	if err == nil {
@@ -197,11 +201,11 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 		}()
 		var iaStone window.Stone
 		pane.GameState = "IA_Turn"
-		ch := make(chan arbitre.Coor, 10)
+		ch := make(chan Coor, 10)
 		for i := 0; i < (cap(ch)); i++ {
-			go func(chan arbitre.Coor) {
-				var c arbitre.Coor
-				c.X, c.Y = ia_monte_carlo.MonteCarlo(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, cap(ch)*10)
+			go func(chan Coor) {
+				var c Coor
+				c.X, c.Y, c.Val = ia_monte_carlo.MonteCarlo(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, cap(ch)*10)
 				ch <- c
 			}(ch)
 		}
