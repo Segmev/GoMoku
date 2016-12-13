@@ -83,6 +83,14 @@ func IsChecked(MMap *[Map_size*Map_size + Nb_Players](uint64), i, j int) bool {
 	return MMap[(i*Map_size)+j]&(1<<ISCHECKED) != 0
 }
 
+func ResetCheck(MMap *[Map_size*Map_size + Nb_Players](uint64)) {
+	for i := 0; i <= Map_size*Map_size; i++ {
+		if MMap[i]&(1<<ISCHECKED) != 0 {
+			MMap[i] &^= (1 << ISCHECKED)
+		}
+	}
+}
+
 func SetChecked(MMap *[Map_size*Map_size + Nb_Players](uint64), i, j int, val bool) {
 	if val != IsChecked(MMap, i, j) {
 		if val {
