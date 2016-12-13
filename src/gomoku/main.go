@@ -162,6 +162,18 @@ func PlayTurn(pane *window.Drawer, game *arbitre.GomokuGame, Map *[363]uint64, s
 	pane.Turn = game.Turn
 	pane.BoardRes.Wscore = pane.Font.Write(strconv.Itoa(int(bmap.GetPlayerTakenStones(&bmap.Map, true))))
 	pane.BoardRes.Bscore = pane.Font.Write(strconv.Itoa(int(bmap.GetPlayerTakenStones(&bmap.Map, false))))
+	if st.Infos.Ipos < arbitre.XMin {
+		arbitre.XMin = st.Infos.Ipos
+	}
+	if st.Infos.Ipos > arbitre.XMax {
+		arbitre.XMax = st.Infos.Ipos
+	}
+	if st.Infos.Jpos < arbitre.YMin {
+		arbitre.YMin = st.Infos.Jpos
+	}
+	if st.Infos.Jpos > arbitre.YMax {
+		arbitre.YMax = st.Infos.Jpos
+	}
 	return true
 }
 
