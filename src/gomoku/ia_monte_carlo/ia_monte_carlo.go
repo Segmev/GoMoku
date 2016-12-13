@@ -114,7 +114,9 @@ func findRange() {
 func Play(board *[363]uint64, rule1, rule2 bool, test_nb int, tmpboard [363]uint64) (int, int) {
 	initResTab()
 	rand.Seed(time.Now().Unix())
-	ch := make(chan bool, 4)
+	ch := make(chan bool, 6)
+	go MonteCarlo(board, rule1, rule2, test_nb, ch)
+	go MonteCarlo(board, rule1, rule2, test_nb, ch)
 	go MonteCarlo(board, rule1, rule2, test_nb, ch)
 	go MonteCarlo(board, rule1, rule2, test_nb, ch)
 	go MonteCarlo(board, rule1, rule2, test_nb, ch)
@@ -198,9 +200,9 @@ func findAndApply(board *[363]uint64, rule1, rule2 bool) (int, int) {
 	var a, b, save, saveA, saveB int
 
 	for true {
-		save = resTab[xMin+xMin*19]
+		save = resTab[xMin+yMin*19]
 		for a = xMin; a <= xMax; a++ {
-			for b = xMin; b <= xMax; b++ {
+			for b = yMin; b <= yMax; b++ {
 				if resTab[a+b*19] > save {
 					save = resTab[a+b*19]
 					saveA = a
@@ -214,6 +216,5 @@ func findAndApply(board *[363]uint64, rule1, rule2 bool) (int, int) {
 			resTab[saveA+saveB*19] = -9999
 		}
 	}
-	println("Return Parfait")
 	return saveA, saveB
 }
