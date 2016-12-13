@@ -80,7 +80,7 @@ type Drawer struct {
 }
 
 func (me *Drawer) initOptions() bool {
-	me.OptionsRes.Op1, me.OptionsRes.Op2 = true, true
+	me.OptionsRes.Op1, me.OptionsRes.Op2 = false, false
 	me.OptionsRes.optionRule1 = me.Font.Write("Unbroken row")
 	me.OptionsRes.optionRule2 = me.Font.Write("Three and three")
 	me.OptionsRes.exit = me.Font.Write("Exit...")
