@@ -203,22 +203,10 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 		}()
 		var iaStone window.Stone
 		pane.GameState = "IA_Turn"
-		ch := make(chan Coor, 3)
-		for i := 0; i < (cap(ch)); i++ {
-			go func(chan Coor) {
-				var c Coor
-				c.X, c.Y, c.Val = ia_monte_carlo.MonteCarlo(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, bmap.Map, 1000)
-				ch <- c
-			}(ch)
-		}
-		val := -1000
-		for i := 0; i < cap(ch); i++ {
-			c := <-ch
-			if c.Val > val {
-				val = c.Val
-				iaStone.Infos.Ipos, iaStone.Infos.Jpos = c.X, c.Y
-			}
-		}
+
+		//TON CODE HERE
+		iaStone.Infos.Ipos, iaStone.Infos.Jpos = c.X, c.Y
+
 		println("out", time.Now().Sub(starttime).Seconds())
 		pane.GameState = "gameOn"
 		PlayTurn(pane, game, &bmap.Map, &iaStone)
