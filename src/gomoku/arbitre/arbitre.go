@@ -237,6 +237,12 @@ func updateThreeGroupLoop(Map *[363]uint64, color bool, x, y, dirI, dirJ, cptHow
 	if !(dirI == 0 && dirJ == 0) {
 		i, j := dirI, dirJ
 		end := 2
+		if (i <= 0 && j <= 0) || (i == -1 && j == 1) {
+			if IsStoneAtPos(Map, x-dirI, y-dirJ) && color == bmap.IsWhite(Map, x-dirI, y-dirJ) {
+				cpt++
+				end = 1
+			}
+		}
 		for c := 0; c <= end; c++ {
 			if IsStoneAtPos(Map, x+i, y+j) {
 				if color == bmap.IsWhite(Map, x+i, y+j) {
