@@ -274,16 +274,16 @@ func UpdateThreeGroups(Map *[363]uint64, x, y int, color bool) bool {
 	}
 	// cptHowManyThreeGroups, cptFourGroups =
 	// 	updateThreeGroupLoop(Map, color, x, y, -1, 1, cptHowManyThreeGroups, cptFourGroups)
-	if cptFourGroups > 0 {
-		bmap.SetInFourGroup(Map, x, y, true)
-	} else {
-		bmap.SetInFourGroup(Map, x, y, false)
-	}
-	if cptHowManyThreeGroups > 0 {
-		bmap.SetInThreeGroup(Map, x, y, true)
-	} else {
-		bmap.SetInThreeGroup(Map, x, y, false)
-	}
+	// if cptFourGroups > 0 {
+	// 	bmap.SetInFourGroup(Map, x, y, true)
+	// } else {
+	// 	bmap.SetInFourGroup(Map, x, y, false)
+	// }
+	// if cptHowManyThreeGroups > 0 {
+	// 	bmap.SetInThreeGroup(Map, x, y, true)
+	// } else {
+	// 	bmap.SetInThreeGroup(Map, x, y, false)
+	// }
 	return cptHowManyThreeGroups >= 2
 }
 
