@@ -24,13 +24,14 @@ type Stone struct {
 	Infos   InfosStone
 }
 
+var Lvl int
+
 type OptionsRes struct {
 	Op1, Op2    bool
 	cross       *gfx.Image
 	optionRule1 *gfx.Text
 	optionRule2 *gfx.Text
 	ialevel     [3]*gfx.Text
-	Lvl         int
 	restart     *gfx.Text
 	back        *gfx.Text
 	exit        *gfx.Text
@@ -274,7 +275,7 @@ func (me *Drawer) drawOptions(c *gfx.Canvas) {
 	//	c.SetRGBA(150, 150, 150, 70)
 	c.SetRGBA(133, 94, 66, 150)
 	c.FillRoundedRect(gfx.DisplayHeight()*27/50, gfx.DisplayHeight()/7, 150, 50, 7)
-	c.DrawText(me.OptionsRes.ialevel[me.OptionsRes.Lvl], gfx.DisplayHeight()*28/50,
+	c.DrawText(me.OptionsRes.ialevel[Lvl], gfx.DisplayHeight()*28/50,
 		gfx.DisplayHeight()/7)
 	for i, elem := range elems {
 		if i >= 2 {
