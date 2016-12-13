@@ -209,8 +209,8 @@ func ThreeBlockNear(Map *[363]uint64, x, y int, color bool) bool {
 	}
 	ret := false
 	bmap.SetVisibility(Map, x, y, true)
-	for i := -1; i <= 1; i++ {
-		for j := -1; j <= 1; j++ {
+	for i := -1; i <= 0; i++ {
+		for j := -1; j <= 0; j++ {
 			if !(i == 0 && j == 0) {
 				a, b := i, j
 				for c := 0; c <= 2; c++ {
@@ -232,7 +232,7 @@ func ThreeBlockNear(Map *[363]uint64, x, y int, color bool) bool {
 	return ret
 }
 
-func updateThreeGroupLoop(Map *[363]uint64, color bool, x, y, dirI, dirJ, cptHowManyThreeGroups, cptFourGroups int) (int, int) {
+func updateThreeGroupLoop(Map *[363]uint64, color bool, x, y, dirI, dirJ, cptHowManyThreeGroups int) int {
 	cpt := 0
 	if !(dirI == 0 && dirJ == 0) {
 		i, j := dirI, dirJ
@@ -257,21 +257,19 @@ func updateThreeGroupLoop(Map *[363]uint64, color bool, x, y, dirI, dirJ, cptHow
 		if cpt == 2 && !IsStoneAtPos(Map, i+x, j+y) {
 			cptHowManyThreeGroups++
 		}
-		if cpt == 3 {
-			cptFourGroups++
-		}
 	}
-	return cptHowManyThreeGroups, cptFourGroups
+	return cptHowManyThreeGroups
 }
 
 func UpdateThreeGroups(Map *[363]uint64, x, y int, color bool) bool {
-	cptHowManyThreeGroups, cptFourGroups := 0, 0
+	cptHowManyThreeGroups := 0
 	for dirI := -1; dirI <= 1; dirI++ {
 		for dirJ := -1; dirJ <= 1; dirJ++ {
-			cptHowManyThreeGroups, cptFourGroups =
-				updateThreeGroupLoop(Map, color, x, y, dirI, dirJ, cptHowManyThreeGroups, cptFourGroups)
+			cptHowManyThreeGroups =
+				updateThreeGroupLoop(Map, color, x, y, dirI, dirJ, cptHowManyThreeGroups)
 		}
 	}
+	return cptHowManyThreeGroups >= 2
 	// cptHowManyThreeGroups, cptFourGroups =
 	// 	updateThreeGroupLoop(Map, color, x, y, -1, 1, cptHowManyThreeGroups, cptFourGroups)
 	// if cptFourGroups > 0 {
@@ -284,7 +282,6 @@ func UpdateThreeGroups(Map *[363]uint64, x, y int, color bool) bool {
 	// } else {
 	// 	bmap.SetInThreeGroup(Map, x, y, false)
 	// }
-	return cptHowManyThreeGroups >= 2
 }
 
 func IsDraw(pane *window.Drawer, game *GomokuGame) {
