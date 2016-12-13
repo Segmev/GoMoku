@@ -109,7 +109,7 @@ func findRange() {
 	}
 }
 
-func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int) (int, int, int) {
+func MonteCarlo(board *[363]uint64, rule1, rule2 bool, tmpboard [363]uint64, test_nb int) (int, int, int) {
 	var cpt, a, b, break_cpt, i int
 
 	win := 0
@@ -166,14 +166,14 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int) (int, int, i
 	if iCheck == cpt {
 		a = rand.Int() % (xMax - xMin)
 		b = rand.Int() % (xMax - xMin)
-		for !(ApplyRules(board, a+xMin, b+xMin, myColor, rule1, rule2)) {
+		for !(ApplyRules(&tmpboard, a+xMin, b+xMin, myColor, rule1, rule2)) {
 			a = rand.Int() % (xMax - xMin)
 			b = rand.Int() % (xMax - xMin)
 		}
 		println("Return Par Défaut")
 		return a, b, 0
 	} else {
-		return findAndApply(board, rule1, rule2)
+		return findAndApply(&tmpboard, rule1, rule2)
 	}
 }
 
