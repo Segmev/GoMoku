@@ -113,6 +113,7 @@ func findRange() {
 
 func Play(board *[363]uint64, rule1, rule2 bool, test_nb int, tmpboard [363]uint64) (int, int) {
 	initResTab()
+	rand.Seed(time.Now().Unix())
 	go MonteCarlo(board, rule1, rule2, *board, test_nb)
 	go MonteCarlo(board, rule1, rule2, *board, test_nb)
 	go MonteCarlo(board, rule1, rule2, *board, test_nb)
@@ -129,7 +130,6 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, tmpboard [363]uint64, tes
 	win := 0
 	loose := 0
 	iCheck := 0
-	rand.Seed(time.Now().Unix())
 	findRange()
 	for cpt = 0; cpt != test_nb; cpt++ {
 		tmpTab = empty
