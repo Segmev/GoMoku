@@ -115,15 +115,15 @@ func Play(board *[363]uint64, rule1, rule2 bool, test_nb int, tmpboard [363]uint
 	initResTab()
 	rand.Seed(time.Now().Unix())
 	ch := make(chan bool, 4)
-	go MonteCarlo(board, rule1, rule2, *board, test_nb, ch)
-	go MonteCarlo(board, rule1, rule2, *board, test_nb, ch)
-	go MonteCarlo(board, rule1, rule2, *board, test_nb, ch)
-	go MonteCarlo(board, rule1, rule2, *board, test_nb, ch)
+	go MonteCarlo(board, rule1, rule2, test_nb, ch)
+	go MonteCarlo(board, rule1, rule2, test_nb, ch)
+	go MonteCarlo(board, rule1, rule2, test_nb, ch)
+	go MonteCarlo(board, rule1, rule2, test_nb, ch)
 	<-ch
 	return (findAndApply(&tmpboard, rule1, rule2))
 }
 
-func MonteCarlo(board *[363]uint64, rule1, rule2 bool, tmpboard [363]uint64, test_nb int, ch chan bool) {
+func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int, ch chan bool) {
 	var cpt, a, b, break_cpt, i int
 	var tmpTab [361]int
 	var tmpTab2 [361]int

@@ -205,7 +205,7 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 		pane.GameState = "IA_Turn"
 
 		//TON CODE HERE
-		iaStone.Infos.Ipos, iaStone.Infos.Jpos = c.X, c.Y
+		iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 750, bmap.Map)
 
 		println("out", time.Now().Sub(starttime).Seconds())
 		pane.GameState = "gameOn"
