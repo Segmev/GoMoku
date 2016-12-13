@@ -9,7 +9,6 @@ const (
 	VISIBLE = 0
 	COLOR   = 1
 
-	// TODO: Update infos in arbitre, not done for now
 	INTWOGROUP    = 2
 	BREAKABLE     = 3
 	INTHREEGROUP  = 4

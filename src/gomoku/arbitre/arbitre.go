@@ -160,45 +160,36 @@ func ResetTeamInfos(Map *[363]uint64, color bool) {
 
 func UpdateStone(Map *[363](uint64), x, y int, color bool) {
 	totOpp, totTeam := 0, 0
-	tmpx := x
-	tmpy := y
-	check := true
-	for check {
-		check = false
-		x = tmpx
-		y = tmpy
-		for i := -1; i <= 1; i++ {
-			for j := -1; j <= 1; j++ {
-				if !(i == 0 && j == 0) {
-					if bmap.IsWhite(Map, x, y) == color {
-						bmap.SetNbTeamAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
-							bmap.IsWhite(Map, x, y), i, j)))
-						if bmap.GetNbT(Map, x, y, 1+j, 1+i) > 0 && bmap.IsChecked(Map, x, y) {
-							totTeam += bmap.GetNbT(Map, x, y, 1+j, 1+i)
-							bmap.SetChecked(Map, x, y, true)
-							tmpx = 1 + j
-							tmpy = 1 + i
-							check = true
-						}
-					} else {
-						bmap.SetNbOppoAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
-							!bmap.IsWhite(Map, x, y), i, j)))
-						if bmap.GetNbO(Map, x, y, 1+j, 1+i) > 0 && bmap.IsChecked(Map, x, y) {
-							totOpp += bmap.GetNbO(Map, x, y, 1+j, 1+i)
-							bmap.SetChecked(Map, x, y, true)
-							tmpx = 1 + j
-							tmpy = i + i
-							check = true
+	for a := -2; a <= 2; a++ {
+		for b := -2; b <= 2; b++ {
+			if IsStoneAtPos(Map, x+a, y+a) {
+				for i := -1; i <= 1; i++ {
+					for j := -1; j <= 1; j++ {
+						if !(i == 0 && j == 0) {
+							if bmap.IsWhite(Map, x+a, y+b) == color {
+								bmap.SetNbTeamAt(Map, x+a, y+b, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x+a, y+b,
+									bmap.IsWhite(Map, x+a, y+b), i, j)))
+								if bmap.GetNbT(Map, x+a, y+b, 1+j, 1+i) > 0 && bmap.IsChecked(Map, x+a, y+b) {
+									totTeam += bmap.GetNbT(Map, x+a, y+b, 1+j, 1+i)
+								}
+							} else {
+								bmap.SetNbOppoAt(Map, x+a, y+b, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x+a, y+b,
+									!bmap.IsWhite(Map, x+a, y+b), i, j)))
+								if bmap.GetNbO(Map, x+a, y+b, 1+j, 1+i) > 0 && bmap.IsChecked(Map, x+a, y+b) {
+									totOpp += bmap.GetNbO(Map, x+a, y+b, 1+j, 1+i)
+								}
+							}
+							bmap.SetNbTeamAt(Map, x+a, y+b, 1, 1, uint64(totTeam))
+							bmap.SetNbOppoAt(Map, x+a, y+b, 1, 1, uint64(totOpp))
 						}
 					}
-					bmap.SetNbTeamAt(Map, x, y, 1, 1, uint64(totTeam))
-					bmap.SetNbOppoAt(Map, x, y, 1, 1, uint64(totOpp))
 				}
 			}
 		}
 	}
-	bmap.ResetCheck(Map)
 }
+
+//	bmap.ResetCheck(Map)
 
 func UpdateInfos(Map *[363](uint64), color bool) {
 	//ResetTeamInfos(dat, color)
