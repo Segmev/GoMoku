@@ -194,6 +194,7 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 	}
 	pane.BoardRes.BadX, pane.BoardRes.BadY = 0, 0
 	if pane.GameType == "IA" && game.End != 2 {
+		starttime := time.Now()
 		timer2 := time.NewTimer(time.Millisecond * 20)
 		go func() {
 			<-timer2.C
@@ -217,7 +218,7 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 				iaStone.Infos.Ipos, iaStone.Infos.Jpos = c.X, c.Y
 			}
 		}
-		println("out")
+		println("out", time.Now().Sub(starttime).Seconds())
 		pane.GameState = "gameOn"
 		PlayTurn(pane, game, &bmap.Map, &iaStone)
 	}
