@@ -162,7 +162,6 @@ func UpdateInfos(Map *[363](uint64), color bool) {
 	//ResetTeamInfos(dat, color)
 	for x := 0; x <= 18; x++ {
 		for y := 0; y <= 18; y++ {
-			//UpdateThreeGroups(Map, x, y, color)
 			totOpp, totTeam := 0, 0
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
@@ -221,8 +220,11 @@ func ThreeBlockNear(Map *[363]uint64, x, y int, color bool) bool {
 							bmap.ResetStone(Map, x, y)
 							ret = true
 						}
+						a, b = augmentPos(a), augmentPos(b)
+					} else if IsStoneAtPos(Map, x+a, y+b) &&
+						color != bmap.IsWhite(Map, x+a, y+b) {
+						c = 2
 					}
-					a, b = augmentPos(a), augmentPos(b)
 				}
 			}
 		}
@@ -235,12 +237,6 @@ func updateThreeGroupLoop(Map *[363]uint64, color bool, x, y, dirI, dirJ, cptHow
 	if !(dirI == 0 && dirJ == 0) {
 		i, j := dirI, dirJ
 		end := 2
-		if (i <= 0 && j <= 0) || (i == -1 && j == 1) {
-			if IsStoneAtPos(Map, x-dirI, y-dirJ) && color == bmap.IsWhite(Map, x-dirI, y-dirJ) {
-				cpt++
-				end = 1
-			}
-		}
 		for c := 0; c <= end; c++ {
 			if IsStoneAtPos(Map, x+i, y+j) {
 				if color == bmap.IsWhite(Map, x+i, y+j) {
@@ -264,14 +260,14 @@ func updateThreeGroupLoop(Map *[363]uint64, color bool, x, y, dirI, dirJ, cptHow
 
 func UpdateThreeGroups(Map *[363]uint64, x, y int, color bool) bool {
 	cptHowManyThreeGroups, cptFourGroups := 0, 0
-	for dirI := 0; dirI <= 1; dirI++ {
-		for dirJ := 0; dirJ <= 1; dirJ++ {
+	for dirI := -1; dirI <= 1; dirI++ {
+		for dirJ := -1; dirJ <= 1; dirJ++ {
 			cptHowManyThreeGroups, cptFourGroups =
 				updateThreeGroupLoop(Map, color, x, y, dirI, dirJ, cptHowManyThreeGroups, cptFourGroups)
 		}
 	}
-	cptHowManyThreeGroups, cptFourGroups =
-		updateThreeGroupLoop(Map, color, x, y, -1, 1, cptHowManyThreeGroups, cptFourGroups)
+	// cptHowManyThreeGroups, cptFourGroups =
+	// 	updateThreeGroupLoop(Map, color, x, y, -1, 1, cptHowManyThreeGroups, cptFourGroups)
 	if cptFourGroups > 0 {
 		bmap.SetInFourGroup(Map, x, y, true)
 	} else {
