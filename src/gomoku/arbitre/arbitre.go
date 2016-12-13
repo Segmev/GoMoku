@@ -162,7 +162,7 @@ func UpdateInfos(Map *[363](uint64), color bool) {
 	//ResetTeamInfos(dat, color)
 	for x := 0; x <= 18; x++ {
 		for y := 0; y <= 18; y++ {
-			UpdateThreeGroups(Map, x, y, color)
+			//UpdateThreeGroups(Map, x, y, color)
 			totOpp, totTeam := 0, 0
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
@@ -282,7 +282,7 @@ func UpdateThreeGroups(Map *[363]uint64, x, y int, color bool) bool {
 	} else {
 		bmap.SetInThreeGroup(Map, x, y, false)
 	}
-	return cptHowManyThreeGroups == 2
+	return cptHowManyThreeGroups >= 2
 }
 
 func IsDraw(pane *window.Drawer, game *GomokuGame) {
