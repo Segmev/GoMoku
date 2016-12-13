@@ -169,7 +169,6 @@ func UpdateInfos(Map *[363](uint64), color bool) {
 							bmap.SetNbTeamAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
 								bmap.IsWhite(Map, x, y), i, j)))
 							totTeam += bmap.GetNbT(Map, x, y, 1+j, 1+i)
-
 						} else {
 							bmap.SetNbOppoAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
 								!bmap.IsWhite(Map, x, y), i, j)))
@@ -263,14 +262,14 @@ func updateThreeGroupLoop(Map *[363]uint64, color bool, x, y, dirI, dirJ, cptHow
 
 func UpdateThreeGroups(Map *[363]uint64, x, y int, color bool) bool {
 	cptHowManyThreeGroups, cptFourGroups := 0, 0
-	for dirI := -1; dirI <= 0; dirI++ {
-		for dirJ := -1; dirJ <= 0; dirJ++ {
+	for dirI := -1; dirI <= 1; dirI++ {
+		for dirJ := -1; dirJ <= 1; dirJ++ {
 			cptHowManyThreeGroups, cptFourGroups =
 				updateThreeGroupLoop(Map, color, x, y, dirI, dirJ, cptHowManyThreeGroups, cptFourGroups)
 		}
 	}
-	cptHowManyThreeGroups, cptFourGroups =
-		updateThreeGroupLoop(Map, color, x, y, -1, 1, cptHowManyThreeGroups, cptFourGroups)
+	// cptHowManyThreeGroups, cptFourGroups =
+	// 	updateThreeGroupLoop(Map, color, x, y, 1, -1, cptHowManyThreeGroups, cptFourGroups)
 	if cptFourGroups > 0 {
 		bmap.SetInFourGroup(Map, x, y, true)
 	} else {

@@ -186,10 +186,11 @@ func Seek(carte [363]uint64, t_color bool, deep int, rule1, rule2 bool) (int, in
 	y := 0
 	result = nil
 	check := true
+	arbitre.UpdateInfos(&carte, t_color)
 	for curr != nil {
 		check = true
-		if curr.father == &racine && bmap.GetValStones(&curr.carte, x, y, bmap.MO)+bmap.GetValStones(&curr.carte, x, y, bmap.MT) != 0 {
-			println(x, y)
+		if (curr.father == &racine || curr.father == nil) && bmap.GetValStones(&curr.carte, x, y, bmap.MO)+bmap.GetValStones(&curr.carte, x, y, bmap.MT) != 0 {
+			println(x, y, bmap.GetValStones(&curr.carte, x, y, bmap.MO)+bmap.GetValStones(&curr.carte, x, y, bmap.MT))
 		}
 		if !bmap.IsVisible(&curr.carte, x, y) &&
 			bmap.GetValStones(&curr.carte, x, y, bmap.MO)+bmap.GetValStones(&curr.carte, x, y, bmap.MT) != 0 &&
