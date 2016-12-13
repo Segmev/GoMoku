@@ -114,12 +114,15 @@ func findRange() {
 func Play(board *[363]uint64, rule1, rule2 bool, test_nb int, tmpboard [363]uint64) (int, int) {
 	initResTab()
 	rand.Seed(time.Now().Unix())
+	starttime := time.Now()
 	ch := make(chan bool, 6)
 	findRange()
 	go MonteCarlo(board, rule1, rule2, test_nb, ch)
 	go MonteCarlo(board, rule1, rule2, test_nb, ch)
 	<-ch
-	return (findAndApply(&tmpboard, rule1, rule2))
+	x, y := findAndApply(&tmpboard, rule1, rule2)
+	println("out", time.Now().Sub(starttime).Seconds())
+	return x, y
 }
 
 func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int, ch chan bool) {
