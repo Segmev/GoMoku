@@ -4,6 +4,7 @@ import (
 	"gomoku/arbitre"
 	"gomoku/bmap"
 	"math/rand"
+	"sync"
 	"time"
 )
 
@@ -11,8 +12,7 @@ var myColor bool
 var hisColor bool
 var _board [363]uint64
 var resTab [361]int
-var tmpTab [361]int
-var tmpTab2 [361]int
+var mute sync.Mutex
 
 var xMin, xMax, yMin, yMax int
 
@@ -38,12 +38,12 @@ func initResTab() {
 	}
 }
 
-func myMemset() {
-	for a := 0; a < 361; a++ {
-		tmpTab[a] = 0
-		tmpTab2[a] = 0
-	}
-}
+// func myMemset() {
+// 	for a := 0; a < 361; a++ {
+// 		tmpTab[a] = 0
+// 		tmpTab2[a] = 0
+// 	}
+// }
 
 func ResBoard(board *[363]uint64) {
 	for a := 0; a < 363; a++ {
@@ -72,7 +72,8 @@ func CheckWin(rule bool, color bool) bool {
 	return false
 }
 
-func refreshTab(value int) {
+func refreshTab(value int, tmpTab *[361]int, tmpTab2 *[361]int) {
+	mute.Lock()
 	if value == 1 {
 		for y := 0; y < 361; y++ {
 			resTab[y] -= tmpTab2[y]
@@ -84,6 +85,7 @@ func refreshTab(value int) {
 			resTab[y] -= tmpTab[y]
 		}
 	}
+	mute.Unlock()
 }
 
 func findRange() {
@@ -109,17 +111,29 @@ func findRange() {
 	}
 }
 
-func MonteCarlo(board *[363]uint64, rule1, rule2 bool, tmpboard [363]uint64, test_nb int) (int, int, int) {
+func Play(board *[363]uint64, rule1, rule2 bool, test_nb int, tmpboard [363]uint64) (int, int) {
+	initResTab()
+	go MonteCarlo(board, rule1, rule2, *board, test_nb)
+	go MonteCarlo(board, rule1, rule2, *board, test_nb)
+	go MonteCarlo(board, rule1, rule2, *board, test_nb)
+	go MonteCarlo(board, rule1, rule2, *board, test_nb)
+	return (findAndApply(&tmpboard, rule1, rule2))
+}
+
+func MonteCarlo(board *[363]uint64, rule1, rule2 bool, tmpboard [363]uint64, test_nb int) {
 	var cpt, a, b, break_cpt, i int
+	var tmpTab [361]int
+	var tmpTab2 [361]int
+	var empty [361]int
 
 	win := 0
 	loose := 0
 	iCheck := 0
 	rand.Seed(time.Now().Unix())
-	initResTab()
 	findRange()
 	for cpt = 0; cpt != test_nb; cpt++ {
-		myMemset()
+		tmpTab = empty
+		tmpTab2 = empty
 		_board = *board
 		for i = 0; i < 10; i++ {
 			break_cpt = 0
@@ -135,7 +149,7 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, tmpboard [363]uint64, tes
 			}
 			tmpTab[(b+xMin)*19+(a+xMin)] = 1
 			if CheckWin(rule1, myColor) {
-				refreshTab(1)
+				refreshTab(1, &tmpTab, &tmpTab2)
 				win += 1
 				i = 9
 				break
@@ -153,7 +167,7 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, tmpboard [363]uint64, tes
 			}
 			tmpTab2[(b+xMin)*19+(a+xMin)] = 1
 			if CheckWin(rule1, hisColor) {
-				refreshTab(-1)
+				refreshTab(-1, &tmpTab, &tmpTab2)
 				loose += 1
 				i = 9
 				break
@@ -163,21 +177,21 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, tmpboard [363]uint64, tes
 			iCheck++
 		}
 	}
-	if iCheck == cpt {
-		a = rand.Int() % (xMax - xMin)
-		b = rand.Int() % (xMax - xMin)
-		for !(ApplyRules(&tmpboard, a+xMin, b+xMin, myColor, rule1, rule2)) {
-			a = rand.Int() % (xMax - xMin)
-			b = rand.Int() % (xMax - xMin)
-		}
-		println("Return Par Défaut")
-		return a, b, 0
-	} else {
-		return findAndApply(&tmpboard, rule1, rule2)
-	}
+	// if iCheck == cpt {
+	// 	a = rand.Int() % (xMax - xMin)
+	// 	b = rand.Int() % (xMax - xMin)
+	// 	for !(ApplyRules(&tmpboard, a+xMin, b+xMin, myColor, rule1, rule2)) {
+	// 		a = rand.Int() % (xMax - xMin)
+	// 		b = rand.Int() % (xMax - xMin)
+	// 	}
+	// 	println("Return Par Défaut")
+	// 	return a, b, -1000
+	// } else {
+	// 	return findAndApply(&tmpboard, rule1, rule2)
+	// }
 }
 
-func findAndApply(board *[363]uint64, rule1, rule2 bool) (int, int, int) {
+func findAndApply(board *[363]uint64, rule1, rule2 bool) (int, int) {
 	var a, b, save, saveA, saveB int
 
 	for true {
@@ -198,5 +212,5 @@ func findAndApply(board *[363]uint64, rule1, rule2 bool) (int, int, int) {
 		}
 	}
 	println("Return Parfait")
-	return saveA, saveB, resTab[saveA+saveB*19]
+	return saveA, saveB
 }

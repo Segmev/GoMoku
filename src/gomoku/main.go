@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"gomoku/arbitre"
 	"gomoku/bmap"
 	"gomoku/ia_monte_carlo"
@@ -201,7 +200,6 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 		timer2 := time.NewTimer(time.Millisecond * 20)
 		go func() {
 			<-timer2.C
-			fmt.Println("PA PA PAAAAAA")
 		}()
 		var iaStone window.Stone
 		pane.GameState = "IA_Turn"
