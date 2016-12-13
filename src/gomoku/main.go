@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"gomoku/arbitre"
 	"gomoku/bmap"
-	"gomoku/ia"
+	"gomoku/ia_monte_carlo"
 	"gomoku/window"
 	"math/rand"
 	"net/http"
@@ -185,13 +185,14 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 		}()
 		var iaStone window.Stone
 		pane.GameState = "IA_Turn"
-		iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia.Seek(bmap.Map, game.Turn, 3, pane.OptionsRes.Op1, pane.OptionsRes.Op2)
+		iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.MonteCarlo(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2)
 		pane.GameState = "gameOn"
 		PlayTurn(pane, game, &bmap.Map, &iaStone)
 	}
 }
 
 func main() {
+	ia_monte_carlo.Start(false)
 	if checkFiles() && launchWindow(900, 640) {
 		go http.ListenAndServe(":8080", http.DefaultServeMux)
 		gfx.Main()
