@@ -123,7 +123,7 @@ func Play(board *[363]uint64, rule1, rule2 bool, test_nb int, tmpboard [363]uint
 	return (findAndApply(&tmpboard, rule1, rule2))
 }
 
-func MonteCarlo(board *[363]uint64, rule1, rule2 bool, tmpboard [363]uint64, test_nb int, ab chan bool) {
+func MonteCarlo(board *[363]uint64, rule1, rule2 bool, tmpboard [363]uint64, test_nb int, ch chan bool) {
 	var cpt, a, b, break_cpt, i int
 	var tmpTab [361]int
 	var tmpTab2 [361]int
@@ -179,6 +179,7 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, tmpboard [363]uint64, tes
 			iCheck++
 		}
 	}
+	ch <- true
 	// if iCheck == cpt {
 	// 	a = rand.Int() % (xMax - xMin)
 	// 	b = rand.Int() % (xMax - xMin)
