@@ -66,7 +66,7 @@ func CheckWin(rule bool, color bool) bool {
 	var res [][5]arbitre.Coor
 
 	arbitre.CheckWinAl(&_board, color, &res)
-	if !rule || arbitre.CheckBreakableAlign(&_board, res, color) {
+	if (!rule && len(res) != 0) || (rule && arbitre.CheckBreakableAlign(&_board, res, color)) {
 		return true
 	}
 	return false
