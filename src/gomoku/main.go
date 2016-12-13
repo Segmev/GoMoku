@@ -102,7 +102,7 @@ func addInput(pane *window.Drawer, game *arbitre.GomokuGame) {
 					pane.GameState = "gameOn"
 				} else if gfx.DisplayHeight()/7 <= e.Y &&
 					e.Y <= gfx.DisplayHeight()/7+50 {
-					pane.OptionsRes.Lvl = (pane.OptionsRes.Lvl + 1) % 3
+					window.Lvl = (window.Lvl + 1) % 3
 				} else if gfx.DisplayHeight()/4+(3*gfx.DisplayHeight()/9) <= e.Y &&
 					e.Y <= gfx.DisplayHeight()/4+(3*gfx.DisplayHeight()/9)+50 {
 					quit()
@@ -199,7 +199,13 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 		pane.GameState = "IA_Turn"
 
 		//TON CODE HERE
-		iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 1000, bmap.Map)
+		if window.Lvl == 0 {
+			iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 250, bmap.Map)
+		} else if window.Lvl == 1 {
+			iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 500, bmap.Map)
+		} else if window.Lvl == 2 {
+			iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 750, bmap.Map)
+		}
 
 		pane.GameState = "gameOn"
 		PlayTurn(pane, game, &bmap.Map, &iaStone)
