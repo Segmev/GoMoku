@@ -2,6 +2,7 @@ package ia_monte_carlo
 
 import (
 	"gomoku/arbitre"
+	"gomoku/bmap"
 	"math/rand"
 	"time"
 )
@@ -22,6 +23,13 @@ func Start(color bool) {
 	arbitre.YMax = 9
 	myColor = color
 	hisColor = !myColor
+}
+
+func ApplyRules(Map *[363](uint64), i, j int, color bool, rule1, rule2 bool) bool {
+	if bmap.IsVisible(Map, i, j) {
+		return false
+	}
+	return arbitre.ApplyRules(Map, i, j, color, rule1, rule2)
 }
 
 func initResTab() {
@@ -117,7 +125,7 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool) (int, int) {
 			break_cpt = 0
 			a = rand.Int() % (xMax - xMin)
 			b = rand.Int() % (xMax - xMin)
-			for !arbitre.ApplyRules(&_board, a+xMin, b+xMin, myColor, rule1, rule2) && break_cpt < 9 {
+			for !ApplyRules(&_board, a+xMin, b+xMin, myColor, rule1, rule2) && break_cpt < 9 {
 				a = rand.Int() % (xMax - xMin)
 				b = rand.Int() % (xMax - xMin)
 				break_cpt++
@@ -135,7 +143,7 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool) (int, int) {
 			break_cpt = 0
 			a = rand.Int() % (xMax - xMin)
 			b = rand.Int() % (xMax - xMin)
-			for !arbitre.ApplyRules(&_board, a+xMin, b+xMin, hisColor, rule1, rule2) && break_cpt < 9 {
+			for !ApplyRules(&_board, a+xMin, b+xMin, hisColor, rule1, rule2) && break_cpt < 9 {
 				a = rand.Int() % (xMax - xMin)
 				b = rand.Int() % (xMax - xMin)
 				break_cpt++
@@ -158,7 +166,7 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool) (int, int) {
 	if iCheck == cpt {
 		a = rand.Int() % (xMax - xMin)
 		b = rand.Int() % (xMax - xMin)
-		for !(arbitre.ApplyRules(board, a+xMin, b+xMin, myColor, rule1, rule2)) {
+		for !(ApplyRules(board, a+xMin, b+xMin, myColor, rule1, rule2)) {
 			a = rand.Int() % (xMax - xMin)
 			b = rand.Int() % (xMax - xMin)
 		}
@@ -183,7 +191,7 @@ func findAndApply(board *[363]uint64, rule1, rule2 bool) (int, int) {
 				}
 			}
 		}
-		if arbitre.ApplyRules(board, saveA, saveB, myColor, rule1, rule2) {
+		if ApplyRules(board, saveA, saveB, myColor, rule1, rule2) {
 			break
 		} else {
 			resTab[saveA+saveB*19] = -9999
