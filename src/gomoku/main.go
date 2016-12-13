@@ -176,6 +176,7 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 			return
 		}
 	}
+	pane.BoardRes.BadX, pane.BoardRes.BadY = 0, 0
 	if pane.GameType == "IA" && game.End != 2 {
 		timer2 := time.NewTimer(time.Millisecond * 20)
 		go func() {

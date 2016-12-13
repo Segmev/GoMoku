@@ -177,7 +177,7 @@ func (me *Drawer) drawGameBoard(c *gfx.Canvas) {
 		timer := time.NewTimer(time.Second * 4)
 		go func() {
 			<-timer.C
-			me.BoardRes.BadX = 0
+			me.BoardRes.BadX, me.BoardRes.BadY = 0, 0
 		}()
 
 		c.DrawAnimation(me.BoardRes.badmove, me.BoardRes.BadX, me.BoardRes.BadY)
