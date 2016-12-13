@@ -158,6 +158,31 @@ func ResetTeamInfos(Map *[363]uint64, color bool) {
 	}
 }
 
+func UpdateStone(Map *[363](uint64), x, y int, color bool) {
+	totOpp, totTeam := 0, 0
+	for i := -1; i <= 1; i++ {
+		for j := -1; j <= 1; j++ {
+			if !(i == 0 && j == 0) {
+				if bmap.IsWhite(Map, x, y) == color {
+					bmap.SetNbTeamAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
+						bmap.IsWhite(Map, x, y), i, j)))
+					if bmap.GetNbT(Map, x, y, 1+j, 1+i) > 0 {
+						totTeam += bmap.GetNbT(Map, x, y, 1+j, 1+i)
+					}
+				} else {
+					bmap.SetNbOppoAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
+						!bmap.IsWhite(Map, x, y), i, j)))
+					if bmap.GetNbO(Map, x, y, 1+j, 1+i) > 0 {
+						totOpp += bmap.GetNbO(Map, x, y, 1+j, 1+i)
+					}
+				}
+				bmap.SetNbTeamAt(Map, x, y, 1, 1, uint64(totTeam))
+				bmap.SetNbOppoAt(Map, x, y, 1, 1, uint64(totOpp))
+			}
+		}
+	}
+}
+
 func UpdateInfos(Map *[363](uint64), color bool) {
 	//ResetTeamInfos(dat, color)
 	for x := 0; x <= 18; x++ {
