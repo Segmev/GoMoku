@@ -14,7 +14,7 @@ const (
 	BREAKABLE     = 3
 	INTHREEGROUP  = 4
 	INDOUBLETHREE = 5
-	INFOURGROUP   = 6
+	ISCHECKED     = 6
 
 	ULT, UT, URT = 6 + (3 * 1), 6 + (3 * 2), 6 + (3 * 3)
 	MLT, MT, MRT = 6 + (3 * 4), 6 + (3 * 5), 6 + (3 * 6)
@@ -79,16 +79,16 @@ func SetNbTeamAt(MMap *[Map_size*Map_size + Nb_Players](uint64), i, j int, posx,
 	setAtPos(MMap, i, j, info+0, (nb>>2)&(1))
 }
 
-func IsInFourGroup(MMap *[Map_size*Map_size + Nb_Players](uint64), i, j int) bool {
-	return MMap[(i*Map_size)+j]&(1<<INFOURGROUP) != 0
+func IsChecked(MMap *[Map_size*Map_size + Nb_Players](uint64), i, j int) bool {
+	return MMap[(i*Map_size)+j]&(1<<ISCHECKED) != 0
 }
 
-func SetInFourGroup(MMap *[Map_size*Map_size + Nb_Players](uint64), i, j int, val bool) {
-	if val != IsInFourGroup(MMap, i, j) {
+func SetChecked(MMap *[Map_size*Map_size + Nb_Players](uint64), i, j int, val bool) {
+	if val != IsChecked(MMap, i, j) {
 		if val {
-			MMap[(i*Map_size)+j] |= (1 << INFOURGROUP)
+			MMap[(i*Map_size)+j] |= (1 << ISCHECKED)
 		} else {
-			MMap[(i*Map_size)+j] &^= (1 << INFOURGROUP)
+			MMap[(i*Map_size)+j] &^= (1 << ISCHECKED)
 		}
 	}
 }
