@@ -197,7 +197,20 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 		}()
 		var iaStone window.Stone
 		pane.GameState = "IA_Turn"
-		iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.MonteCarlo(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2)
+		ch := make(chan arbitre.Coor, 10)
+		for i := 0; i < (cap(ch)); i++ {
+			go func(chan arbitre.Coor) {
+				var c arbitre.Coor
+				c.X, c.Y = ia_monte_carlo.MonteCarlo(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, cap(ch)*10)
+				ch <- c
+			}(ch)
+		}
+		for i := 0; i < cap(ch); i++ {
+			println(i)
+			c := <-ch
+			iaStone.Infos.Ipos, iaStone.Infos.Jpos = c.X, c.Y
+		}
+		println("out")
 		pane.GameState = "gameOn"
 		PlayTurn(pane, game, &bmap.Map, &iaStone)
 	}

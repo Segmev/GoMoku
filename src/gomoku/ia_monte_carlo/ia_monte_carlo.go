@@ -109,7 +109,7 @@ func findRange() {
 	}
 }
 
-func MonteCarlo(board *[363]uint64, rule1, rule2 bool) (int, int) {
+func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int) (int, int) {
 	var cpt, a, b, break_cpt, i int
 
 	win := 0
@@ -118,7 +118,7 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool) (int, int) {
 	rand.Seed(time.Now().Unix())
 	initResTab()
 	findRange()
-	for cpt = 0; cpt != 3000; cpt++ {
+	for cpt = 0; cpt != test_nb; cpt++ {
 		myMemset()
 		_board = *board
 		for i = 0; i < 10; i++ {
