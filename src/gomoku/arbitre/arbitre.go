@@ -183,8 +183,12 @@ func UpdateStone(Map *[363](uint64), x, y int, color bool) {
 					} else {
 						bmap.SetNbOppoAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
 							!bmap.IsWhite(Map, x, y), i, j)))
-						if bmap.GetNbO(Map, x, y, 1+j, 1+i) > 0 {
+						if bmap.GetNbO(Map, x, y, 1+j, 1+i) > 0 && bmap.IsChecked(Map, x, y) {
 							totOpp += bmap.GetNbO(Map, x, y, 1+j, 1+i)
+							bmap.SetChecked(Map, x, y, true)
+							tmpx = 1 + j
+							tmpy = i + i
+							check = true
 						}
 					}
 					bmap.SetNbTeamAt(Map, x, y, 1, 1, uint64(totTeam))
@@ -193,6 +197,7 @@ func UpdateStone(Map *[363](uint64), x, y int, color bool) {
 			}
 		}
 	}
+	bmap.ResetCheck(Map)
 }
 
 func UpdateInfos(Map *[363](uint64), color bool) {
