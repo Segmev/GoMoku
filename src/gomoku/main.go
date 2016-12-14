@@ -15,6 +15,8 @@ import (
 	"github.com/gtalent/starfish/input"
 )
 
+var custom_nbr int
+
 type Coor struct {
 	X, Y, Val int
 }
@@ -199,12 +201,16 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 		pane.GameState = "IA_Turn"
 
 		//TON CODE HERE
-		if window.Lvl == 0 {
-			iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 500, bmap.Map)
-		} else if window.Lvl == 1 {
-			iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 750, bmap.Map)
-		} else if window.Lvl == 2 {
-			iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 1000, bmap.Map)
+		if custom_nbr <= 0 {
+			if window.Lvl == 0 {
+				iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 500, bmap.Map)
+			} else if window.Lvl == 1 {
+				iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 750, bmap.Map)
+			} else if window.Lvl == 2 {
+				iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 1000, bmap.Map)
+			}
+		} else {
+			iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, custom_nbr, bmap.Map)
 		}
 		bmap.ResetCheck(&bmap.Map)
 		pane.GameState = "gameOn"
@@ -214,6 +220,11 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 
 func main() {
 	ia_monte_carlo.Start(false)
+	if len(os.Args) > 0 {
+		custom_nbr, _ = strconv.Atoi(os.Args[1])
+	} else {
+		custom_nbr = -1
+	}
 	if checkFiles() && launchWindow(900, 640) {
 		go http.ListenAndServe(":8080", http.DefaultServeMux)
 		gfx.Main()
