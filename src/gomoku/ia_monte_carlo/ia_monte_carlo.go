@@ -72,7 +72,7 @@ func CheckWin(rule bool, color bool) bool {
 	return false
 }
 
-func refreshTab(value int, tmpTab *[361]int, tmpTab2 *[361]int) { //, x, y int) {
+func refreshTab(value int, tmpTab *[361]int, tmpTab2 *[361]int) {
 	mute.Lock()
 	if value == 1 {
 		for y := 0; y < 361; y++ {
@@ -132,57 +132,44 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int, ch chan bool
 	var tmpTab [361]int
 	var tmpTab2 [361]int
 	var empty [361]int
-	// var first bool
-	// var tmpa int
-	// var tmpb int
 
-	win := 0
-	loose := 0
 	iCheck := 0
 	for cpt = 0; cpt != test_nb; cpt++ {
 		tmpTab = empty
 		tmpTab2 = empty
 		_board = *board
-		// first = true
 		for i = 0; i < 10; i++ {
 			break_cpt = 0
 			a = rand.Int() % (xMax - xMin)
-			b = rand.Int() % (xMax - xMin)
-			for !ApplyRules(&_board, a+xMin, b+xMin, myColor, rule1, rule2) && break_cpt < 9 {
+			b = rand.Int() % (yMax - yMin)
+			for !ApplyRules(&_board, a+xMin, b+yMin, myColor, rule1, rule2) && break_cpt < 9 {
 				a = rand.Int() % (xMax - xMin)
-				b = rand.Int() % (xMax - xMin)
+				b = rand.Int() % (yMax - yMin)
 				break_cpt++
 			}
 			if break_cpt == 9 {
 				break
 			}
-			// if first {
-			// 	tmpa = a
-			// 	tmpb = b
-			// 	first = false
-			// }
-			tmpTab[(b+xMin)*19+(a+xMin)] = 1
+			tmpTab[(b+yMin)*19+(a+xMin)] = 1
 			if CheckWin(rule1, myColor) {
-				refreshTab(1, &tmpTab, &tmpTab2) //, tmpa, tmpb)
-				win += 1
+				refreshTab(1, &tmpTab, &tmpTab2)
 				i = 9
 				break
 			}
 			break_cpt = 0
 			a = rand.Int() % (xMax - xMin)
-			b = rand.Int() % (xMax - xMin)
-			for !ApplyRules(&_board, a+xMin, b+xMin, hisColor, rule1, rule2) && break_cpt < 9 {
+			b = rand.Int() % (yMax - yMin)
+			for !ApplyRules(&_board, a+xMin, b+yMin, hisColor, rule1, rule2) && break_cpt < 9 {
 				a = rand.Int() % (xMax - xMin)
-				b = rand.Int() % (xMax - xMin)
+				b = rand.Int() % (yMax - yMin)
 				break_cpt++
 			}
 			if break_cpt == 9 {
 				break
 			}
-			tmpTab2[(b+xMin)*19+(a+xMin)] = 1
+			tmpTab2[(b+yMin)*19+(a+xMin)] = 1
 			if CheckWin(rule1, hisColor) {
-				refreshTab(-1, &tmpTab, &tmpTab2) //, tmpa, tmpb)
-				loose += 1
+				refreshTab(-1, &tmpTab, &tmpTab2)
 				i = 9
 				break
 			}
@@ -192,18 +179,6 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int, ch chan bool
 		}
 	}
 	ch <- true
-	// if iCheck == cpt {
-	// 	a = rand.Int() % (xMax - xMin)
-	// 	b = rand.Int() % (xMax - xMin)
-	// 	for !(ApplyRules(&tmpboard, a+xMin, b+xMin, myColor, rule1, rule2)) {
-	// 		a = rand.Int() % (xMax - xMin)
-	// 		b = rand.Int() % (xMax - xMin)
-	// 	}
-	// 	println("Return Par Défaut")
-	// 	return a, b, -1000
-	// } else {
-	// 	return findAndApply(&tmpboard, rule1, rule2)
-	// }
 }
 
 func findAndApply(board *[363]uint64, rule1, rule2 bool) (int, int) {
