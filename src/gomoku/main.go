@@ -220,7 +220,7 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 
 func main() {
 	ia_monte_carlo.Start(false)
-	if len(os.Args) > 0 {
+	if len(os.Args) > 1 {
 		custom_nbr, _ = strconv.Atoi(os.Args[1])
 	} else {
 		custom_nbr = -1
