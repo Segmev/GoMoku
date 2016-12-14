@@ -142,7 +142,7 @@ func launchWindow(h, w int) bool {
 }
 
 func PlayTurn(pane *window.Drawer, game *arbitre.GomokuGame, Map *[363]uint64, st *window.Stone) bool {
-	if !arbitre.ApplyRules(&bmap.Map, st.Infos.Ipos, st.Infos.Jpos, game.Turn, pane.OptionsRes.Op1, pane.OptionsRes.Op2) {
+	if !arbitre.ApplyRules(&bmap.Map, st.Infos.Ipos, st.Infos.Jpos, game.Turn, pane.OptionsRes.Op1, pane.OptionsRes.Op2, true) {
 		pane.BoardRes.BadX, pane.BoardRes.BadY = st.X, st.Y
 		return false
 	}

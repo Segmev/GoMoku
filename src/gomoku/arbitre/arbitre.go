@@ -160,24 +160,35 @@ func ResetTeamInfos(Map *[363]uint64, color bool) {
 
 func UpdateStone(Map *[363](uint64), x, y int, color bool) {
 	totOpp, totTeam := 0, 0
-	for i := -1; i <= 1; i++ {
-		for j := -1; j <= 1; j++ {
-			if !(i == 0 && j == 0) {
-				if bmap.IsWhite(Map, x, y) == color {
-					bmap.SetNbTeamAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
-						bmap.IsWhite(Map, x, y), i, j)))
-					if bmap.GetNbT(Map, x, y, 1+j, 1+i) > 0 {
-						totTeam += bmap.GetNbT(Map, x, y, 1+j, 1+i)
+	tmpx := x
+	tmpy := y
+	check := true
+	for check {
+		check = false
+		x = tmpx
+		y = tmpy
+		for i := -1; i <= 1; i++ {
+			for j := -1; j <= 1; j++ {
+				if !(i == 0 && j == 0) {
+					if bmap.IsWhite(Map, x, y) == color {
+						bmap.SetNbTeamAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
+							bmap.IsWhite(Map, x, y), i, j)))
+						if bmap.GetNbT(Map, x, y, 1+j, 1+i) > 0 {
+							totTeam += bmap.GetNbT(Map, x, y, 1+j, 1+i)
+							tmpx = 1 + j
+							tmpy = 1 + i
+							check = true
+						}
+					} else {
+						bmap.SetNbOppoAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
+							!bmap.IsWhite(Map, x, y), i, j)))
+						if bmap.GetNbO(Map, x, y, 1+j, 1+i) > 0 {
+							totOpp += bmap.GetNbO(Map, x, y, 1+j, 1+i)
+						}
 					}
-				} else {
-					bmap.SetNbOppoAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
-						!bmap.IsWhite(Map, x, y), i, j)))
-					if bmap.GetNbO(Map, x, y, 1+j, 1+i) > 0 {
-						totOpp += bmap.GetNbO(Map, x, y, 1+j, 1+i)
-					}
+					bmap.SetNbTeamAt(Map, x, y, 1, 1, uint64(totTeam))
+					bmap.SetNbOppoAt(Map, x, y, 1, 1, uint64(totOpp))
 				}
-				bmap.SetNbTeamAt(Map, x, y, 1, 1, uint64(totTeam))
-				bmap.SetNbOppoAt(Map, x, y, 1, 1, uint64(totOpp))
 			}
 		}
 	}
@@ -392,13 +403,17 @@ func CheckBreakableAlign(Map *[363]uint64, fl [][5]Coor, color bool) bool {
 	return false
 }
 
-func ApplyRules(Map *[363](uint64), i, j int, color bool, rule1, rule2 bool) bool {
+func ApplyRules(Map *[363](uint64), i, j int, color bool, rule1, rule2 bool, check bool) bool {
 	bmap.SetColor(Map, i, j, color)
 	if rule2 && ThreeBlockNear(Map, i, j, color) == true {
 		return false
 	}
 	bmap.SetVisibility(Map, i, j, true)
 	TakeTwoStones(Map, i, j, color)
-	UpdateInfos(Map, color)
+	if check {
+		UpdateInfos(Map, color)
+	} else {
+		UpdateStone(Map, i, j, color)
+	}
 	return true
 }

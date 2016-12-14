@@ -29,7 +29,7 @@ func ApplyRules(Map *[363](uint64), i, j int, color bool, rule1, rule2 bool) boo
 	if bmap.IsVisible(Map, i, j) {
 		return false
 	}
-	return arbitre.ApplyRules(Map, i, j, color, rule1, rule2)
+	return arbitre.ApplyRules(Map, i, j, color, rule1, rule2, false)
 }
 
 func initResTab() {
