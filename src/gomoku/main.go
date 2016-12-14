@@ -200,11 +200,11 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 
 		//TON CODE HERE
 		if window.Lvl == 0 {
-			iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 250, bmap.Map)
-		} else if window.Lvl == 1 {
 			iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 500, bmap.Map)
-		} else if window.Lvl == 2 {
+		} else if window.Lvl == 1 {
 			iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 750, bmap.Map)
+		} else if window.Lvl == 2 {
+			iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 1000, bmap.Map)
 		}
 		bmap.ResetCheck(&bmap.Map)
 		pane.GameState = "gameOn"
