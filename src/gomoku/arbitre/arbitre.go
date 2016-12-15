@@ -263,7 +263,7 @@ func UpdateThreeGroups(Map *[363]uint64, x, y int, color bool) int {
 					}
 					Ci, Cj = augmentPos(Ci), augmentPos(Cj)
 				}
-				if count == 2 && !IsStoneAtPos(Map, x+Ci, y+Cj) {
+				if count == 2 && (!IsStoneAtPos(Map, x+Ci, y+Cj) || !IsStoneAtPos(Map, x+i*2, y+j*2)) {
 					cpt++
 				}
 			}
