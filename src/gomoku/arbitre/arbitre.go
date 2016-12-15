@@ -239,14 +239,14 @@ func UpdateThreeGroups(Map *[363]uint64, x, y int, color bool) int {
 	for i := -1; i <= 1; i++ {
 		for j := -1; j <= 1; j++ {
 			if !(i == 0 && j == 0) {
-				count, endTestC := 0, 2
+				count, endTestC := 0, 3
 				if IsStoneAtPos(Map, x-i, y-j) {
 					if bmap.IsWhite(Map, x-i, y-j) == color &&
-						!IsStoneAtPos(Map, x-i-i, y+j+j) &&
+						!IsStoneAtPos(Map, x-i-i, y-j-j) &&
 						tab[i+1][j+1] == 0 {
 						count++
 						tab[-i+1][-j+1] = 1
-						endTestC = 1
+						endTestC = 2
 					} else {
 						endTestC = -1
 					}
@@ -274,6 +274,7 @@ func ThreeBlockNear(Map *[363]uint64, x, y int, color bool) bool {
 	if UpdateThreeGroups(Map, x, y, color) >= 2 {
 		return true
 	}
+	bmap.SetColor(Map, x, y, color)
 	bmap.SetVisibility(Map, x, y, true)
 	for i := -1; i <= 1; i++ {
 		for j := -1; j <= 1; j++ {
@@ -282,7 +283,7 @@ func ThreeBlockNear(Map *[363]uint64, x, y int, color bool) bool {
 				for c := 0; c <= 2; c++ {
 					if IsStoneAtPos(Map, x+a, y+b) &&
 						color == bmap.IsWhite(Map, x+a, y+b) {
-						if (UpdateThreeGroups(Map, x+a, y+b, color)) == 2 {
+						if (UpdateThreeGroups(Map, x+a, y+b, color)) >= 2 {
 							bmap.ResetStone(Map, x, y)
 							return true
 						}
