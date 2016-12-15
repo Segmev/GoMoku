@@ -241,14 +241,14 @@ func UpdateThreeGroups(Map *[363]uint64, x, y int, color bool) int {
 	for i := -1; i <= 1; i++ {
 		for j := -1; j <= 1; j++ {
 			if !(i == 0 && j == 0) {
-				count, endTestC := 0, 3
+				count, endTestC := 0, 2
 				if IsStoneAtPos(Map, x-i, y-j) {
 					if bmap.IsWhite(Map, x-i, y-j) == color &&
 						!IsStoneAtPos(Map, x-i-i, y-j-j) &&
 						tab[i+1][j+1] == 0 {
 						count++
 						tab[-i+1][-j+1] = 1
-						endTestC = 2
+						endTestC = 1
 					} else {
 						endTestC = -1
 					}
@@ -263,7 +263,7 @@ func UpdateThreeGroups(Map *[363]uint64, x, y int, color bool) int {
 					}
 					Ci, Cj = augmentPos(Ci), augmentPos(Cj)
 				}
-				if count == 2 {
+				if count == 2 && !IsStoneAtPos(Map, x+Ci, y+Cj) {
 					cpt++
 				}
 			}
