@@ -66,6 +66,9 @@ func setAtPos(MMap *[Map_size*Map_size + Nb_Players](uint64), i, j int, infos ui
 
 func SetNbOppoAt(MMap *[Map_size*Map_size + Nb_Players](uint64), i, j int, posx, posy int, nb uint64) {
 	var info uint = uint(TabOppo[posx][posy])
+	if nb > 7 {
+		nb = 7
+	}
 	setAtPos(MMap, i, j, info+2, (nb>>0)&(1))
 	setAtPos(MMap, i, j, info+1, (nb>>1)&(1))
 	setAtPos(MMap, i, j, info+0, (nb>>2)&(1))
@@ -73,6 +76,9 @@ func SetNbOppoAt(MMap *[Map_size*Map_size + Nb_Players](uint64), i, j int, posx,
 
 func SetNbTeamAt(MMap *[Map_size*Map_size + Nb_Players](uint64), i, j int, posx, posy int, nb uint64) {
 	var info uint = uint(TabTeam[posx][posy])
+	if nb > 7 {
+		nb = 7
+	}
 	setAtPos(MMap, i, j, info+2, (nb>>0)&(1))
 	setAtPos(MMap, i, j, info+1, (nb>>1)&(1))
 	setAtPos(MMap, i, j, info+0, (nb>>2)&(1))

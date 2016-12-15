@@ -193,17 +193,19 @@ func UpdateInfos(Map *[363](uint64), color bool) {
 	for x := 0; x <= 18; x++ {
 		for y := 0; y <= 18; y++ {
 			totOpp, totTeam := 0, 0
-			for i := -1; i <= 1; i++ {
-				for j := -1; j <= 1; j++ {
-					if !(i == 0 && j == 0) {
-						if bmap.IsWhite(Map, x, y) == color {
-							bmap.SetNbTeamAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
-								bmap.IsWhite(Map, x, y), i, j)))
-							totTeam += bmap.GetNbT(Map, x, y, 1+j, 1+i)
-						} else {
-							bmap.SetNbOppoAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
-								!bmap.IsWhite(Map, x, y), i, j)))
-							totOpp += bmap.GetNbO(Map, x, y, 1+j, 1+i)
+			if IsStoneAtPos(Map, x, y) {
+				for i := -1; i <= 1; i++ {
+					for j := -1; j <= 1; j++ {
+						if !(i == 0 && j == 0) {
+							if bmap.IsWhite(Map, x, y) == color {
+								bmap.SetNbTeamAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
+									bmap.IsWhite(Map, x, y), i, j)))
+								totTeam += bmap.GetNbT(Map, x, y, 1+j, 1+i)
+							} else {
+								bmap.SetNbOppoAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
+									!bmap.IsWhite(Map, x, y), i, j)))
+								totOpp += bmap.GetNbO(Map, x, y, 1+j, 1+i)
+							}
 						}
 					}
 				}
@@ -390,8 +392,8 @@ func CheckWinAl(Map *[363](uint64), color bool, FiveAligned *[][5]Coor) {
 				if bmap.GetNbT(Map, x, y, 0, 2) >= 4 {
 					fillAlignedArray(FiveAligned, x, y, 1, -1)
 				}
-				for j := 1; j <= 2; j++ {
-					for i := 1; i <= 2; i++ {
+				for j := 0; j <= 2; j++ {
+					for i := 0; i <= 2; i++ {
 						if !(i == 1 && j == 1) && bmap.GetNbT(Map, x, y, i, j) >= 4 {
 							fillAlignedArray(FiveAligned, x, y, i-1, j-1)
 						}
@@ -433,10 +435,24 @@ func CheckBreakableAlign(Map *[363]uint64, fl [][5]Coor, color bool) bool {
 		}
 		tot += cpt
 	}
+	println(tot)
 	if tot < len(fl) {
 		return true
 	}
+
 	return false
+}
+
+func disp(Map *[363](uint64)) {
+	for x := 0; x <= 18; x++ {
+		for y := 0; y <= 18; y++ {
+			print(bmap.GetValStones(Map, y, x, bmap.MT), " ")
+		}
+		println()
+	}
+	println()
+	println()
+	println()
 }
 
 func ApplyRules(Map *[363](uint64), i, j int, color bool, rule1, rule2 bool, check bool) bool {
@@ -448,6 +464,7 @@ func ApplyRules(Map *[363](uint64), i, j int, color bool, rule1, rule2 bool, che
 	TakeTwoStones(Map, i, j, color)
 	if check {
 		UpdateInfos(Map, color)
+		disp(Map)
 	} else {
 		UpdateStone(Map, i, j, color)
 	}
