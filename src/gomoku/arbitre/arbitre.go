@@ -264,29 +264,30 @@ func ThreeBlockNear(Map *[363]uint64, x, y int, color bool) bool {
 
 func updateThreeGroupLoop(Map *[363]uint64, color bool, x, y, dirI, dirJ, cptHowManyThreeGroups int) int {
 	cpt := 0
-	if !(dirI == 0 && dirJ == 0) {
-		i, j := dirI, dirJ
-		end := 2
-		if (i <= 0 && j <= 0) || (i == -1 && j == 1) {
-			if IsStoneAtPos(Map, x-dirI, y-dirJ) && color == bmap.IsWhite(Map, x-dirI, y-dirJ) {
+	i, j := dirI, dirJ
+	end := 3
+	if IsStoneAtPos(Map, x-dirI, y-dirJ) {
+		if color == bmap.IsWhite(Map, x-dirI, y-dirJ) &&
+			!IsStoneAtPos(Map, x-dirI-dirI, y-dirJ-dirJ) {
+			cpt++
+			end = 2
+		} else {
+			return cptHowManyThreeGroups
+		}
+	}
+	for c := 0; c <= end; c++ {
+		if IsStoneAtPos(Map, x+i, y+j) {
+			if color == bmap.IsWhite(Map, x+i, y+j) {
 				cpt++
-				end = 1
+			} else {
+				c = 3
+				cpt = 0
 			}
 		}
-		for c := 0; c <= end; c++ {
-			if IsStoneAtPos(Map, x+i, y+j) {
-				if color == bmap.IsWhite(Map, x+i, y+j) {
-					cpt++
-				} else {
-					c = 3
-					cpt = 0
-				}
-			}
-			i, j = augmentPos(i), augmentPos(j)
-		}
-		if cpt == 2 && !IsStoneAtPos(Map, i+x, j+y) {
-			cptHowManyThreeGroups++
-		}
+		i, j = augmentPos(i), augmentPos(j)
+	}
+	if cpt == 2 && !IsStoneAtPos(Map, i+x, j+y) {
+		cptHowManyThreeGroups++
 	}
 	return cptHowManyThreeGroups
 }
@@ -295,10 +296,13 @@ func UpdateThreeGroups(Map *[363]uint64, x, y int, color bool) bool {
 	cptHowManyThreeGroups := 0
 	for dirI := -1; dirI <= 1; dirI++ {
 		for dirJ := -1; dirJ <= 1; dirJ++ {
-			cptHowManyThreeGroups =
-				updateThreeGroupLoop(Map, color, x, y, dirI, dirJ, cptHowManyThreeGroups)
+			if !(dirI == 0 && dirJ == 0) {
+				cptHowManyThreeGroups =
+					updateThreeGroupLoop(Map, color, x, y, dirI, dirJ, cptHowManyThreeGroups)
+			}
 		}
 	}
+	println(cptHowManyThreeGroups)
 	return cptHowManyThreeGroups >= 2
 	// cptHowManyThreeGroups, cptFourGroups =
 	// 	updateThreeGroupLoop(Map, color, x, y, -1, 1, cptHowManyThreeGroups, cptFourGroups)
