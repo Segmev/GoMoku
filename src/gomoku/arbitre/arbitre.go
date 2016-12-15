@@ -233,90 +233,127 @@ func HasTakenEnoughStones(Map *[363]uint64) (bool, bool) {
 	return false, false
 }
 
+func UpdateThreeGroups(Map *[363]uint64, x, y int, color bool) int {
+	var tab = [][]int{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}
+	var cpt int
+	for i := -1; i <= 1; i++ {
+		for j := -1; j <= 1; j++ {
+			if !(i == 0 && j == 0) {
+				count, endTestC := 0, 2
+				if IsStoneAtPos(Map, x-i, y-j) {
+					if bmap.IsWhite(Map, x-i, y-j) == color &&
+						!IsStoneAtPos(Map, x-i-i, y+j+j) &&
+						tab[i+1][j+1] == 0 {
+						count++
+						tab[-i+1][-j+1] = 1
+						endTestC = 1
+					} else {
+						endTestC = -1
+					}
+				}
+				Ci, Cj := i, j
+				for c := 0; c <= endTestC; c++ {
+					if IsStoneAtPos(Map, x+Ci, y+Cj) && bmap.IsWhite(Map, x+Ci, y+Cj) == color {
+						count++
+					} else if IsStoneAtPos(Map, x+Ci, y+Cj) {
+						count = 0
+						c = 2
+					}
+					Ci, Cj = augmentPos(Ci), augmentPos(Cj)
+				}
+				if count == 2 {
+					cpt++
+				}
+			}
+		}
+	}
+	return cpt
+}
+
 func ThreeBlockNear(Map *[363]uint64, x, y int, color bool) bool {
-	if UpdateThreeGroups(Map, x, y, color) {
+	if UpdateThreeGroups(Map, x, y, color) >= 2 {
 		return true
 	}
-	ret := false
 	bmap.SetVisibility(Map, x, y, true)
-	for i := -1; i <= 0; i++ {
-		for j := -1; j <= 0; j++ {
+	for i := -1; i <= 1; i++ {
+		for j := -1; j <= 1; j++ {
 			if !(i == 0 && j == 0) {
 				a, b := i, j
 				for c := 0; c <= 2; c++ {
 					if IsStoneAtPos(Map, x+a, y+b) &&
 						color == bmap.IsWhite(Map, x+a, y+b) {
-						if UpdateThreeGroups(Map, x+a, y+b, color) {
+						if (UpdateThreeGroups(Map, x+a, y+b, color)) == 2 {
 							bmap.ResetStone(Map, x, y)
-							ret = true
+							return true
 						}
-						a, b = augmentPos(a), augmentPos(b)
 					} else if IsStoneAtPos(Map, x+a, y+b) &&
 						color != bmap.IsWhite(Map, x+a, y+b) {
 						c = 2
 					}
+					a, b = augmentPos(a), augmentPos(b)
 				}
 			}
 		}
 	}
-	return ret
+	return false
 }
 
-func updateThreeGroupLoop(Map *[363]uint64, color bool, x, y, dirI, dirJ, cptHowManyThreeGroups int) int {
-	cpt := 0
-	i, j := dirI, dirJ
-	end := 3
-	if IsStoneAtPos(Map, x-dirI, y-dirJ) {
-		if color == bmap.IsWhite(Map, x-dirI, y-dirJ) &&
-			!IsStoneAtPos(Map, x-dirI-dirI, y-dirJ-dirJ) {
-			cpt++
-			end = 2
-		} else {
-			return cptHowManyThreeGroups
-		}
-	}
-	for c := 0; c <= end; c++ {
-		if IsStoneAtPos(Map, x+i, y+j) {
-			if color == bmap.IsWhite(Map, x+i, y+j) {
-				cpt++
-			} else {
-				c = 3
-				cpt = 0
-			}
-		}
-		i, j = augmentPos(i), augmentPos(j)
-	}
-	if cpt == 2 && !IsStoneAtPos(Map, i+x, j+y) {
-		cptHowManyThreeGroups++
-	}
-	return cptHowManyThreeGroups
-}
-
-func UpdateThreeGroups(Map *[363]uint64, x, y int, color bool) bool {
-	cptHowManyThreeGroups := 0
-	for dirI := -1; dirI <= 1; dirI++ {
-		for dirJ := -1; dirJ <= 1; dirJ++ {
-			if !(dirI == 0 && dirJ == 0) {
-				cptHowManyThreeGroups =
-					updateThreeGroupLoop(Map, color, x, y, dirI, dirJ, cptHowManyThreeGroups)
-			}
-		}
-	}
-	println(cptHowManyThreeGroups)
-	return cptHowManyThreeGroups >= 2
-	// cptHowManyThreeGroups, cptFourGroups =
-	// 	updateThreeGroupLoop(Map, color, x, y, -1, 1, cptHowManyThreeGroups, cptFourGroups)
-	// if cptFourGroups > 0 {
-	// 	bmap.SetInFourGroup(Map, x, y, true)
-	// } else {
-	// 	bmap.SetInFourGroup(Map, x, y, false)
-	// }
-	// if cptHowManyThreeGroups > 0 {
-	// 	bmap.SetInThreeGroup(Map, x, y, true)
-	// } else {
-	// 	bmap.SetInThreeGroup(Map, x, y, false)
-	// }
-}
+//
+// func updateThreeGroupLoop(Map *[363]uint64, color bool, x, y, dirI, dirJ, cptHowManyThreeGroups int) int {
+// 	cpt := 0
+// 	i, j := dirI, dirJ
+// 	end := 3
+// 	if IsStoneAtPos(Map, x-dirI, y-dirJ) {
+// 		if color == bmap.IsWhite(Map, x-dirI, y-dirJ) &&
+// 			!IsStoneAtPos(Map, x-dirI-dirI, y-dirJ-dirJ) {
+// 			cpt++
+// 			end = 2
+// 		} else {
+// 			return cptHowManyThreeGroups
+// 		}
+// 	}
+// 	for c := 0; c <= end; c++ {
+// 		if IsStoneAtPos(Map, x+i, y+j) {
+// 			if color == bmap.IsWhite(Map, x+i, y+j) {
+// 				cpt++
+// 			} else {
+// 				c = end
+// 				cpt = 0
+// 			}
+// 		}
+// 		i, j = augmentPos(i), augmentPos(j)
+// 	}
+// 	if cpt == 2 && !IsStoneAtPos(Map, i+x, j+y) {
+// 		cptHowManyThreeGroups++
+// 	}
+// 	return cptHowManyThreeGroups
+// }
+//
+// func UpdateThreeGroups(Map *[363]uint64, x, y int, color bool) bool {
+// 	cptHowManyThreeGroups := 0
+// 	for dirI := -1; dirI <= 1; dirI++ {
+// 		for dirJ := -1; dirJ <= 1; dirJ++ {
+// 			if !(dirI == 0 && dirJ == 0) {
+// 				cptHowManyThreeGroups =
+// 					updateThreeGroupLoop(Map, color, x, y, dirI, dirJ, cptHowManyThreeGroups)
+// 			}
+// 		}
+// 	}
+// 	println(cptHowManyThreeGroups)
+// 	return cptHowManyThreeGroups >= 2
+// 	// cptHowManyThreeGroups, cptFourGroups =
+// 	// 	updateThreeGroupLoop(Map, color, x, y, -1, 1, cptHowManyThreeGroups, cptFourGroups)
+// 	// if cptFourGroups > 0 {
+// 	// 	bmap.SetInFourGroup(Map, x, y, true)
+// 	// } else {
+// 	// 	bmap.SetInFourGroup(Map, x, y, false)
+// 	// }
+// 	// if cptHowManyThreeGroups > 0 {
+// 	// 	bmap.SetInThreeGroup(Map, x, y, true)
+// 	// } else {
+// 	// 	bmap.SetInThreeGroup(Map, x, y, false)
+// 	// }
+// }
 
 func IsDraw(pane *window.Drawer, game *GomokuGame) {
 	state := true
