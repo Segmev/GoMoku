@@ -389,9 +389,9 @@ func CheckWinAl(Map *[363](uint64), color bool, FiveAligned *[][5]Coor) {
 	for x := 0; x <= 18; x++ {
 		for y := 0; y <= 18; y++ {
 			if bmap.IsVisible(Map, x, y) && bmap.IsWhite(Map, x, y) == color && bmap.GetValStones(Map, x, y, bmap.MT) >= 4 {
-				if bmap.GetNbT(Map, x, y, 0, 2) >= 4 {
-					fillAlignedArray(FiveAligned, x, y, 1, -1)
-				}
+				// if bmap.GetNbT(Map, x, y, 2, 0) >= 4 {
+				// 	fillAlignedArray(FiveAligned, x, y, 1, -1)
+				// }
 				for j := 0; j <= 2; j++ {
 					for i := 0; i <= 2; i++ {
 						if !(i == 1 && j == 1) && bmap.GetNbT(Map, x, y, i, j) >= 4 {
@@ -435,7 +435,6 @@ func CheckBreakableAlign(Map *[363]uint64, fl [][5]Coor, color bool) bool {
 		}
 		tot += cpt
 	}
-	println(tot)
 	if tot < len(fl) {
 		return true
 	}
@@ -464,7 +463,7 @@ func ApplyRules(Map *[363](uint64), i, j int, color bool, rule1, rule2 bool, che
 	TakeTwoStones(Map, i, j, color)
 	if check {
 		UpdateInfos(Map, color)
-		//disp(Map)
+		disp(Map)
 	} else {
 		UpdateStone(Map, i, j, color)
 	}
