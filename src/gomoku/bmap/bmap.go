@@ -1,3 +1,4 @@
+// Bmap is a set of functions for getting and setting game information
 package bmap
 
 const Map_size = 19

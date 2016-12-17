@@ -1,26 +1,22 @@
 package arbitre
 
 import (
+	"fmt"
 	"gomoku/bmap"
 	"gomoku/window"
 	"strconv"
+	"time"
 )
 
 type Coor struct {
 	X, Y int
 }
 
-type Player struct {
-	Name        string
-	Points      int
-	FiveAligned [][5]*window.Stone
-}
-
 type GomokuGame struct {
-	Players  [2]Player
-	Turn     bool
-	End      int
-	GameType bool
+	PlayersScore [2]int
+	Turn         bool
+	End          int
+	GameType     bool
 }
 
 var XMin, XMax, YMin, YMax int
@@ -36,12 +32,10 @@ func (game *GomokuGame) Restart(pane *window.Drawer) bool {
 	pane.EndRes.DrawEnd = false
 	bmap.SetPlayerTakenStones(&bmap.Map, true, 0)
 	bmap.SetPlayerTakenStones(&bmap.Map, false, 0)
-	pane.BoardRes.Wscore = pane.Font.Write(strconv.Itoa(game.Players[0].Points))
-	pane.BoardRes.Bscore = pane.Font.Write(strconv.Itoa(game.Players[1].Points))
+	pane.BoardRes.Wscore = pane.Font.Write(strconv.Itoa(int(bmap.Map[361])))
+	pane.BoardRes.Bscore = pane.Font.Write(strconv.Itoa(int(bmap.Map[362])))
 	pane.GameState = "menu"
 	pane.BoardRes.BadX, pane.BoardRes.BadY = 0, 0
-	// rand.Seed(time.Now().UTC().UnixNano())
-	// game.Turn = rand.Uint32()%2 == 0
 	game.Turn = true
 	pane.Turn = game.Turn
 	return true
@@ -103,7 +97,6 @@ func CheckAlignement(Map *[363](uint64), x, y, i, j, lim, ite int, del bool) boo
 			if CheckAlignement(Map, x, y, i, j, lim, ite+1, del) {
 				if del {
 					bmap.ResetStone(Map, x+iniI, y+iniJ)
-					//bmap.SetVisibility(Map, x+iniI, y+iniJ, false)
 				}
 				return true
 			}
@@ -186,34 +179,31 @@ func UpdateStone(Map *[363](uint64), x, y int, color bool) {
 
 }
 
-//	bmap.ResetCheck(Map)
-
 func UpdateInfos(Map *[363](uint64), color bool) {
-	//ResetTeamInfos(dat, color)
 	for x := 0; x <= 18; x++ {
 		for y := 0; y <= 18; y++ {
-			//start := time.Now()
+			start := time.Now()
 			totOpp, totTeam := 0, 0
 			if IsStoneAtPos(Map, x, y) {
 				for i := -1; i <= 1; i++ {
 					for j := -1; j <= 1; j++ {
 						if !(i == 0 && j == 0) {
-							//if bmap.IsWhite(Map, x, y) == color {
-							bmap.SetNbTeamAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
-								bmap.IsWhite(Map, x, y), i, j)))
-							totTeam += bmap.GetNbT(Map, x, y, 1+j, 1+i)
-							//} else {
-							bmap.SetNbOppoAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
-								!bmap.IsWhite(Map, x, y), i, j)))
-							totOpp += bmap.GetNbO(Map, x, y, 1+j, 1+i)
-							//}
+							if bmap.IsWhite(Map, x, y) == color {
+								bmap.SetNbTeamAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
+									bmap.IsWhite(Map, x, y), i, j)))
+								totTeam += bmap.GetNbT(Map, x, y, 1+j, 1+i)
+							} else {
+								bmap.SetNbOppoAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
+									!bmap.IsWhite(Map, x, y), i, j)))
+								totOpp += bmap.GetNbO(Map, x, y, 1+j, 1+i)
+							}
 						}
 					}
 				}
 				bmap.SetNbTeamAt(Map, x, y, 1, 1, uint64(totTeam))
 				bmap.SetNbOppoAt(Map, x, y, 1, 1, uint64(totOpp))
 			}
-			//	fmt.Println("->", time.Since(start))
+			fmt.Println("->", time.Since(start))
 		}
 	}
 }
@@ -303,63 +293,6 @@ func ThreeBlockNear(Map *[363]uint64, x, y int, color bool) bool {
 	return false
 }
 
-//
-// func updateThreeGroupLoop(Map *[363]uint64, color bool, x, y, dirI, dirJ, cptHowManyThreeGroups int) int {
-// 	cpt := 0
-// 	i, j := dirI, dirJ
-// 	end := 3
-// 	if IsStoneAtPos(Map, x-dirI, y-dirJ) {
-// 		if color == bmap.IsWhite(Map, x-dirI, y-dirJ) &&
-// 			!IsStoneAtPos(Map, x-dirI-dirI, y-dirJ-dirJ) {
-// 			cpt++
-// 			end = 2
-// 		} else {
-// 			return cptHowManyThreeGroups
-// 		}
-// 	}
-// 	for c := 0; c <= end; c++ {
-// 		if IsStoneAtPos(Map, x+i, y+j) {
-// 			if color == bmap.IsWhite(Map, x+i, y+j) {
-// 				cpt++
-// 			} else {
-// 				c = end
-// 				cpt = 0
-// 			}
-// 		}
-// 		i, j = augmentPos(i), augmentPos(j)
-// 	}
-// 	if cpt == 2 && !IsStoneAtPos(Map, i+x, j+y) {
-// 		cptHowManyThreeGroups++
-// 	}
-// 	return cptHowManyThreeGroups
-// }
-//
-// func UpdateThreeGroups(Map *[363]uint64, x, y int, color bool) bool {
-// 	cptHowManyThreeGroups := 0
-// 	for dirI := -1; dirI <= 1; dirI++ {
-// 		for dirJ := -1; dirJ <= 1; dirJ++ {
-// 			if !(dirI == 0 && dirJ == 0) {
-// 				cptHowManyThreeGroups =
-// 					updateThreeGroupLoop(Map, color, x, y, dirI, dirJ, cptHowManyThreeGroups)
-// 			}
-// 		}
-// 	}
-// 	println(cptHowManyThreeGroups)
-// 	return cptHowManyThreeGroups >= 2
-// 	// cptHowManyThreeGroups, cptFourGroups =
-// 	// 	updateThreeGroupLoop(Map, color, x, y, -1, 1, cptHowManyThreeGroups, cptFourGroups)
-// 	// if cptFourGroups > 0 {
-// 	// 	bmap.SetInFourGroup(Map, x, y, true)
-// 	// } else {
-// 	// 	bmap.SetInFourGroup(Map, x, y, false)
-// 	// }
-// 	// if cptHowManyThreeGroups > 0 {
-// 	// 	bmap.SetInThreeGroup(Map, x, y, true)
-// 	// } else {
-// 	// 	bmap.SetInThreeGroup(Map, x, y, false)
-// 	// }
-// }
-
 func IsDraw(pane *window.Drawer, game *GomokuGame) {
 	state := true
 	for _, stonesCol := range pane.BoardRes.Stones {
@@ -406,21 +339,11 @@ func CheckWinAl(Map *[363](uint64), color bool, FiveAligned *[][5]Coor) {
 	}
 }
 
-// 0 0 0
-// X X B
-// 0 X 0
-
 func Break_cases(Map *[363]uint64, Ipos, Jpos, i, j int) bool {
 	return bmap.GetNbT(Map, Ipos, Jpos, i+1, j+1) == 1 &&
 		((!IsStoneAtPos(Map, Ipos+j+j, Jpos+i+i) && bmap.GetNbO(Map, Ipos, Jpos, 1+(-1*i), 1+(-1*j)) >= 1) ||
 			(bmap.GetNbO(Map, Ipos+j, Jpos+i, 1+i, 1+j) >= 1 && !IsStoneAtPos(Map, Ipos+(-1*j), Jpos+(-1*i))))
 }
-
-// func Break_cases(Map *[363]uint64, st *window.Stone, i, j int) bool {
-// 	return bmap.GetNbT(Map, st.Infos.Ipos, st.Infos.Jpos, i+1, j+1) == 1 &&
-// 		((!IsStoneAtPos(Map, st.Infos.Ipos-i-i, st.Infos.Jpos-j-j) && bmap.GetNbO(Map, st.Infos.Ipos, st.Infos.Jpos, 1+(-1*i), 1+(-1*j)) >= 1) ||
-// 			(bmap.GetNbO(Map, st.Infos.Ipos+j, st.Infos.Jpos+i, 1+i, 1+j) >= 1 && !IsStoneAtPos(Map, st.Infos.Ipos+(-1*j), st.Infos.Jpos+(-1*i))))
-// }
 
 func CheckBreakableAlign(Map *[363]uint64, fl [][5]Coor, color bool) bool {
 	tot := 0
