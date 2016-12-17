@@ -197,15 +197,15 @@ func UpdateInfos(Map *[363](uint64), color bool) {
 				for i := -1; i <= 1; i++ {
 					for j := -1; j <= 1; j++ {
 						if !(i == 0 && j == 0) {
-							if bmap.IsWhite(Map, x, y) == color {
-								bmap.SetNbTeamAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
-									bmap.IsWhite(Map, x, y), i, j)))
-								totTeam += bmap.GetNbT(Map, x, y, 1+j, 1+i)
-							} else {
-								bmap.SetNbOppoAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
-									!bmap.IsWhite(Map, x, y), i, j)))
-								totOpp += bmap.GetNbO(Map, x, y, 1+j, 1+i)
-							}
+							//if bmap.IsWhite(Map, x, y) == color {
+							bmap.SetNbTeamAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
+								bmap.IsWhite(Map, x, y), i, j)))
+							totTeam += bmap.GetNbT(Map, x, y, 1+j, 1+i)
+							//} else {
+							bmap.SetNbOppoAt(Map, x, y, 1+j, 1+i, uint64(getInfosNbStonesDirection(Map, x, y,
+								!bmap.IsWhite(Map, x, y), i, j)))
+							totOpp += bmap.GetNbO(Map, x, y, 1+j, 1+i)
+							//}
 						}
 					}
 				}
@@ -389,11 +389,11 @@ func CheckWinAl(Map *[363](uint64), color bool, FiveAligned *[][5]Coor) {
 	for x := 0; x <= 18; x++ {
 		for y := 0; y <= 18; y++ {
 			if bmap.IsVisible(Map, x, y) && bmap.IsWhite(Map, x, y) == color && bmap.GetValStones(Map, x, y, bmap.MT) >= 4 {
-				// if bmap.GetNbT(Map, x, y, 2, 0) >= 4 {
-				// 	fillAlignedArray(FiveAligned, x, y, 1, -1)
-				// }
-				for j := 0; j <= 2; j++ {
-					for i := 0; i <= 2; i++ {
+				if bmap.GetNbT(Map, x, y, 2, 0) >= 4 {
+					fillAlignedArray(FiveAligned, x, y, 1, -1)
+				}
+				for j := 1; j <= 2; j++ {
+					for i := 1; i <= 2; i++ {
 						if !(i == 1 && j == 1) && bmap.GetNbT(Map, x, y, i, j) >= 4 {
 							fillAlignedArray(FiveAligned, x, y, i-1, j-1)
 						}
@@ -404,9 +404,13 @@ func CheckWinAl(Map *[363](uint64), color bool, FiveAligned *[][5]Coor) {
 	}
 }
 
+// 0 0 0
+// X X B
+// 0 X 0
+
 func Break_cases(Map *[363]uint64, Ipos, Jpos, i, j int) bool {
 	return bmap.GetNbT(Map, Ipos, Jpos, i+1, j+1) == 1 &&
-		((!IsStoneAtPos(Map, Ipos-i-i, Jpos-j-j) && bmap.GetNbO(Map, Ipos, Jpos, 1+(-1*i), 1+(-1*j)) >= 1) ||
+		((!IsStoneAtPos(Map, Ipos+j+j, Jpos+i+i) && bmap.GetNbO(Map, Ipos, Jpos, 1+(-1*i), 1+(-1*j)) >= 1) ||
 			(bmap.GetNbO(Map, Ipos+j, Jpos+i, 1+i, 1+j) >= 1 && !IsStoneAtPos(Map, Ipos+(-1*j), Jpos+(-1*i))))
 }
 
@@ -427,8 +431,6 @@ func CheckBreakableAlign(Map *[363]uint64, fl [][5]Coor, color bool) bool {
 						Break_cases(Map, st.X, st.Y, i, j) {
 						bmap.SetBreakable(Map, st.X, st.Y, true)
 						cpt = 1
-					} else if IsStoneAtPos(Map, st.X, st.Y) {
-						bmap.SetBreakable(Map, st.X, st.Y, false)
 					}
 				}
 			}
@@ -445,7 +447,8 @@ func CheckBreakableAlign(Map *[363]uint64, fl [][5]Coor, color bool) bool {
 func disp(Map *[363](uint64)) {
 	for x := 0; x <= 18; x++ {
 		for y := 0; y <= 18; y++ {
-			print(bmap.GetValStones(Map, y, x, bmap.MT), " ")
+			print(bmap.GetValStones(Map, y, x, bmap.MT))
+			print(bmap.GetValStones(Map, y, x, bmap.MO), "  ")
 		}
 		println()
 	}
@@ -463,7 +466,7 @@ func ApplyRules(Map *[363](uint64), i, j int, color bool, rule1, rule2 bool, che
 	TakeTwoStones(Map, i, j, color)
 	if check {
 		UpdateInfos(Map, color)
-		disp(Map)
+		//disp(Map)
 	} else {
 		UpdateStone(Map, i, j, color)
 	}
