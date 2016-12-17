@@ -159,8 +159,8 @@ func ResetTeamInfos(Map *[363]uint64, color bool) {
 }
 
 func UpdateStone(Map *[363](uint64), x, y int, color bool) {
-	for a := -10; a <= 10; a++ {
-		for b := -10; b <= 10; b++ {
+	for a := -5; a <= 5; a++ {
+		for b := -5; b <= 5; b++ {
 			if IsStoneAtPos(Map, x+a, y+b) {
 				totOpp, totTeam := 0, 0
 				for i := -1; i <= 1; i++ {
@@ -192,6 +192,7 @@ func UpdateInfos(Map *[363](uint64), color bool) {
 	//ResetTeamInfos(dat, color)
 	for x := 0; x <= 18; x++ {
 		for y := 0; y <= 18; y++ {
+			//start := time.Now()
 			totOpp, totTeam := 0, 0
 			if IsStoneAtPos(Map, x, y) {
 				for i := -1; i <= 1; i++ {
@@ -209,9 +210,10 @@ func UpdateInfos(Map *[363](uint64), color bool) {
 						}
 					}
 				}
+				bmap.SetNbTeamAt(Map, x, y, 1, 1, uint64(totTeam))
+				bmap.SetNbOppoAt(Map, x, y, 1, 1, uint64(totOpp))
 			}
-			bmap.SetNbTeamAt(Map, x, y, 1, 1, uint64(totTeam))
-			bmap.SetNbOppoAt(Map, x, y, 1, 1, uint64(totOpp))
+			//	fmt.Println("->", time.Since(start))
 		}
 	}
 }

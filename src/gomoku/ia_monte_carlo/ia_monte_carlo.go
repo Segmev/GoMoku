@@ -1,6 +1,7 @@
 package ia_monte_carlo
 
 import (
+	"fmt"
 	"gomoku/arbitre"
 	"gomoku/bmap"
 	"math/rand"
@@ -123,7 +124,7 @@ func Play(board *[363]uint64, rule1, rule2 bool, test_nb int, tmpboard [363]uint
 	go MonteCarlo(board, rule1, rule2, test_nb, ch)
 	<-ch
 	x, y := findAndApply(&tmpboard, rule1, rule2)
-	println("out", time.Now().Sub(starttime).Seconds())
+	fmt.Println("out:", time.Now().Sub(starttime).Seconds())
 	return x, y
 }
 
