@@ -33,7 +33,8 @@ func checkFiles() bool {
 	if !exists("ressources/board.png") || !exists("ressources/bstone.png") ||
 		!exists("ressources/woodback.jpg") || !exists("ressources/MotionControl-Bold.otf") ||
 		!exists("ressources/wstone.png") || !exists("ressources/Red.png") ||
-		!exists("ressources/Empty.png") || !exists("ressources/Cross.png") {
+		!exists("ressources/Empty.png") || !exists("ressources/Cross.png") ||
+		!exists("ressources/go-gopher.png") {
 		return false
 	}
 	return true
@@ -205,9 +206,9 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 			if window.Lvl == 0 {
 				iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 500, bmap.Map)
 			} else if window.Lvl == 1 {
-				iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 750, bmap.Map)
+				iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 5000, bmap.Map)
 			} else if window.Lvl == 2 {
-				iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 1000, bmap.Map)
+				iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 15000, bmap.Map)
 			}
 		} else {
 			iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, custom_nbr, bmap.Map)

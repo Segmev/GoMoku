@@ -1,11 +1,9 @@
 package arbitre
 
 import (
-	"fmt"
 	"gomoku/bmap"
 	"gomoku/window"
 	"strconv"
-	"time"
 )
 
 type Coor struct {
@@ -182,7 +180,7 @@ func UpdateStone(Map *[363](uint64), x, y int, color bool) {
 func UpdateInfos(Map *[363](uint64), color bool) {
 	for x := 0; x <= 18; x++ {
 		for y := 0; y <= 18; y++ {
-			start := time.Now()
+			// start := time.Now()
 			totOpp, totTeam := 0, 0
 			if IsStoneAtPos(Map, x, y) {
 				for i := -1; i <= 1; i++ {
@@ -203,7 +201,7 @@ func UpdateInfos(Map *[363](uint64), color bool) {
 				bmap.SetNbTeamAt(Map, x, y, 1, 1, uint64(totTeam))
 				bmap.SetNbOppoAt(Map, x, y, 1, 1, uint64(totOpp))
 			}
-			fmt.Println("->", time.Since(start))
+			// fmt.Println("->", time.Since(start))
 		}
 	}
 }

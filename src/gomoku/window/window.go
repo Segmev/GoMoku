@@ -72,6 +72,7 @@ type Drawer struct {
 	mturn       *gfx.Text
 	black_stone *gfx.Image
 	white_stone *gfx.Image
+	thinking    *gfx.Image
 	anim        *gfx.Animation
 	Font        *gfx.Font
 	Turn        bool
@@ -111,6 +112,8 @@ func (me *Drawer) initGame() bool {
 		gfx.DisplayHeight()/20)
 	me.white_stone = gfx.LoadImageSize("ressources/wstone.png", gfx.DisplayHeight()/20,
 		gfx.DisplayHeight()/20)
+	me.thinking = gfx.LoadImageSize("ressources/go-gopher.png",
+		gfx.DisplayWidth()/5, gfx.DisplayHeight()/5)
 	me.BoardRes.Stones = nil
 	for i := 0; i <= 18; i++ {
 		row := []*Stone{}
@@ -199,6 +202,9 @@ func (me *Drawer) drawGameBoard(c *gfx.Canvas) {
 	c.FillRect(10*gfx.DisplayWidth()/14, gfx.DisplayHeight()*10/11,
 		8*gfx.DisplayWidth()/18, gfx.DisplayHeight()/11)
 	c.DrawText(me.BoardRes.Restart, 14*gfx.DisplayWidth()/19, gfx.DisplayHeight()*11/12)
+	if me.GameState == "IA_Turn" {
+		c.DrawImage(me.thinking, gfx.DisplayWidth()*3/4, gfx.DisplayHeight()*4/5)
+	}
 }
 
 func (me *Drawer) drawMenu(c *gfx.Canvas) {
