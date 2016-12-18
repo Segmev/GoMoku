@@ -6,7 +6,6 @@ import (
 	"gomoku/ia_monte_carlo"
 	"gomoku/window"
 	"math/rand"
-	"net/http"
 	_ "net/http/pprof"
 	"os"
 	"strconv"
@@ -234,7 +233,7 @@ func main() {
 		custom_nbr = -1
 	}
 	if checkFiles() && launchWindow(900, 640) {
-		go http.ListenAndServe(":8080", http.DefaultServeMux)
+		//go http.ListenAndServe(":8080", http.DefaultServeMux)
 		gfx.Main()
 	} else {
 		os.Stderr.WriteString("Couldn't launch the game, missing ressources or window can't be opened.\n")
