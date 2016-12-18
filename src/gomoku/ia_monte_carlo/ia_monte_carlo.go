@@ -146,7 +146,7 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int, ch chan bool
 			break_cpt = 0
 			a = rand.Int() % (xMax - xMin)
 			b = rand.Int() % (yMax - yMin)
-			for !ApplyRules(&_board, a+xMin, b+yMin, myColor, rule1, rule2, break_cpt > 5) && break_cpt < 9 {
+			for !ApplyRules(&_board, a+xMin, b+yMin, myColor, rule1, rule2, break_cpt > 6) && break_cpt < 9 {
 				a = rand.Int() % (xMax - xMin)
 				b = rand.Int() % (yMax - yMin)
 				break_cpt++
@@ -163,7 +163,7 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int, ch chan bool
 			break_cpt = 0
 			a = rand.Int() % (xMax - xMin)
 			b = rand.Int() % (yMax - yMin)
-			for !ApplyRules(&_board, a+xMin, b+yMin, hisColor, rule1, rule2, break_cpt > 5) && break_cpt < 9 {
+			for !ApplyRules(&_board, a+xMin, b+yMin, hisColor, rule1, rule2, break_cpt > 6) && break_cpt < 9 {
 				a = rand.Int() % (xMax - xMin)
 				b = rand.Int() % (yMax - yMin)
 				break_cpt++
