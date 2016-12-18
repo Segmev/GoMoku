@@ -116,22 +116,22 @@ func findRange() {
 	}
 }
 
-func Play(board *[363]uint64, rule1, rule2 bool, test_nb int64, tmpboard [363]uint64) (int64, int64) {
+func Play(board *[363]uint64, rule1, rule2 bool, test_nb int64, deep int64, tmpboard [363]uint64) (int64, int64) {
 	initResTab()
 	starttime := time.Now()
 	ch := make(chan bool, 6)
 	findRange()
-	go MonteCarlo(board, rule1, rule2, test_nb/4, ch)
-	go MonteCarlo(board, rule1, rule2, test_nb/4, ch)
-	go MonteCarlo(board, rule1, rule2, test_nb/4, ch)
-	go MonteCarlo(board, rule1, rule2, test_nb/4, ch)
+	go MonteCarlo(board, rule1, rule2, test_nb/4, deep, ch)
+	go MonteCarlo(board, rule1, rule2, test_nb/4, deep, ch)
+	go MonteCarlo(board, rule1, rule2, test_nb/4, deep, ch)
+	go MonteCarlo(board, rule1, rule2, test_nb/4, deep, ch)
 	<-ch
 	x, y := findAndApply(&tmpboard, rule1, rule2)
 	fmt.Println("out:", time.Now().Sub(starttime).Seconds())
 	return x, y
 }
 
-func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int64, ch chan bool) {
+func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int64, deep int64, ch chan bool) {
 	var cpt, a, b, break_cpt, i int64
 	var large *big.Int
 	var tmpTab [361]int
@@ -141,18 +141,17 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int64, ch chan bo
 	yLim := big.NewInt(yMax - yMin)
 	xLim := big.NewInt(xMax - xMin)
 	reader := rand.Reader
-	iCheck := 0
 	for cpt = 0; cpt != test_nb; cpt++ {
 		tmpTab = empty
 		tmpTab2 = empty
 		_board = *board
-		for i = 0; i < 10; i++ {
+		for i = 0; i < deep; i++ {
 			break_cpt = 0
 			large, _ = rand.Int(reader, xLim)
 			a = large.Int64()
 			large, _ = rand.Int(reader, yLim)
 			b = large.Int64()
-			for !ApplyRules(&_board, int(a+xMin), int(b+yMin), myColor, rule1, rule2, break_cpt > 6) && break_cpt < 9 {
+			for !ApplyRules(&_board, int(a+xMin), int(b+yMin), myColor, rule1, rule2, i > 14) && break_cpt < 9 {
 				large, _ = rand.Int(reader, xLim)
 				a = large.Int64()
 				large, _ = rand.Int(reader, yLim)
@@ -165,7 +164,7 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int64, ch chan bo
 			tmpTab[(b+yMin)*19+(a+xMin)] = 1
 			if CheckWin(rule1, myColor) {
 				refreshTab(1, &tmpTab, &tmpTab2)
-				i = 9
+				i = deep
 				break
 			}
 			break_cpt = 0
@@ -173,7 +172,7 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int64, ch chan bo
 			a = large.Int64()
 			large, _ = rand.Int(reader, yLim)
 			b = large.Int64()
-			for !ApplyRules(&_board, int(a+xMin), int(b+yMin), hisColor, rule1, rule2, break_cpt > 6) && break_cpt < 9 {
+			for !ApplyRules(&_board, int(a+xMin), int(b+yMin), hisColor, rule1, rule2, i > 14) && break_cpt < 9 {
 				large, _ = rand.Int(reader, xLim)
 				a = large.Int64()
 				large, _ = rand.Int(reader, yLim)
@@ -186,12 +185,9 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int64, ch chan bo
 			tmpTab2[(b+yMin)*19+(a+xMin)] = 1
 			if CheckWin(rule1, hisColor) {
 				refreshTab(-1, &tmpTab, &tmpTab2)
-				i = 9
+				i = deep
 				break
 			}
-		}
-		if i == 10 {
-			iCheck++
 		}
 	}
 	ch <- true

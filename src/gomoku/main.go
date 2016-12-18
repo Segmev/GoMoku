@@ -15,7 +15,7 @@ import (
 	"github.com/gtalent/starfish/input"
 )
 
-var custom_nbr int64
+var custom_nbr, deep_nbr int64
 
 type Coor struct {
 	X, Y, Val int
@@ -203,16 +203,16 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 		pane.GameState = "IA_Turn"
 
 		//TON CODE HERE
-		if custom_nbr <= 0 {
+		if custom_nbr <= 0 || deep_nbr <= 0 {
 			if window.Lvl == 0 {
-				xa, ya = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 5000, bmap.Map)
+				xa, ya = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 6000, 10, bmap.Map)
 			} else if window.Lvl == 1 {
-				xa, ya = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 25000, bmap.Map)
+				xa, ya = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 25000, 15, bmap.Map)
 			} else if window.Lvl == 2 {
-				xa, ya = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 100000, bmap.Map)
+				xa, ya = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 100000, 20, bmap.Map)
 			}
 		} else {
-			xa, ya = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, custom_nbr, bmap.Map)
+			xa, ya = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, custom_nbr, deep_nbr, bmap.Map)
 		}
 		iaStone.Infos.Ipos = int(xa)
 		iaStone.Infos.Jpos = int(ya)
@@ -227,6 +227,9 @@ func main() {
 	if len(os.Args) > 1 {
 		custo_nbr, _ := strconv.Atoi(os.Args[1])
 		custom_nbr = int64(custo_nbr)
+	} else if len(os.Args) > 2 {
+		dee_nbr, _ := strconv.Atoi(os.Args[2])
+		deep_nbr = int64(dee_nbr)
 	} else {
 		custom_nbr = -1
 	}
