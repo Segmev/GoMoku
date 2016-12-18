@@ -1,10 +1,11 @@
 package ia_monte_carlo
 
 import (
+	"crypto/rand"
 	"fmt"
 	"gomoku/arbitre"
 	"gomoku/bmap"
-	"math/rand"
+	"math/big"
 	"sync"
 	"time"
 )
@@ -15,7 +16,7 @@ var _board [363]uint64
 var resTab [361]int
 var mute sync.Mutex
 
-var xMin, xMax, yMin, yMax int
+var xMin, xMax, yMin, yMax int64
 
 func Start(color bool) {
 	arbitre.XMin = 9
@@ -115,9 +116,8 @@ func findRange() {
 	}
 }
 
-func Play(board *[363]uint64, rule1, rule2 bool, test_nb int, tmpboard [363]uint64) (int, int) {
+func Play(board *[363]uint64, rule1, rule2 bool, test_nb int64, tmpboard [363]uint64) (int, int) {
 	initResTab()
-	rand.Seed(time.Now().Unix())
 	starttime := time.Now()
 	ch := make(chan bool, 6)
 	findRange()
@@ -131,12 +131,14 @@ func Play(board *[363]uint64, rule1, rule2 bool, test_nb int, tmpboard [363]uint
 	return x, y
 }
 
-func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int, ch chan bool) {
-	var cpt, a, b, break_cpt, i int
+func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int64, ch chan bool) {
+	var cpt, a, b, break_cpt, i int64
+	var large *big.Int
 	var tmpTab [361]int
 	var tmpTab2 [361]int
 	var empty [361]int
 
+	reader := rand.Reader
 	iCheck := 0
 	for cpt = 0; cpt != test_nb; cpt++ {
 		tmpTab = empty
@@ -144,11 +146,15 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int, ch chan bool
 		_board = *board
 		for i = 0; i < 10; i++ {
 			break_cpt = 0
-			a = rand.Int() % (xMax - xMin)
-			b = rand.Int() % (yMax - yMin)
-			for !ApplyRules(&_board, a+xMin, b+yMin, myColor, rule1, rule2, break_cpt > 6) && break_cpt < 9 {
-				a = rand.Int() % (xMax - xMin)
-				b = rand.Int() % (yMax - yMin)
+			large, _ = rand.Int(reader, big.NewInt(xMax-xMin))
+			a = large.Int64()
+			large, _ = rand.Int(reader, big.NewInt(int64(yMax-yMin)))
+			b = large.Int64()
+			for !ApplyRules(&_board, int(a+xMin), int(b+yMin), myColor, rule1, rule2, break_cpt > 6) && break_cpt < 9 {
+				large, _ = rand.Int(reader, big.NewInt(xMax-xMin))
+				a = large.Int64()
+				large, _ = rand.Int(reader, big.NewInt(int64(yMax-yMin)))
+				b = large.Int64()
 				break_cpt++
 			}
 			if break_cpt == 9 {
@@ -161,11 +167,15 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int, ch chan bool
 				break
 			}
 			break_cpt = 0
-			a = rand.Int() % (xMax - xMin)
-			b = rand.Int() % (yMax - yMin)
-			for !ApplyRules(&_board, a+xMin, b+yMin, hisColor, rule1, rule2, break_cpt > 6) && break_cpt < 9 {
-				a = rand.Int() % (xMax - xMin)
-				b = rand.Int() % (yMax - yMin)
+			large, _ = rand.Int(reader, big.NewInt(xMax-xMin))
+			a = large.Int64()
+			large, _ = rand.Int(reader, big.NewInt(int64(yMax-yMin)))
+			b = large.Int64()
+			for !ApplyRules(&_board, int(a+xMin), int(b+yMin), hisColor, rule1, rule2, break_cpt > 6) && break_cpt < 9 {
+				large, _ = rand.Int(reader, big.NewInt(xMax-xMin))
+				a = large.Int64()
+				large, _ = rand.Int(reader, big.NewInt(int64(yMax-yMin)))
+				b = large.Int64()
 				break_cpt++
 			}
 			if break_cpt == 9 {
@@ -186,7 +196,8 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int, ch chan bool
 }
 
 func findAndApply(board *[363]uint64, rule1, rule2 bool) (int, int) {
-	var a, b, save int
+	var a, b int64
+	var save int
 
 	saveA := xMin
 	saveB := yMin
@@ -201,11 +212,11 @@ func findAndApply(board *[363]uint64, rule1, rule2 bool) (int, int) {
 				}
 			}
 		}
-		if ApplyRules(board, saveA, saveB, myColor, rule1, rule2, true) {
+		if ApplyRules(board, int(saveA), int(saveB), myColor, rule1, rule2, true) {
 			break
 		} else {
 			resTab[saveA+saveB*19] = -9999
 		}
 	}
-	return saveA, saveB
+	return int(saveA), int(saveB)
 }

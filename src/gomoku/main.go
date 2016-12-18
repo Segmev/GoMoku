@@ -15,7 +15,7 @@ import (
 	"github.com/gtalent/starfish/input"
 )
 
-var custom_nbr int
+var custom_nbr int64
 
 type Coor struct {
 	X, Y, Val int
@@ -170,17 +170,17 @@ func PlayTurn(pane *window.Drawer, game *arbitre.GomokuGame, Map *[363]uint64, s
 	pane.Turn = game.Turn
 	pane.BoardRes.Wscore = pane.Font.Write(strconv.Itoa(int(bmap.GetPlayerTakenStones(&bmap.Map, true))))
 	pane.BoardRes.Bscore = pane.Font.Write(strconv.Itoa(int(bmap.GetPlayerTakenStones(&bmap.Map, false))))
-	if st.Infos.Ipos < arbitre.XMin {
-		arbitre.XMin = st.Infos.Ipos
+	if st.Infos.Ipos < int(arbitre.XMin) {
+		arbitre.XMin = int64(st.Infos.Ipos)
 	}
-	if st.Infos.Ipos > arbitre.XMax {
-		arbitre.XMax = st.Infos.Ipos
+	if st.Infos.Ipos > int(arbitre.XMax) {
+		arbitre.XMax = int64(st.Infos.Ipos)
 	}
-	if st.Infos.Jpos < arbitre.YMin {
-		arbitre.YMin = st.Infos.Jpos
+	if st.Infos.Jpos < int(arbitre.YMin) {
+		arbitre.YMin = int64(st.Infos.Jpos)
 	}
-	if st.Infos.Jpos > arbitre.YMax {
-		arbitre.YMax = st.Infos.Jpos
+	if st.Infos.Jpos > int(arbitre.YMax) {
+		arbitre.YMax = int64(st.Infos.Jpos)
 	}
 	return true
 }
@@ -222,7 +222,8 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 func main() {
 	ia_monte_carlo.Start(false)
 	if len(os.Args) > 1 {
-		custom_nbr, _ = strconv.Atoi(os.Args[1])
+		custo_nbr, _ := strconv.Atoi(os.Args[1])
+		custom_nbr = int64(custo_nbr)
 	} else {
 		custom_nbr = -1
 	}

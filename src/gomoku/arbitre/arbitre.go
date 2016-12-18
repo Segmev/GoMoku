@@ -17,7 +17,7 @@ type GomokuGame struct {
 	GameType     bool
 }
 
-var XMin, XMax, YMin, YMax int
+var XMin, XMax, YMin, YMax int64
 
 func (game *GomokuGame) Restart(pane *window.Drawer) bool {
 	for i := range pane.BoardRes.Stones {

@@ -1,9 +1,9 @@
 ##
 ## Makefile for gomoku in /home/karraz_s/rendu/Gomoku
-## 
+##
 ## Made by stephane karraz
 ## Login   <karraz_s@epitech.net>
-## 
+##
 ## Started on  Mon Oct 10 23:14:47 2016 stephane karraz
 ## Last update Fri Oct 14 01:04:29 2016 stephane karraz
 ##
@@ -31,7 +31,7 @@ build:
 clean	:
 	go clean
 
-fclean	: 
+fclean	:
 	rm -f $(NAME)
 
 re	: clean all
