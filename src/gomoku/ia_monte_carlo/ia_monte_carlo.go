@@ -151,7 +151,7 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int64, deep int64
 			a = large.Int64()
 			large, _ = rand.Int(reader, yLim)
 			b = large.Int64()
-			for !ApplyRules(&_board, int(a+xMin), int(b+yMin), myColor, rule1, rule2, i > 14) && break_cpt < 9 {
+			for !ApplyRules(&_board, int(a+xMin), int(b+yMin), myColor, rule1, rule2, i > deep-3) && break_cpt < 9 {
 				large, _ = rand.Int(reader, xLim)
 				a = large.Int64()
 				large, _ = rand.Int(reader, yLim)
@@ -172,7 +172,7 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int64, deep int64
 			a = large.Int64()
 			large, _ = rand.Int(reader, yLim)
 			b = large.Int64()
-			for !ApplyRules(&_board, int(a+xMin), int(b+yMin), hisColor, rule1, rule2, i > 14) && break_cpt < 9 {
+			for !ApplyRules(&_board, int(a+xMin), int(b+yMin), hisColor, rule1, rule2, i > deep-3) && break_cpt < 9 {
 				large, _ = rand.Int(reader, xLim)
 				a = large.Int64()
 				large, _ = rand.Int(reader, yLim)
