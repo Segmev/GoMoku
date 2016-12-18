@@ -26,9 +26,12 @@ func Start(color bool) {
 	hisColor = !myColor
 }
 
-func ApplyRules(Map *[363](uint64), i, j int, color bool, rule1, rule2 bool) bool {
+func ApplyRules(Map *[363](uint64), i, j int, color bool, rule1, rule2, updateSt bool) bool {
 	if bmap.IsVisible(Map, i, j) {
 		return false
+	}
+	if updateSt {
+		arbitre.UpdateStone(Map, i, j, color)
 	}
 	return arbitre.ApplyRules(Map, i, j, color, rule1, rule2, false)
 }
@@ -143,7 +146,7 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int, ch chan bool
 			break_cpt = 0
 			a = rand.Int() % (xMax - xMin)
 			b = rand.Int() % (yMax - yMin)
-			for !ApplyRules(&_board, a+xMin, b+yMin, myColor, rule1, rule2) && break_cpt < 9 {
+			for !ApplyRules(&_board, a+xMin, b+yMin, myColor, rule1, rule2, break_cpt > 5) && break_cpt < 9 {
 				a = rand.Int() % (xMax - xMin)
 				b = rand.Int() % (yMax - yMin)
 				break_cpt++
@@ -160,7 +163,7 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int, ch chan bool
 			break_cpt = 0
 			a = rand.Int() % (xMax - xMin)
 			b = rand.Int() % (yMax - yMin)
-			for !ApplyRules(&_board, a+xMin, b+yMin, hisColor, rule1, rule2) && break_cpt < 9 {
+			for !ApplyRules(&_board, a+xMin, b+yMin, hisColor, rule1, rule2, break_cpt > 5) && break_cpt < 9 {
 				a = rand.Int() % (xMax - xMin)
 				b = rand.Int() % (yMax - yMin)
 				break_cpt++
@@ -198,7 +201,7 @@ func findAndApply(board *[363]uint64, rule1, rule2 bool) (int, int) {
 				}
 			}
 		}
-		if ApplyRules(board, saveA, saveB, myColor, rule1, rule2) {
+		if ApplyRules(board, saveA, saveB, myColor, rule1, rule2, true) {
 			break
 		} else {
 			resTab[saveA+saveB*19] = -9999

@@ -390,8 +390,6 @@ func ApplyRules(Map *[363](uint64), i, j int, color bool, rule1, rule2 bool, che
 	if check {
 		UpdateInfos(Map, color)
 		//disp(Map)
-	} else {
-		UpdateStone(Map, i, j, color)
 	}
 	return true
 }
