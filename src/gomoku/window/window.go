@@ -31,7 +31,7 @@ type OptionsRes struct {
 	cross       *gfx.Image
 	optionRule1 *gfx.Text
 	optionRule2 *gfx.Text
-	Ialevel     [5]*gfx.Text
+	Ialevel     [8]*gfx.Text
 	restart     *gfx.Text
 	back        *gfx.Text
 	exit        *gfx.Text
@@ -93,6 +93,9 @@ func (me *Drawer) initOptions() bool {
 	me.OptionsRes.Ialevel[2] = me.Font.Write("Medium")
 	me.OptionsRes.Ialevel[3] = me.Font.Write("Hard")
 	me.OptionsRes.Ialevel[4] = me.Font.Write("Insane")
+	me.OptionsRes.Ialevel[5] = me.Font.Write("Master")
+	me.OptionsRes.Ialevel[6] = me.Font.Write("Killer")
+	me.OptionsRes.Ialevel[7] = me.Font.Write("OMG Die")
 	return true
 }
 
