@@ -186,6 +186,7 @@ func PlayTurn(pane *window.Drawer, game *arbitre.GomokuGame, Map *[363]uint64, s
 }
 
 func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
+	var xa, ya int64
 	if game.End != 2 {
 		st := arbitre.IsStoneHere(pane, x, y, size)
 		if st != nil && !bmap.IsVisible(&bmap.Map, st.Infos.Ipos, st.Infos.Jpos) {
@@ -204,15 +205,17 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 		//TON CODE HERE
 		if custom_nbr <= 0 {
 			if window.Lvl == 0 {
-				iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 5000, bmap.Map)
+				xa, ya = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 5000, bmap.Map)
 			} else if window.Lvl == 1 {
-				iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 25000, bmap.Map)
+				xa, ya = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 25000, bmap.Map)
 			} else if window.Lvl == 2 {
-				iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 100000, bmap.Map)
+				xa, ya = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 100000, bmap.Map)
 			}
 		} else {
-			iaStone.Infos.Ipos, iaStone.Infos.Jpos = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, custom_nbr, bmap.Map)
+			xa, ya = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, custom_nbr, bmap.Map)
 		}
+		iaStone.Infos.Ipos = int(xa)
+		iaStone.Infos.Jpos = int(ya)
 		bmap.ResetCheck(&bmap.Map)
 		pane.GameState = "gameOn"
 		PlayTurn(pane, game, &bmap.Map, &iaStone)
