@@ -101,7 +101,7 @@ func addInput(pane *window.Drawer, game *arbitre.GomokuGame) {
 				if gfx.DisplayHeight()/4+(2*gfx.DisplayHeight()/9) <= e.Y &&
 					e.Y <= gfx.DisplayHeight()/4+(2*gfx.DisplayHeight()/9)+50 {
 					game.Restart(pane)
-					pane.GameState = "gameOn"
+					pane.GameState = "menu"
 				} else if gfx.DisplayHeight()/7 <= e.Y &&
 					e.Y <= gfx.DisplayHeight()/7+50 {
 					if e.Button == 1 {

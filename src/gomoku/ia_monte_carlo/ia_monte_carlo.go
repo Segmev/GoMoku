@@ -151,6 +151,7 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int64, deep int64
 			a = large.Int64()
 			large, _ = rand.Int(reader, yLim)
 			b = large.Int64()
+			nbTakenIA := bmap.GetPlayerTakenStones(&_board, false)
 			for !ApplyRules(&_board, int(a+xMin), int(b+yMin), myColor, rule1, rule2, i > deep-3) && break_cpt < 9 {
 				large, _ = rand.Int(reader, xLim)
 				a = large.Int64()
@@ -161,7 +162,7 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int64, deep int64
 			if break_cpt == 9 {
 				break
 			}
-			tmpTab[(b+yMin)*19+(a+xMin)] = 1
+			tmpTab[(b+yMin)*19+(a+xMin)] = 4 + int((bmap.GetPlayerTakenStones(&_board, false) - nbTakenIA))
 			if CheckWin(rule1, myColor) {
 				refreshTab(1, &tmpTab, &tmpTab2)
 				i = deep
@@ -172,6 +173,7 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int64, deep int64
 			a = large.Int64()
 			large, _ = rand.Int(reader, yLim)
 			b = large.Int64()
+			nbTakenPlayer := bmap.GetPlayerTakenStones(&_board, true)
 			for !ApplyRules(&_board, int(a+xMin), int(b+yMin), hisColor, rule1, rule2, i > deep-3) && break_cpt < 9 {
 				large, _ = rand.Int(reader, xLim)
 				a = large.Int64()
@@ -182,7 +184,7 @@ func MonteCarlo(board *[363]uint64, rule1, rule2 bool, test_nb int64, deep int64
 			if break_cpt == 9 {
 				break
 			}
-			tmpTab2[(b+yMin)*19+(a+xMin)] = 1
+			tmpTab2[(b+yMin)*19+(a+xMin)] = 4 + int((bmap.GetPlayerTakenStones(&_board, true) - nbTakenPlayer))
 			if CheckWin(rule1, hisColor) {
 				refreshTab(-1, &tmpTab, &tmpTab2)
 				i = deep
