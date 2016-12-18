@@ -104,7 +104,7 @@ func addInput(pane *window.Drawer, game *arbitre.GomokuGame) {
 					pane.GameState = "gameOn"
 				} else if gfx.DisplayHeight()/7 <= e.Y &&
 					e.Y <= gfx.DisplayHeight()/7+50 {
-					window.Lvl = (window.Lvl + 1) % 3
+					window.Lvl = (window.Lvl + 1) % 5
 				} else if gfx.DisplayHeight()/4+(3*gfx.DisplayHeight()/9) <= e.Y &&
 					e.Y <= gfx.DisplayHeight()/4+(3*gfx.DisplayHeight()/9)+50 {
 					quit()
@@ -203,13 +203,8 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 
 		//TON CODE HERE
 		if custom_nbr <= 0 || deep_nbr <= 0 {
-			if window.Lvl == 0 {
-				xa, ya = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 6000, 10, bmap.Map)
-			} else if window.Lvl == 1 {
-				xa, ya = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 25000, 15, bmap.Map)
-			} else if window.Lvl == 2 {
-				xa, ya = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, 100000, 20, bmap.Map)
-			}
+			xa, ya = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, (6000 + (int64(window.Lvl) * 10000)),
+				10+(2*int64(window.Lvl)), bmap.Map)
 		} else {
 			xa, ya = ia_monte_carlo.Play(&bmap.Map, pane.OptionsRes.Op1, pane.OptionsRes.Op2, custom_nbr, deep_nbr, bmap.Map)
 		}

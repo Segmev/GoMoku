@@ -31,7 +31,7 @@ type OptionsRes struct {
 	cross       *gfx.Image
 	optionRule1 *gfx.Text
 	optionRule2 *gfx.Text
-	ialevel     [3]*gfx.Text
+	Ialevel     [5]*gfx.Text
 	restart     *gfx.Text
 	back        *gfx.Text
 	exit        *gfx.Text
@@ -88,9 +88,11 @@ func (me *Drawer) initOptions() bool {
 	me.OptionsRes.exit = me.Font.Write("Exit...")
 	me.OptionsRes.restart = me.Font.Write("Restart")
 	me.OptionsRes.back = me.Font.Write("Back")
-	me.OptionsRes.ialevel[0] = me.Font.Write("Easy")
-	me.OptionsRes.ialevel[1] = me.Font.Write("Medium")
-	me.OptionsRes.ialevel[2] = me.Font.Write("Hard")
+	me.OptionsRes.Ialevel[0] = me.Font.Write("Noob")
+	me.OptionsRes.Ialevel[1] = me.Font.Write("Easy")
+	me.OptionsRes.Ialevel[2] = me.Font.Write("Medium")
+	me.OptionsRes.Ialevel[3] = me.Font.Write("Hard")
+	me.OptionsRes.Ialevel[4] = me.Font.Write("Insane")
 	return true
 }
 
@@ -281,7 +283,7 @@ func (me *Drawer) drawOptions(c *gfx.Canvas) {
 	//	c.SetRGBA(150, 150, 150, 70)
 	c.SetRGBA(133, 94, 66, 150)
 	c.FillRoundedRect(gfx.DisplayHeight()*27/50, gfx.DisplayHeight()/7, 150, 50, 7)
-	c.DrawText(me.OptionsRes.ialevel[Lvl], gfx.DisplayHeight()*28/50,
+	c.DrawText(me.OptionsRes.Ialevel[Lvl], gfx.DisplayHeight()*28/50,
 		gfx.DisplayHeight()/7)
 	for i, elem := range elems {
 		if i >= 2 {
