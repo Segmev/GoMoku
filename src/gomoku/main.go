@@ -225,14 +225,14 @@ func GamePlay(pane *window.Drawer, game *arbitre.GomokuGame, x, y, size int) {
 
 func main() {
 	ia_monte_carlo.Start(false)
+	custom_nbr = -1
 	if len(os.Args) > 1 {
 		custo_nbr, _ := strconv.Atoi(os.Args[1])
 		custom_nbr = int64(custo_nbr)
-	} else if len(os.Args) > 2 {
+	}
+	if len(os.Args) > 2 {
 		dee_nbr, _ := strconv.Atoi(os.Args[2])
 		deep_nbr = int64(dee_nbr)
-	} else {
-		custom_nbr = -1
 	}
 	if checkFiles() && launchWindow(900, 640) {
 		//go http.ListenAndServe(":8080", http.DefaultServeMux)
